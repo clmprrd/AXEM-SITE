@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Search, GraduationCap, Cpu, Rocket } from 'lucide-react';
+import { Search, Compass, Hammer, BookOpen, Target, Sparkles, RefreshCcw } from 'lucide-react';
 import EditableText from './ui/EditableText';
 import Reveal from './ui/Reveal';
 import MagicBento from './MagicBento';
@@ -10,34 +9,58 @@ const Expertise: React.FC = () => {
     {
       id: 'audit',
       icon: Search,
-      title: "Diagnostic",
-      subtitle: "Audit & Cartographie",
-      desc: "Analyse approfondie de vos processus pour identifier les goulots d'étranglement. Nous scannons votre business pour détecter où l'IA aura le ROI le plus immédiat.",
+      title: "Audit",
+      subtitle: "On regarde",
+      desc: "Analyse de vos process actuels, cartographie des flux et points de friction. Identification des opportunités IA prioritaires.",
       tags: ["Audit Data", "Roadmap", "ROI"]
     },
     {
-      id: 'strategy',
-      icon: Rocket,
-      title: "Stratégie",
-      subtitle: "Architecture Solution",
-      desc: "Construction du plan de bataille. Sélection des modèles (GPT-4, Claude), sécurisation des données et design de l'infrastructure technique idéale.",
-      tags: ["Architecture", "Sécurité", "Stack"]
+      id: 'conseil',
+      icon: Compass,
+      title: "Conseil",
+      subtitle: "On décide",
+      desc: "Choix des outils, architecture des solutions, sélection fournisseurs et pilotage du déploiement.",
+      tags: ["Architecture", "Stratégie", "Cadrage"]
     },
     {
-      id: 'training',
-      icon: GraduationCap,
-      title: "Activation",
-      subtitle: "Formation Équipes",
-      desc: "L'outil n'est rien sans la main. Nous transformons vos collaborateurs en 'Super-Utilisateurs' capables de prompter et d'interagir avec les modèles efficacement.",
-      tags: ["Workshops", "Prompting", "Culture"]
+      id: 'deploiement',
+      icon: Hammer,
+      title: "Déploiement",
+      subtitle: "On construit",
+      desc: "Construction, test et mise en production d'automatisations. N8N, Make, Claude Code. Clé en main.",
+      tags: ["N8N", "Make", "Automatisation"]
     },
     {
-      id: 'scale',
-      icon: Cpu,
-      title: "Scaling",
-      subtitle: "Automatisation",
-      desc: "Déploiement d'agents autonomes et de workflows complexes (n8n, Make). Votre entreprise tourne 24/7, sans fatigue, avec une fiabilité industrielle.",
-      tags: ["Agents", "n8n/Make", "Scale"]
+      id: 'formation',
+      icon: BookOpen,
+      title: "Formation",
+      subtitle: "On forme",
+      desc: "12 modules, 3 niveaux, 70% pratique. Pour acculturer vos équipes et les rendre opérationnelles dès J+1.",
+      tags: ["Pratique", "Acculturation", "Workshops"]
+    },
+    {
+      id: 'coaching',
+      icon: Target,
+      title: "Coaching",
+      subtitle: "On ancre",
+      desc: "Accompagnement individuel. Ancrer les compétences dans la durée pour managers et dirigeants.",
+      tags: ["Suivi", "Personnalisé", "Managers"]
+    },
+    {
+      id: 'production',
+      icon: Sparkles,
+      title: "Production",
+      subtitle: "On livre",
+      desc: "Livrables créés avec l'IA. Vidéos avatars, clonage vocal, sites no-code, assets visuels produits 10x plus vite.",
+      tags: ["Assets", "Avatars", "No-code"]
+    },
+    {
+      id: 'suivi',
+      icon: RefreshCcw,
+      title: "Suivi",
+      subtitle: "On reste",
+      desc: "Maintenance, évolutions continues et nouvelles automatisations. On garantit la valeur dans la durée.",
+      tags: ["Maintenance", "Long Terme", "Évolutif"]
     }
   ];
 
@@ -57,18 +80,18 @@ const Expertise: React.FC = () => {
               <Reveal>
                 <span className="inline-flex items-center gap-2 px-3 py-1 text-[10px] tracking-widest text-[#00FA9A] border border-[#00FA9A]/20 rounded-full bg-[#00FA9A]/5 uppercase font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#00FA9A] animate-pulse"></span>
-                    <EditableText value="Méthodologie" storageKey="exp_badge" />
+                    <EditableText value="Le Parcours" storageKey="exp_badge_v2" />
                 </span>
               </Reveal>
               <Reveal delay={0.1}>
                 <h2 className="text-4xl md:text-6xl font-medium text-white tracking-tight">
-                    <EditableText value="Protocole AXEM" storageKey="exp_title" />
+                    <EditableText value="De l'audit au suivi, un seul parcours." storageKey="exp_title_v2" />
                 </h2>
               </Reveal>
            </div>
            <Reveal delay={0.2} className="md:text-right max-w-sm">
               <p className="text-neutral-500 text-base leading-relaxed">
-                <EditableText isTextarea value="Une approche structurée pour transformer le chaos en clarté, et l'intention en automatisation." storageKey="exp_subtitle" />
+                <EditableText isTextarea value="7 étapes. Vous entrez où vous voulez, vous pouvez tout enchaîner ou piocher à la carte." storageKey="exp_subtitle_v2" />
               </p>
            </Reveal>
         </div>
@@ -89,6 +112,15 @@ const Expertise: React.FC = () => {
             disableAnimations={false}
         />
         
+        <div className="mt-16 flex justify-center">
+            <Reveal delay={0.4}>
+                <div className="inline-flex items-center gap-4 px-6 py-4 bg-[#0a0a0a] border border-white/10 rounded-full">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#00FA9A] shadow-[0_0_12px_#00FA9A]"></span>
+                    <span className="text-white text-sm md:text-base">Entrée possible à chaque étape. À la carte, ou en parcours complet.</span>
+                </div>
+            </Reveal>
+        </div>
+
       </div>
     </section>
   );

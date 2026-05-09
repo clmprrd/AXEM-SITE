@@ -165,6 +165,31 @@ const Philosophy: React.FC = () => {
                    <EditableText isTextarea value="Le stratège. Celui qui traduit la technologie en rentabilité et en leviers de croissance." storageKey="philo_left_desc_v3" />
                 </p>
 
+                <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-white/10 w-full max-w-[280px]">
+                   <div className="flex items-baseline gap-2 text-[#00FA9A]">
+                       <span className="font-medium text-3xl md:text-4xl">
+                           <EditableText value="+30 000" storageKey="philo_left_stat_val" />
+                       </span>
+                       <span className="text-xs uppercase tracking-widest font-bold opacity-80">
+                           <EditableText value="abonnés LinkedIn" storageKey="philo_left_stat_label" />
+                       </span>
+                   </div>
+                   <ul className="text-sm text-neutral-400 space-y-2 mt-2 w-full">
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="3 ans de terrain IA" storageKey="philo_left_b1" /></span>
+                       </li>
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="Formations, conseil, automatisation" storageKey="philo_left_b2" /></span>
+                       </li>
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="Pilotage de missions audit et stratégie" storageKey="philo_left_b3" /></span>
+                       </li>
+                   </ul>
+                </div>
+
                 <div className="h-10 w-px border-l border-dashed border-white/20 my-2"></div>
                 
                 <div className="group relative">
@@ -212,6 +237,31 @@ const Philosophy: React.FC = () => {
                 <p className="text-center text-base md:text-xl text-neutral-400 max-w-[320px] leading-relaxed">
                    <EditableText isTextarea value="L'ingénieur. Celui qui forge les systèmes et automatise l'intelligence pour transformer la vision en moteur de production." storageKey="philo_right_desc_v3" />
                 </p>
+
+                <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-white/10 w-full max-w-[280px]">
+                   <div className="flex items-baseline gap-2 text-[#00FA9A]">
+                       <span className="font-medium text-3xl md:text-4xl">
+                           <EditableText value="+10 000" storageKey="philo_right_stat_val" />
+                       </span>
+                       <span className="text-xs uppercase tracking-widest font-bold opacity-80">
+                           <EditableText value="abonnés LinkedIn" storageKey="philo_right_stat_label" />
+                       </span>
+                   </div>
+                   <ul className="text-sm text-neutral-400 space-y-2 mt-2 w-full">
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="3 ans de terrain IA" storageKey="philo_right_b1" /></span>
+                       </li>
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="Déploiement terrain, équipes et dirigeants" storageKey="philo_right_b2" /></span>
+                       </li>
+                       <li className="flex gap-2 items-start">
+                           <span className="text-[#00FA9A]">→</span>
+                           <span><EditableText value="Expérience terrain dans le secteur financier" storageKey="philo_right_b3" /></span>
+                       </li>
+                   </ul>
+                </div>
 
                 <div className="h-10 w-px border-l border-dashed border-white/20 my-2"></div>
                 

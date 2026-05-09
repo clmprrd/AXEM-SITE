@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import MarqueeSection from './components/MarqueeSection';
-import FolderShowcase from './components/FolderShowcase';
 import Philosophy from './components/Philosophy';
 import Expertise from './components/Expertise';
 import Pricing from './components/Pricing';
+import FolderShowcase from './components/FolderShowcase';
+import Problem from './components/Problem';
+import Difference from './components/Difference';
+import ServicesCatalog from './components/ServicesCatalog';
 import Footer from './components/Footer';
 import ProjectDetailPage from './components/ProjectDetailPage';
 import defaultContent from './src/data/defaultContent';
@@ -91,10 +93,12 @@ const App: React.FC = () => {
             <Navbar customLogo={customLogo} onUpdateLogo={handleUpdateLogo} />
             <main>
                 <Hero />
-                <MarqueeSection onOpenProject={handleOpenProject} />
+                <Problem />
                 <FolderShowcase onOpenProject={handleOpenProject} />
-                <Philosophy />
                 <Expertise />
+                <Philosophy />
+                <ServicesCatalog />
+                <Difference />
                 <Pricing />
             </main>
             <Footer customLogo={customLogo} />

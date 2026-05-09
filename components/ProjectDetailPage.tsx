@@ -9,80 +9,14 @@ interface ProjectDetailProps {
   onSave: (id: string | number, newData: any) => void;
 }
 
-const MediaItem: React.FC<{ src: string; isMain?: boolean }> = ({ src, isMain = false }) => {
-  const isVideo = src.toLowerCase().endsWith('.mp4') || src.includes('.mp4');
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const [isInView, setIsInView] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!isVideo || !videoRef.current) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsInView(entry.isIntersecting);
-    }, { threshold: 0.1 });
-
-    observer.observe(videoRef.current);
-    return () => observer.disconnect();
-  }, [isVideo]);
-
-  React.useEffect(() => {
-    if (!isVideo || !videoRef.current) return;
-    if (isInView) {
-      videoRef.current.play().catch(() => {});
-    } else {
-      videoRef.current.pause();
-    }
-  }, [isInView, isVideo]);
-
-  if (isVideo) {
-    return (
-      <video 
-        ref={videoRef}
-        src={src} 
-        className={`w-full h-auto ${isMain ? 'object-contain' : 'object-cover'} transform-gpu`} 
-        controls 
-        muted 
-        loop 
-        playsInline
-        preload="metadata"
-      />
-    );
-  }
-  return (
-    <img 
-      src={src} 
-      className={`w-full h-auto ${isMain ? 'object-contain' : 'object-cover'}`} 
-      alt="Project media" 
-      loading="lazy"
-    />
-  );
-};
-
 const ProjectDetailPage: React.FC<ProjectDetailProps> = ({ projectId, initialData, onClose, onSave }) => {
   const [data, setData] = useState(initialData);
   const [content, setContent] = useState(initialData.content || "<h1>Détails du projet</h1><p>Ceci est une page de type Notion. Décrivez le contexte, les objectifs, et les résultats.</p>");
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const updateField = (field: string, value: string) => {
     const newData = { ...data, [field]: value };
     setData(newData);
     onSave(projectId, newData);
-  };
-
-  const nextImage = () => {
-    if (data.gallery) {
-        setCurrentImageIndex((prev) => (prev + 1) % data.gallery.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (data.gallery) {
-        setCurrentImageIndex((prev) => (prev - 1 + data.gallery.length) % data.gallery.length);
-    }
-  };
-
-  const renderMediaItem = (src: string, isMain: boolean = false) => {
-      return <MediaItem src={src} isMain={isMain} />;
   };
 
   return (
@@ -107,31 +41,8 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({ projectId, initialDat
         </div>
       </div>
 
-      {/* Header Image (Read Only) */}
-      <div className="w-full h-[30vh] md:h-[40vh] relative overflow-hidden">
-        {data.image && !data.image.includes('.mp4') ? (
-            <img 
-                src={data.image} 
-                className="w-full h-full object-cover opacity-60" 
-                alt="Cover"
-            />
-        ) : (
-            <div className="w-full h-full bg-neutral-900 opacity-60"></div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/50 to-transparent"></div>
-      </div>
-
       {/* Content Area */}
-      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 relative -mt-32 md:-mt-40 z-10">
-        
-        {/* Icon / Avatar */}
-        <div className="w-24 h-24 rounded-full bg-[#1a1a1a] border-4 border-[#050505] shadow-xl flex items-center justify-center mb-8 overflow-hidden relative">
-             {data.image && !data.image.includes('.mp4') ? (
-                 <img src={data.image} className="w-full h-full object-cover opacity-80" />
-             ) : (
-                 <div className="w-full h-full bg-neutral-800"></div>
-             )}
-        </div>
+      <div className="max-w-4xl mx-auto px-6 py-24 md:py-32 relative z-10">
 
         {/* Static Title Area */}
         <div className="mb-12">
@@ -149,34 +60,7 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({ projectId, initialDat
             </div>
         </div>
 
-        {/* Media Display - NO BORDER, NO BG */}
-        <div className="w-full relative mb-12 group">
-             {/* Slider Logic */}
-             {data.gallery && data.gallery.length > 1 ? (
-                 <div className="relative w-full rounded-xl overflow-hidden bg-black/50">
-                    {renderMediaItem(data.gallery[currentImageIndex], true)}
-                    
-                    {/* Arrows */}
-                    <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition opacity-0 group-hover:opacity-100 z-10">
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition opacity-0 group-hover:opacity-100 rotate-180 z-10">
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    
-                    {/* Dots */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                        {data.gallery.map((_: any, idx: number) => (
-                            <div key={idx} className={`w-2 h-2 rounded-full transition-colors shadow-sm ${idx === currentImageIndex ? 'bg-[#00FA9A]' : 'bg-white/50'}`} />
-                        ))}
-                    </div>
-                 </div>
-             ) : (
-                 <div className="w-full rounded-xl overflow-hidden bg-black/50">
-                    {renderMediaItem(data.image, true)}
-                 </div>
-             )}
-        </div>
+
 
         <div className="h-px w-full bg-white/10 mb-12"></div>
 
