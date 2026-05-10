@@ -1,58 +1,44 @@
-
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Philosophy from './components/Philosophy';
-import Expertise from './components/Expertise';
-import Pricing from './components/Pricing';
-import FolderShowcase from './components/FolderShowcase';
-import Problem from './components/Problem';
-import Difference from './components/Difference';
-import ServicesCatalog from './components/ServicesCatalog';
-import Footer from './components/Footer';
-import ProjectDetailPage from './components/ProjectDetailPage';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './src/pages/Home';
+import Realisations from './src/pages/Realisations';
 import defaultContent from './src/data/defaultContent';
 
 const App: React.FC = () => {
-  const [activeProject, setActiveProject] = useState<{id: string | number, data: any, saveCallback: (id: string|number, data: any) => void} | null>(null);
-  const [homeKey, setHomeKey] = useState(0);
   const [customLogo, setCustomLogo] = useState<string | null>(null);
 
   // --- SYNC LOGIC (The Magic Part) ---
   useEffect(() => {
     const checkSync = () => {
-        // 1. Get the timestamp from the code file (what you pushed to git)
-        const fileTimestamp = (defaultContent as any).config_timestamp || 0;
-        
-        // 2. Get the timestamp from the browser's local memory
-        const localTimestamp = Number(localStorage.getItem('config_timestamp') || 0);
+      // 1. Get the timestamp from the code file (what you pushed to git)
+      const fileTimestamp = (defaultContent as any).config_timestamp || 0;
 
-        // 3. If the code file is NEWER than local memory, it means your associate 
-        //    pulled new changes. We must overwrite local memory with the file data.
-        if (fileTimestamp > localTimestamp) {
-            console.log("📥 New update found in code! Syncing...");
-            
-            Object.entries(defaultContent).forEach(([key, value]) => {
-                if (typeof value === 'object') {
-                    localStorage.setItem(key, JSON.stringify(value));
-                } else {
-                    localStorage.setItem(key, String(value));
-                }
-            });
-            
-            // Reload the logo specifically
-            const logo = localStorage.getItem('axem_custom_logo');
-            if (logo) setCustomLogo(logo);
+      // 2. Get the timestamp from the browser's local memory
+      const localTimestamp = Number(localStorage.getItem('config_timestamp') || 0);
 
-            // Force React to re-render everything
-            setHomeKey(prev => prev + 1);
-        } else {
-            // Load Logo normally
-            const savedLogo = localStorage.getItem('axem_custom_logo');
-            if (savedLogo) {
-                setCustomLogo(savedLogo);
-            }
+      // 3. If the code file is NEWER than local memory, it means your associate
+      //    pulled new changes. We must overwrite local memory with the file data.
+      if (fileTimestamp > localTimestamp) {
+        console.log('📥 New update found in code! Syncing...');
+
+        Object.entries(defaultContent).forEach(([key, value]) => {
+          if (typeof value === 'object') {
+            localStorage.setItem(key, JSON.stringify(value));
+          } else {
+            localStorage.setItem(key, String(value));
+          }
+        });
+
+        // Reload the logo specifically
+        const logo = localStorage.getItem('axem_custom_logo');
+        if (logo) setCustomLogo(logo);
+      } else {
+        // Load Logo normally
+        const savedLogo = localStorage.getItem('axem_custom_logo');
+        if (savedLogo) {
+          setCustomLogo(savedLogo);
         }
+      }
     };
 
     checkSync();
@@ -63,47 +49,21 @@ const App: React.FC = () => {
     localStorage.setItem('axem_custom_logo', newLogoBase64);
   };
 
-  const handleOpenProject = (id: string | number, data: any, saveCallback: (id: string|number, data: any) => void) => {
-    setActiveProject({ id, data, saveCallback });
-  };
-
-  const handleCloseProject = () => {
-    setActiveProject(null);
-    setHomeKey(prev => prev + 1);
-  };
-
-  const handleSaveProject = (id: string | number, newData: any) => {
-    if (activeProject && activeProject.saveCallback) {
-        activeProject.saveCallback(id, newData);
-        setActiveProject(prev => prev ? { ...prev, data: newData } : null);
-    }
-  };
-
   return (
     <div className="min-h-screen overflow-x-hidden selection:bg-[#00FA9A]/30 text-white bg-[#050505] relative">
-      {activeProject ? (
-        <ProjectDetailPage 
-            projectId={activeProject.id}
-            initialData={activeProject.data}
-            onClose={handleCloseProject}
-            onSave={handleSaveProject}
-        />
-      ) : (
-        <div key={homeKey}>
-            <Navbar customLogo={customLogo} onUpdateLogo={handleUpdateLogo} />
-            <main>
-                <Hero />
-                <Problem />
-                <FolderShowcase onOpenProject={handleOpenProject} />
-                <Expertise />
-                <Philosophy />
-                <ServicesCatalog />
-                <Difference />
-                <Pricing />
-            </main>
-            <Footer customLogo={customLogo} />
-        </div>
-      )}
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<Home customLogo={customLogo} onUpdateLogo={handleUpdateLogo} />}
+          />
+          <Route
+            path="/realisations"
+            element={<Realisations customLogo={customLogo} onUpdateLogo={handleUpdateLogo} />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 };
