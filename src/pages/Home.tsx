@@ -7,17 +7,21 @@ import Philosophy from '../../components/Philosophy';
 import Difference from '../../components/Difference';
 import Pricing from '../../components/Pricing';
 import Footer from '../../components/Footer';
+import { ScrollProgress, SmartCursor } from '../../components/ui/InteractiveLayer';
 
 interface HomeProps {
   customLogo: string | null;
   onUpdateLogo: (newLogoBase64: string) => void;
 }
 
-// Proposition X — Editorial Pure
-// Narration : Hero éditorial → DualityScene (Formation/Conseil) → Philosophy → Difference → Clients → Pricing
+// === FINAL AXEM HOME ===
+// DA Linear (grid/halo/magnetic/marquee) en couleurs AXEM officielles + dualité scénarisée
+// + ScrollProgress vert globale + SmartCursor avec trail
 const Home: React.FC<HomeProps> = ({ customLogo, onUpdateLogo }) => {
   return (
     <>
+      <SmartCursor />
+      <ScrollProgress />
       <Navbar customLogo={customLogo} onUpdateLogo={onUpdateLogo} />
       <main>
         <Hero />
