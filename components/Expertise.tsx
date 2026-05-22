@@ -70,7 +70,7 @@ const Expertise: React.FC = () => {
       className="py-32 bg-[#050505] border-t border-white/5 relative overflow-hidden"
     >
       {/* Background Ambience */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00FA9A]/5 blur-[120px] rounded-full pointer-events-none -mr-20 -mt-20"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#B7FF45]/5 blur-[120px] rounded-full pointer-events-none -mr-20 -mt-20"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
@@ -78,8 +78,8 @@ const Expertise: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
            <div className="space-y-4">
               <Reveal>
-                <span className="inline-flex items-center gap-2 px-3 py-1 text-[10px] tracking-widest text-[#00FA9A] border border-[#00FA9A]/20 rounded-full bg-[#00FA9A]/5 uppercase font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00FA9A] animate-pulse"></span>
+                <span className="inline-flex items-center gap-2 px-3 py-1 text-[10px] tracking-widest text-[#B7FF45] border border-[#B7FF45]/20 rounded-full bg-[#B7FF45]/5 uppercase font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B7FF45] animate-pulse"></span>
                     <EditableText value="Le Parcours" storageKey="exp_badge_v2" />
                 </span>
               </Reveal>
@@ -115,7 +115,7 @@ const Expertise: React.FC = () => {
         <div className="mt-16 flex justify-center">
             <Reveal delay={0.4}>
                 <div className="inline-flex items-center gap-4 px-6 py-4 bg-[#0a0a0a] border border-white/10 rounded-full">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#00FA9A] shadow-[0_0_12px_#00FA9A]"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#B7FF45] shadow-[0_0_12px_#B7FF45]"></span>
                     <span className="text-white text-sm md:text-base">Entrée possible à chaque étape. À la carte, ou en parcours complet.</span>
                 </div>
             </Reveal>

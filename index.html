@@ -19,13 +19,13 @@
               "card-foreground": "#ffffff",
               popover: "#0a0a0a",
               "popover-foreground": "#ffffff",
-              primary: "#00FA9A",
+              primary: "#B7FF45",
               "primary-foreground": "#000000",
               secondary: "#1a1a1a",
               "secondary-foreground": "#ffffff",
               muted: "#1a1a1a",
               "muted-foreground": "#a3a3a3",
-              accent: "#00FA9A",
+              accent: "#B7FF45",
               "accent-foreground": "#000000",
               destructive: "#ef4444",
               "destructive-foreground": "#ffffff",
@@ -39,7 +39,8 @@
               sm: "calc(0.5rem - 4px)",
             },
             fontFamily: {
-              sans: ["Inter", "sans-serif"],
+              sans: ["Geist", "Inter", "sans-serif"],
+              mono: ["Geist Mono", "ui-monospace", "monospace"],
               playfair: ["Playfair Display", "serif"],
             }
           },
@@ -48,11 +49,11 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500&family=Inter:wght@300;400;500;600;800;900&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Inter:wght@300;400;500;600;800;900&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
       :root {
         --bg-color: #050505;
-        --accent-color: #00FA9A;
+        --accent-color: #B7FF45;
         /* Custom Folder Variables */
         --folder-back: #e73827;
         --folder-tab: #f85032;
@@ -62,10 +63,11 @@
         scroll-padding-top: 100px; /* Évite que la navbar cache le titre de la section */
       }
       body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Geist', 'Inter', sans-serif;
         background-color: var(--bg-color);
         color: white;
       }
+      .font-mono { font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; }
       
       /* Cinematic Noise - Optimized with PNG pattern instead of SVG filter */
       .noise-overlay {

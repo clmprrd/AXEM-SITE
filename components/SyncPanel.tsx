@@ -104,7 +104,7 @@ const SyncPanel: React.FC = () => {
 
             <button 
               onClick={handleExport}
-              className="w-full flex items-center justify-center gap-2 bg-[#00FA9A]/10 hover:bg-[#00FA9A]/20 text-[#00FA9A] text-xs font-bold py-2 px-3 rounded-lg transition-colors border border-[#00FA9A]/20"
+              className="w-full flex items-center justify-center gap-2 bg-[#B7FF45]/10 hover:bg-[#B7FF45]/20 text-[#B7FF45] text-xs font-bold py-2 px-3 rounded-lg transition-colors border border-[#B7FF45]/20"
             >
               <Download className="w-4 h-4" />
               Exporter content.json

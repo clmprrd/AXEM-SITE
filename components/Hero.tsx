@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
         <div
           aria-hidden="true"
           className="absolute left-1/2 top-[10%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full opacity-30 blur-[140px]"
-          style={{ background: 'radial-gradient(closest-side, #00FA9A, transparent)' }}
+          style={{ background: 'radial-gradient(closest-side, #B7FF45, transparent)' }}
         />
         {/* bottom fade */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#050505]" />
@@ -45,9 +45,9 @@ const Hero: React.FC = () => {
       <div className="animate-reveal opacity-0 [animation-delay:60ms]">
         <a
           href="#realisations"
-          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-sm transition-all duration-200 hover:border-[#00FA9A]/40 hover:bg-[#00FA9A]/[0.06] hover:text-white"
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-sm transition-all duration-200 hover:border-[#B7FF45]/40 hover:bg-[#B7FF45]/[0.06] hover:text-white"
         >
-          <span className="flex h-1.5 w-1.5 rounded-full bg-[#00FA9A] shadow-[0_0_8px_#00FA9A]" />
+          <span className="flex h-1.5 w-1.5 rounded-full bg-[#B7FF45] shadow-[0_0_8px_#B7FF45]" />
           <span>Nouveau · Audit IA en 5 jours, livrable garanti</span>
           <ArrowUpRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </a>
@@ -78,7 +78,7 @@ const Hero: React.FC = () => {
           href="https://calendly.com/clem-pred/30min"
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 rounded-full bg-[#00FA9A] px-6 py-3 text-sm font-semibold text-black shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_30px_-8px_rgba(0,250,154,0.6)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_0_1px_rgba(0,250,154,0.6),0_0_40px_-4px_rgba(0,250,154,0.7)]"
+          className="group inline-flex items-center gap-2 rounded-full bg-[#B7FF45] px-6 py-3 text-sm font-semibold text-black shadow-[0_0_0_1px_rgba(183,255,69,0.4),0_0_30px_-8px_rgba(183,255,69,0.6)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_0_1px_rgba(183,255,69,0.6),0_0_40px_-4px_rgba(183,255,69,0.7)]"
         >
           Réserver un audit
           <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
