@@ -1,147 +1,401 @@
-import React from 'react';
-import EditableText from './ui/EditableText';
-import { ArrowUpRight } from 'lucide-react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AnimatedCount, SpotlightCard, ScrollRevealWords } from './ui/wow';
 
-// Proposition X — Editorial Pure
-// Founders avec VRAIES données du PDF
+// =====================================================
+// CONCEPT C — "SYNTHWAVE NEURAL" — FOUNDERS NEURAL NODES
+// =====================================================
 const Philosophy: React.FC = () => {
-  const clementImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg";
-  const alexisImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png";
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
-  const founders = [
-    {
-      img: clementImage,
-      tag: 'Stratégie · Formations',
-      name: 'Clément Predo',
-      school: 'ESSEC',
-      role: 'Co-fondateur',
-      pitch: 'Stratégie, formations, conseil et automatisation. Pilotage des missions audit et stratégie.',
-      bullets: [
-        '3 ans de terrain IA',
-        'Formations, conseil, automatisation',
-        'Pilotage missions audit & stratégie',
-      ],
-      stats: { value: 40000, label: 'abonnés LinkedIn' },
-      linkedin: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/',
-    },
-    {
-      img: alexisImage,
-      tag: 'Tech · Déploiement',
-      name: 'Alexis Zeitoun',
-      school: 'Institut Polytechnique de Paris',
-      role: 'Co-fondateur',
-      pitch: "Déploiement terrain, expertise tech. Expérience secteur financier et fonds de Private Equity.",
-      bullets: [
-        '3 ans de terrain IA',
-        'Déploiement terrain, équipes & dirigeants',
-        'Secteur financier · fonds Private Equity',
-      ],
-      stats: { value: 15000, label: 'abonnés LinkedIn' },
-      linkedin: 'https://www.linkedin.com/in/alexiszeitoun/',
-    },
-  ];
+  const clementImage =
+    'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
+  const alexisImage =
+    'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
   return (
-    <section id="qui-sommes-nous" className="relative border-t border-white/[0.06] bg-[#050505] py-32">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-20 grid grid-cols-12 gap-6">
-          <div className="col-span-12 md:col-span-3">
-            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-              <span className="h-2 w-2 bg-[#00FA9A]" />
-              <EditableText value="Fondateurs" storageKey="philo_badge" />
-            </div>
-          </div>
-          <div className="col-span-12 md:col-span-9">
-            <ScrollRevealWords
-              text="Deux experts, un seul interlocuteur."
-              className="font-display text-4xl font-light leading-[1.05] tracking-[-0.03em] md:text-6xl lg:text-7xl"
-              brightClass="text-white"
-              dimClass="text-white/15"
-            />
-            <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-neutral-400">
-              Pas une agence de plus, pas deux consultants génériques. L'excellence technique et la
-              stratégie business, fondues en une seule offre. Du diagnostic au déploiement.
-            </p>
-          </div>
-        </div>
+    <section
+      id="founders"
+      className="relative isolate overflow-hidden py-32"
+      style={{
+        background: 'linear-gradient(180deg, #0A001F 0%, #1A0033 50%, #0A001F 100%)',
+        color: '#F5F0FF',
+        fontFamily: 'Space Grotesk, sans-serif',
+      }}
+      aria-label="Founders — Synthwave Neural"
+    >
+      {/* Pulsing neural nodes background */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[15%] top-[30%] h-[40vw] w-[40vw] rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(255,0,200,0.18) 0%, transparent 60%)',
+          filter: 'blur(40px)',
+        }}
+        animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.9, 1.05, 0.9] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[10%] bottom-[20%] h-[35vw] w-[35vw] rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 60%)',
+          filter: 'blur(40px)',
+        }}
+        animate={{ opacity: [0.4, 0.7, 0.4], scale: [1.05, 0.9, 1.05] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+      />
 
-        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-white/[0.06] md:grid-cols-2">
-          {founders.map((f, idx) => (
-            <SpotlightCard
-              key={f.name}
-              className="group flex flex-col gap-6 border bg-[#0A0A0A] p-8 md:p-10"
-              spotlightColor="rgba(0,250,154,0.10)"
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.2, 0.8, 0.2, 1] }}
-                className="flex h-full flex-col gap-6"
+      {/* CRT scanline */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px, transparent 1px, transparent 3px)',
+        }}
+      />
+
+      <div className="relative z-10 mx-auto max-w-[1320px] px-8">
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+          className="mb-10 flex items-center gap-3"
+        >
+          <motion.span
+            className="h-2 w-2 rounded-full"
+            style={{ background: '#00F0FF', boxShadow: '0 0 16px #00F0FF' }}
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+          <span
+            style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 11,
+              letterSpacing: '0.32em',
+              color: '#00F0FF',
+              textTransform: 'uppercase',
+              textShadow: '0 0 10px rgba(0,240,255,0.5)',
+            }}
+          >
+            // FOUNDERS_NODE_01.exe
+          </span>
+        </motion.div>
+
+        {/* Title */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+          style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontWeight: 700,
+            fontSize: 'clamp(40px, 6vw, 80px)',
+            lineHeight: 1,
+            letterSpacing: '-0.03em',
+            color: '#F5F0FF',
+            maxWidth: '1000px',
+          }}
+        >
+          <span style={{ textShadow: '0 0 24px rgba(245,240,255,0.3)' }}>Two operators. </span>
+          <span
+            style={{
+              background: 'linear-gradient(120deg, #FF00C8 0%, #00F0FF 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 28px rgba(255,0,200,0.5))',
+              fontStyle: 'italic',
+            }}
+          >
+            One stack.
+          </span>
+        </motion.h2>
+
+        {/* 2 cards */}
+        <div className="mt-20 grid gap-8 md:grid-cols-2">
+          {/* CLEMENT */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            whileHover={{
+              boxShadow:
+                '0 0 60px -10px rgba(255,0,200,0.55), 0 0 100px -20px rgba(255,0,200,0.3)',
+            }}
+            className="relative p-10"
+            style={{
+              background: 'rgba(10,0,31,0.75)',
+              border: '1px solid rgba(255,0,200,0.3)',
+              borderRadius: 12,
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 0 40px -15px rgba(255,0,200,0.35)',
+            }}
+          >
+            <div className="flex items-start gap-6">
+              <div
+                className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full"
+                style={{
+                  border: '2px solid #FF00C8',
+                  boxShadow:
+                    '0 0 24px rgba(255,0,200,0.7), inset 0 0 16px rgba(255,0,200,0.25)',
+                }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                    {f.tag}
-                  </div>
-                  <motion.a
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 14 }}
-                    href={f.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-neutral-500 transition-colors hover:text-[#00FA9A]"
-                    aria-label={`LinkedIn de ${f.name}`}
+                <img src={clementImage} alt="Clément Predo" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex-1">
+                <div
+                  style={{
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: 10,
+                    letterSpacing: '0.28em',
+                    color: '#00F0FF',
+                    textTransform: 'uppercase',
+                    textShadow: '0 0 8px rgba(0,240,255,0.5)',
+                  }}
+                >
+                  ESSEC :: STRATEGY
+                </div>
+                <h3
+                  style={{
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontWeight: 700,
+                    fontSize: 36,
+                    lineHeight: 1.05,
+                    letterSpacing: '-0.02em',
+                    color: '#F5F0FF',
+                    marginTop: 6,
+                    textShadow: '0 0 18px rgba(255,0,200,0.3)',
+                  }}
+                >
+                  Clément Predo
+                </h3>
+                <div
+                  style={{
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: 11,
+                    color: '#F5F0FF',
+                    opacity: 0.6,
+                    marginTop: 4,
+                  }}
+                >
+                  Co-fondateur · Formation · Conseil
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              {[
+                'Stratégie, formations, conseil',
+                'Pilotage missions audit & déploiement',
+                '3 ans de terrain IA en production',
+              ].map((b) => (
+                <div key={b} className="flex items-start gap-3">
+                  <span
+                    style={{
+                      color: '#00F0FF',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      textShadow: '0 0 8px rgba(0,240,255,0.5)',
+                    }}
                   >
-                    <ArrowUpRight className="h-5 w-5" />
-                  </motion.a>
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <motion.img
-                    whileHover={{ scale: 1.05, rotate: idx === 0 ? -2 : 2 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 12 }}
-                    src={f.img}
-                    alt={f.name}
-                    className="h-20 w-20 rounded-full border border-white/10 object-cover md:h-24 md:w-24"
-                  />
-                  <div>
-                    <h3 className="font-display text-3xl font-light tracking-tight text-white md:text-4xl">
-                      {f.name}
-                    </h3>
-                    <p className="mt-1 font-playfair text-base italic text-[#00FA9A]">
-                      {f.role}
-                    </p>
-                    <p className="mt-0.5 text-xs uppercase tracking-[0.18em] text-neutral-500">
-                      {f.school}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-base leading-relaxed text-neutral-300">{f.pitch}</p>
-
-                <ul className="space-y-2.5 border-t border-white/[0.06] pt-5">
-                  {f.bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-3 text-sm text-neutral-400">
-                      <span className="mt-1.5 inline-block h-1 w-1 flex-shrink-0 bg-[#00FA9A]" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-auto flex items-baseline gap-3 border-t border-white/[0.06] pt-6">
-                  <span className="font-display text-5xl font-light text-[#00FA9A] md:text-6xl">
-                    +<AnimatedCount value={f.stats.value} />
+                    ▸
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                    {f.stats.label}
-                  </span>
+                  <span style={{ fontSize: 15, color: '#F5F0FF', opacity: 0.85 }}>{b}</span>
                 </div>
-              </motion.div>
-            </SpotlightCard>
-          ))}
+              ))}
+            </div>
+
+            <div className="mt-10 flex items-baseline gap-3">
+              <div
+                style={{
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 64,
+                  color: '#FF00C8',
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
+                  textShadow: '0 0 28px rgba(255,0,200,0.7)',
+                }}
+              >
+                +40K
+              </div>
+              <div
+                style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  color: '#F5F0FF',
+                  opacity: 0.6,
+                  textTransform: 'uppercase',
+                }}
+              >
+                LinkedIn followers
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ALEXIS */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            whileHover={{
+              boxShadow:
+                '0 0 60px -10px rgba(0,240,255,0.55), 0 0 100px -20px rgba(0,240,255,0.3)',
+            }}
+            className="relative p-10"
+            style={{
+              background: 'rgba(10,0,31,0.75)',
+              border: '1px solid rgba(0,240,255,0.3)',
+              borderRadius: 12,
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 0 40px -15px rgba(0,240,255,0.35)',
+            }}
+          >
+            <div className="flex items-start gap-6">
+              <div
+                className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full"
+                style={{
+                  border: '2px solid #00F0FF',
+                  boxShadow:
+                    '0 0 24px rgba(0,240,255,0.7), inset 0 0 16px rgba(0,240,255,0.25)',
+                }}
+              >
+                <img src={alexisImage} alt="Alexis Zeitoun" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex-1">
+                <div
+                  style={{
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: 10,
+                    letterSpacing: '0.28em',
+                    color: '#FF00C8',
+                    textTransform: 'uppercase',
+                    textShadow: '0 0 8px rgba(255,0,200,0.5)',
+                  }}
+                >
+                  INSTITUT POLYTECHNIQUE DE PARIS :: SYSTEMS
+                </div>
+                <h3
+                  style={{
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontWeight: 700,
+                    fontSize: 36,
+                    lineHeight: 1.05,
+                    letterSpacing: '-0.02em',
+                    color: '#F5F0FF',
+                    marginTop: 6,
+                    textShadow: '0 0 18px rgba(0,240,255,0.3)',
+                  }}
+                >
+                  Alexis Zeitoun
+                </h3>
+                <div
+                  style={{
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: 11,
+                    color: '#F5F0FF',
+                    opacity: 0.6,
+                    marginTop: 4,
+                  }}
+                >
+                  Co-fondateur · Production · Systèmes
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              {[
+                'Architecture, automatisation, agents IA',
+                'Production n8n · Make · Claude Code',
+                'Secteur financier / Private Equity',
+              ].map((b) => (
+                <div key={b} className="flex items-start gap-3">
+                  <span
+                    style={{
+                      color: '#FF00C8',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      textShadow: '0 0 8px rgba(255,0,200,0.5)',
+                    }}
+                  >
+                    ▸
+                  </span>
+                  <span style={{ fontSize: 15, color: '#F5F0FF', opacity: 0.85 }}>{b}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex items-baseline gap-3">
+              <div
+                style={{
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 64,
+                  color: '#00F0FF',
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
+                  textShadow: '0 0 28px rgba(0,240,255,0.7)',
+                }}
+              >
+                +15K
+              </div>
+              <div
+                style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  color: '#F5F0FF',
+                  opacity: 0.6,
+                  textTransform: 'uppercase',
+                }}
+              >
+                LinkedIn followers
+              </div>
+            </div>
+          </motion.div>
         </div>
+
+        {/* Massive quote */}
+        <motion.blockquote
+          initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+          className="mt-28 text-center"
+          style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 'clamp(40px, 7vw, 96px)',
+            lineHeight: 1,
+            letterSpacing: '-0.035em',
+            background: 'linear-gradient(120deg, #FF00C8 0%, #F5F0FF 50%, #00F0FF 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            filter: 'drop-shadow(0 0 36px rgba(255,0,200,0.35))',
+          }}
+        >
+          "We don't ship pitches.
+          <br />
+          We ship <span style={{ fontWeight: 700 }}>production.</span>"
+        </motion.blockquote>
       </div>
     </section>
   );

@@ -1,220 +1,190 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import EditableText from './ui/EditableText';
-import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
-import { MagneticButton, AnimatedCount, MarqueeLogos } from './ui/wow';
+import { motion } from 'framer-motion';
 
-// === FINAL AXEM HERO ===
-// DA Linear (grid + halo + magnetic + marquee) en couleurs AXEM officielles.
-// Vert #00FA9A + Bricolage Grotesque + Playfair italic mots-pivots.
-// + Spotlight cursor-tracked sur le grid (effet "torche").
-// + Stats animés avec AnimatedCount.
-// + Marquee logos clients réels du PDF.
+// =====================================================
+// CONCEPT D — "WARM MINIMAL DUOTONE"
+// Inspi : Stripe Tax, Substack, Patagonia, Notion homepage, Mailbrew
+// Vibe : minimaliste premium, beaucoup d'espace blanc, 1 seule couleur dominante chaude
+// Palette : cream chaud #FAF7F2, noir doux #1A1A1A, terracotta #D14E1F (1 SEUL accent)
+// Fonts : Inter Display + Inter (PAS de serif italic, PAS de mono)
+// =====================================================
 const Hero: React.FC = () => {
-  const ref = useRef<HTMLElement>(null);
-
-  // Mouse-tracked spotlight on the grid
-  const mx = useMotionValue(50);
-  const my = useMotionValue(30);
-  const smx = useSpring(mx, { stiffness: 80, damping: 26 });
-  const smy = useSpring(my, { stiffness: 80, damping: 26 });
-  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${smx}% ${smy}%, rgba(0,250,154,0.10), transparent 60%)`;
-
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const el = ref.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      mx.set(((e.clientX - r.left) / r.width) * 100);
-      my.set(((e.clientY - r.top) / r.height) * 100);
-    };
-    window.addEventListener('mousemove', handler);
-    return () => window.removeEventListener('mousemove', handler);
-  }, [mx, my]);
-
-  const titleVariants = {
-    hidden: { opacity: 0, y: 30, filter: 'blur(12px)' },
-    visible: (i: number) => ({
-      opacity: 1, y: 0, filter: 'blur(0px)',
-      transition: { delay: 0.15 + i * 0.08, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as any },
-    }),
-  };
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
 
   return (
     <section
-      ref={ref}
-      className="relative isolate flex min-h-[100vh] flex-col justify-center overflow-hidden bg-[#050505] px-6 pt-32 pb-24"
-      aria-label="AXEM IA — Hero"
+      className="relative isolate flex min-h-[100vh] flex-col justify-center overflow-hidden px-6 pt-32 pb-24"
+      style={{ background: '#FAF7F2', color: '#1A1A1A', fontFamily: 'Inter, sans-serif' }}
+      aria-label="AXEM IA — Warm Minimal Duotone"
     >
-      {/* === BACKGROUND : grid + halo + cursor spotlight === */}
-      <div className="absolute inset-0 -z-10" aria-hidden="true">
-        {/* fine grid */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: '64px 64px',
-            maskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
-          }}
-        />
-        {/* breathing accent halo */}
-        <motion.div
-          className="absolute left-1/2 top-[18%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full blur-[160px]"
-          style={{ background: 'radial-gradient(closest-side, #00FA9A, transparent)' }}
-          animate={{ opacity: [0.16, 0.30, 0.18], scale: [1, 1.05, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* CURSOR SPOTLIGHT — illumine le grid à la position de la souris */}
-        <motion.div className="absolute inset-0" style={{ background: spotlight }} />
-        {/* bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-[#050505]" />
-      </div>
+      {/* Subtle texture overlay (paper-like) */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
 
-      <div className="mx-auto w-full max-w-[1280px]">
-        {/* === Eyebrow vert + carré pulsant === */}
+      <div className="mx-auto w-full max-w-[1200px]">
+        {/* Tiny eyebrow + line */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-10"
+          className="mb-14 flex items-center gap-4"
         >
-          <a
-            href="#dualite"
-            className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-sm transition-all duration-200 hover:border-[#00FA9A]/40 hover:bg-[#00FA9A]/[0.06]"
-          >
-            <motion.span
-              className="h-1.5 w-1.5 rounded-full bg-[#00FA9A]"
-              animate={{ boxShadow: ['0 0 0 #00FA9A', '0 0 14px #00FA9A', '0 0 0 #00FA9A'] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#00FA9A]">
-              <EditableText value="Présentation Commerciale · 2025 / 2026" storageKey="hero_eyebrow" />
-            </span>
-            <span className="text-xs text-[#00FA9A] transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
-          </a>
+          <span className="h-px w-12" style={{ background: '#D14E1F' }} />
+          <span className="text-[12px] font-medium uppercase tracking-[0.2em]" style={{ color: '#D14E1F' }}>
+            <EditableText value="AXEM IA · Agence IA française · Qualiopi" storageKey="hero_eyebrow" />
+          </span>
         </motion.div>
 
-        {/* === Title — Bricolage Grotesque 160px light + Playfair italic vert === */}
-        <h1 className="font-display text-[clamp(48px,8.5vw,148px)] font-light leading-[1.02] tracking-[-0.04em] text-white">
-          <motion.span variants={titleVariants} custom={0} initial="hidden" animate="visible" className="block">
-            <EditableText value="Rendre l'IA" storageKey="hero_title_1" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="simple," storageKey="hero_title_simple" />
-            </span>
+        {/* HEADLINE — large but calm */}
+        <h1
+          className="max-w-5xl"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 'clamp(44px, 7vw, 112px)',
+            fontWeight: 600,
+            lineHeight: 1.0,
+            letterSpacing: '-0.035em',
+            color: '#1A1A1A',
+          }}
+        >
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="block"
+          >
+            <EditableText value="L'IA, prise au sérieux." storageKey="hero_line1" />
           </motion.span>
-          <motion.span variants={titleVariants} custom={1} initial="hidden" animate="visible" className="block">
-            <EditableText value="rentable et" storageKey="hero_title_2" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="actionnable." storageKey="hero_title_actionnable" />
-            </span>
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.35 }}
+            className="block"
+            style={{ color: '#1A1A1A', opacity: 0.5 }}
+          >
+            <EditableText value="Et mise en production." storageKey="hero_line2" />
           </motion.span>
         </h1>
 
-        {/* === Subtitle === */}
+        {/* Subhead */}
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.65 }}
-          className="mt-10 max-w-2xl text-lg font-light leading-snug text-neutral-400 md:text-xl"
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="mt-10 max-w-xl"
+          style={{ fontSize: 19, lineHeight: 1.55, fontWeight: 400, color: '#1A1A1A', opacity: 0.7 }}
         >
-          <EditableText
-            value="Votre partenaire IA, de l'audit à la montée en compétences. Formation Qualiopi, conseil stratégique, déploiement & production."
-            storageKey="hero_subtitle"
-            isTextarea
-            className="w-full"
-          />
+          AXEM IA forme vos équipes (Qualiopi) et déploie l'IA en production. Audit, conseil,
+          agents intelligents — livrés en jours, pas en mois.
         </motion.p>
 
-        {/* === Stats animés === */}
+        {/* CTAs minimalist */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-14 grid max-w-3xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-12"
+          transition={{ duration: 0.7, delay: 0.75 }}
+          className="mt-12 flex flex-col items-start gap-4 sm:flex-row"
+        >
+          <a
+            href="https://calendly.com/clem-pred/30min"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-semibold transition-transform hover:scale-[1.02]"
+            style={{
+              background: '#1A1A1A',
+              color: '#FAF7F2',
+              borderRadius: 999,
+            }}
+          >
+            Réserver un diagnostic
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
+          <a
+            href="#dualite"
+            className="group inline-flex items-center gap-2.5 px-2 py-3.5 text-[15px] font-medium transition-colors hover:opacity-100"
+            style={{ color: '#1A1A1A', opacity: 0.7 }}
+          >
+            <span style={{ borderBottom: '1px solid #1A1A1A', paddingBottom: 2 }}>
+              Voir notre méthode
+            </span>
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
+        </motion.div>
+
+        {/* MASSIVE WHITESPACE + bottom inline stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 1 }}
+          className="mt-32 grid grid-cols-2 gap-y-10 md:grid-cols-4 md:gap-x-12"
         >
           {[
-            { value: 10, suffix: '', label: 'formations' },
-            { value: 3, suffix: '', label: 'niveaux' },
-            { value: 70, suffix: ' %', label: 'de pratique' },
-            { value: null as null | number, label: 'opérationnel' }, // J+1 static
+            { v: '10', l: 'formations Qualiopi' },
+            { v: '55k+', l: 'abonnés LinkedIn' },
+            { v: '12 mois+', l: 'partenariat moyen' },
+            { v: 'J+1', l: 'opérationnel' },
           ].map((s, i) => (
             <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
+              key={s.l}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 + i * 0.08 }}
-              whileHover={{ x: 4 }}
-              className="cursor-default border-l-2 border-[#00FA9A]/40 pl-4 transition-colors hover:border-[#00FA9A]"
+              transition={{ duration: 0.6, delay: 1.2 + i * 0.1 }}
+              className="border-t pt-5"
+              style={{ borderColor: 'rgba(26,26,26,0.15)' }}
             >
-              <div className="font-display text-5xl font-light text-[#00FA9A] md:text-6xl">
-                {s.value !== null ? (
-                  <>
-                    <AnimatedCount value={s.value} suffix={s.suffix} />
-                  </>
-                ) : (
-                  'J+1'
-                )}
+              <div
+                style={{
+                  fontSize: 'clamp(36px, 3.5vw, 56px)',
+                  fontWeight: 500,
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
+                  color: '#1A1A1A',
+                }}
+              >
+                {s.v}
               </div>
-              <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-                {s.label}
+              <div
+                className="mt-3 text-[12px] uppercase"
+                style={{ color: '#1A1A1A', opacity: 0.55, letterSpacing: '0.06em', fontWeight: 500 }}
+              >
+                {s.l}
               </div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* === CTAs magnétiques === */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.2 }}
-          className="mt-14 flex flex-col items-start gap-3 sm:flex-row sm:gap-4"
-        >
-          <MagneticButton
-            href="https://calendly.com/clem-pred/30min"
-            target="_blank"
-            rel="noopener noreferrer"
-            strength={0.4}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#00FA9A] px-8 py-4 text-sm font-semibold text-[#050505] shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_40px_-8px_rgba(0,250,154,0.6)]"
-          >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-            />
-            <span className="relative">Diagnostic gratuit · 30 min</span>
-            <span className="relative transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-          </MagneticButton>
-          <MagneticButton
-            href="#dualite"
-            strength={0.25}
-            className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-7 py-4 text-sm font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/30 hover:bg-white/[0.05]"
-          >
-            Voir notre méthode
-            <span className="opacity-60 transition-transform duration-200 group-hover:translate-y-0.5">↓</span>
-          </MagneticButton>
-        </motion.div>
-
-        {/* === Marquee logos clients (RÉELS du PDF) avec fade mask === */}
+        {/* Subtle "trusted by" line (text-only, no logos here) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.5 }}
-          className="mt-24 w-full"
+          transition={{ duration: 0.9, delay: 1.6 }}
+          className="mt-20 flex flex-wrap items-baseline gap-x-8 gap-y-3"
         >
-          <div className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-500">
-            <span className="h-px w-8 bg-neutral-700" />
-            Ils nous font confiance
-            <span className="h-px flex-1 bg-neutral-800" />
-          </div>
-          <MarqueeLogos
-            logos={['Carrefour', 'Blackfin Capital', 'Avantis', 'KIT France', 'Espace 2', 'Socos Services', 'Gravotech', 'Cegos', 'myconnecting', 'synapse ia', 'ASphere', 'SENZA Formations']}
-            speed={36}
-            itemClassName="font-display text-2xl font-light text-neutral-400/85 tracking-tight"
-          />
+          <span className="text-[11px] uppercase font-medium tracking-[0.18em]" style={{ color: '#1A1A1A', opacity: 0.5 }}>
+            En confiance avec
+          </span>
+          {['Carrefour', 'Blackfin', 'Avantis', 'KIT France', 'Espace 2', 'Gravotech', 'Cegos'].map((c) => (
+            <span
+              key={c}
+              className="text-[15px] font-medium transition-colors hover:opacity-100"
+              style={{ color: '#1A1A1A', opacity: 0.75 }}
+            >
+              {c}
+            </span>
+          ))}
         </motion.div>
       </div>
     </section>
