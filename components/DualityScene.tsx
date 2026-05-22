@@ -1,199 +1,260 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-// Proposition X — DUALITY SCENE
-// Magazine spread éditoriale : Formation (gauche) vs Conseil & Production (droite)
-// Pli central, scroll-locked, les deux pôles se rejoignent dans "AXEM IA" en bas
+// BRUTALIST SWISS — DUALITÉ data-sheet
 const DualityScene: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
 
-  // Subtle parallax on left/right columns (opposite directions)
-  const yLeft = useTransform(scrollYProgress, [0, 1], [-40, 40]);
-  const yRight = useTransform(scrollYProgress, [0, 1], [40, -40]);
-  // Center fold grows as you scroll
-  const foldScale = useTransform(scrollYProgress, [0.1, 0.55, 0.9], [0, 1, 0.95]);
-  // Convergence indicator
-  const convergeOpacity = useTransform(scrollYProgress, [0.6, 0.85], [0, 1]);
+  const formations = [
+    { code: 'F01', name: 'IA_ESSENTIELLE', price: '300€', dur: '1J' },
+    { code: 'F02', name: 'PROMPT_PRO', price: '200€', dur: '½J' },
+    { code: 'F03', name: 'MAITRISER_CLAUDE', price: '450€', dur: '1J' },
+    { code: 'F04', name: 'METIERS', price: '400€', dur: '1J' },
+    { code: 'F05', name: 'NO_CODE', price: '800€', dur: '2J' },
+    { code: 'F06', name: 'AGENT_IA', price: '1250€', dur: '2J' },
+    { code: 'F07', name: 'VIBE_CODING', price: '450€', dur: '1J' },
+    { code: 'F08', name: 'AI_ACT', price: '250€', dur: '½J' },
+    { code: 'F09', name: 'VEILLE', price: '80€', dur: '2H' },
+    { code: 'F10', name: 'CREATION', price: '400€', dur: '1J' },
+  ];
+
+  const conseil = [
+    { n: '01', name: 'AUDIT', desc: 'DIAGNOSTIC // CARTOGRAPHIE // MATURITY' },
+    { n: '02', name: 'CONSEIL', desc: 'ROADMAP // OUTILS // ADOPTION' },
+    { n: '03', name: 'DEPLOIEMENT', desc: 'N8N // MAKE // CLAUDE CODE' },
+    { n: '04', name: 'COACHING', desc: 'REFERENTS // MANAGERS // EXECS' },
+    { n: '05', name: 'PRODUCTION', desc: 'VIDEO // VOIX // VISUEL' },
+    { n: '06', name: 'SUIVI', desc: 'MAINTENANCE // EVOLUTIONS' },
+    { n: '07', name: 'AUTONOMIE', desc: '12 MOIS+ // KNOWLEDGE TRANSFER' },
+  ];
 
   return (
-    <section id="dualite" ref={ref} className="relative isolate overflow-hidden border-t border-white/[0.06] bg-[#050505]">
-      {/* Vertical fold line — animated grow */}
-      <motion.div
-        aria-hidden="true"
-        style={{ scaleY: foldScale, transformOrigin: 'top' }}
-        className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#00FA9A]/40 to-transparent md:block"
+    <section
+      id="dualite"
+      className="relative border-t border-[#F0EDE5]/[0.08] bg-black overflow-hidden"
+      style={{ fontFamily: "'Inter', sans-serif", color: '#F0EDE5' }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: 'linear-gradient(to right, #F0EDE5 1px, transparent 1px)',
+          backgroundSize: 'calc(100% / 12) 100%',
+        }}
       />
 
-      <div className="mx-auto max-w-[1320px] px-6 py-24 md:py-40">
-        {/* Section eyebrow */}
-        <div className="mb-16 flex items-center justify-center gap-3">
-          <span className="h-2 w-2 bg-[#00FA9A]" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-            Notre offre · Deux mondes, un partenaire
+      {/* Top mono badge */}
+      <div className="relative border-b border-[#F0EDE5]/[0.08]">
+        <div className="mx-auto max-w-[1400px] px-6 py-4 flex items-center justify-between">
+          <span
+            className="text-[11px] uppercase tracking-[0.18em] text-[#FF2D5F]"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            // AXEM_OFFER.json
           </span>
-          <span className="h-2 w-2 bg-[#00FA9A]" />
+          <span
+            className="text-[11px] uppercase tracking-[0.18em] text-[#F0EDE5]/50"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            [ 03 // 06 ]
+          </span>
         </div>
+      </div>
 
-        {/* Massive editorial title */}
-        <h2 className="mx-auto mb-20 max-w-5xl text-center font-display text-[clamp(40px,7vw,112px)] font-light leading-[1.02] tracking-[-0.035em] text-white">
-          De l'<span className="font-playfair italic font-normal text-[#00FA9A]">audit</span> à la
-          <br />
-          <span className="font-playfair italic font-normal text-[#00FA9A]">montée en compétences</span>.
-        </h2>
+      <div className="relative mx-auto max-w-[1400px] px-6 py-24 md:py-32">
+        {/* HUGE caps title */}
+        <motion.h2
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="leading-[0.88] tracking-[-0.04em] uppercase mb-20"
+          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(56px, 13vw, 200px)' }}
+        >
+          <span className="block text-[#F0EDE5]">TWO POLES.</span>
+          <span className="inline-block mt-2 bg-[#FF2D5F] text-black px-4">ONE PARTNER.</span>
+        </motion.h2>
 
-        {/* === TWO COLUMNS MAGAZINE SPREAD === */}
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-0">
-          {/* LEFT COLUMN — FORMATION */}
-          <motion.article style={{ y: yLeft }} className="md:pr-12 lg:pr-20">
-            <div className="mb-8 flex items-baseline justify-between border-b border-white/10 pb-6">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#00FA9A]">
-                  Pôle 01
-                </div>
-                <div className="mt-3 font-display text-5xl font-light tracking-[-0.03em] text-white md:text-6xl">
-                  <span className="font-playfair italic text-[#00FA9A]">Formation</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-                  Qualiopi
-                </div>
-                <div className="mt-1 font-mono text-xs text-[#00FA9A]">certifié</div>
-              </div>
+        {/* 2 columns + central divider pink */}
+        <div className="relative grid grid-cols-1 md:grid-cols-2">
+          {/* Central pink divider */}
+          <div
+            aria-hidden
+            className="hidden md:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 bg-[#FF2D5F]"
+            style={{ width: '3px' }}
+          />
+
+          {/* COL 1 FORMATION */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+            className="pr-0 pb-16 md:pr-12 md:pb-0"
+          >
+            <div className="flex items-start justify-between mb-8 border-b border-[#F0EDE5]/[0.08] pb-6">
+              <span
+                className="text-[12px] uppercase tracking-[0.18em] text-[#FF2D5F]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                [01] FORMATION
+              </span>
+              <span
+                className="border border-[#F0EDE5]/[0.2] px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#F0EDE5]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                QUALIOPI ✓
+              </span>
             </div>
 
-            <p className="mb-10 max-w-md text-lg font-light leading-relaxed text-neutral-300">
-              <span className="font-playfair italic text-[#00FA9A]">10 formations</span>,{' '}
-              <span className="font-playfair italic text-[#00FA9A]">3 niveaux</span>,{' '}
-              <span className="font-playfair italic text-[#00FA9A]">70 % de pratique</span>. Vos
-              équipes opérationnelles dès J+1.
+            <h3
+              className="leading-[0.9] tracking-[-0.04em] uppercase text-[#F0EDE5] mb-6"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(32px, 4vw, 56px)' }}
+            >
+              10 MODULES.<br />3 LEVELS.<br />70% PRACTICE.
+            </h3>
+
+            <p
+              className="text-[13px] uppercase tracking-[0.06em] text-[#F0EDE5]/60 mb-10"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+            >
+              YOUR TEAMS OPERATIONAL FROM DAY+1.
             </p>
 
-            {/* Programme list */}
-            <ul className="space-y-3">
-              {[
-                { code: 'F01', name: 'IA Essentielle', level: 'Socle', price: '300 €', duration: '1 j' },
-                { code: 'F02', name: 'Prompt Engineering Pro', level: 'Socle', price: '200 €', duration: '½ j' },
-                { code: 'F03', name: 'Maîtriser Claude', level: 'Socle', price: '450 €', duration: '1 j' },
-                { code: 'F04', name: 'IA pour tous les métiers', level: 'Métiers', price: '400 €', duration: '1 j' },
-                { code: 'F05', name: 'No-Code & Workflows', level: 'Automatisation', price: '800 €', duration: '2 j' },
-                { code: 'F06', name: 'Agent IA sur-mesure', level: 'Automatisation', price: '1 250 €', duration: '2 j' },
-                { code: 'F07', name: 'Vibe Coding & Claude Code', level: 'Automatisation', price: '450 €', duration: '1 j' },
-                { code: 'F08', name: 'Gouvernance & AI Act', level: 'Transversal', price: '250 €', duration: '½ j' },
-                { code: 'F09', name: 'Veille IA', level: 'Transversal', price: '80 €', duration: '2 h' },
-                { code: 'F10', name: 'Création IA · Visuel · Vidéo · Voix', level: 'Production', price: '400 €', duration: '1 j' },
-              ].map((f, i) => (
+            <ul className="space-y-0 border-t border-[#F0EDE5]/[0.08]">
+              {formations.map((f, i) => (
                 <motion.li
                   key={f.code}
                   initial={{ opacity: 0, x: -16 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.4, delay: i * 0.03, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="group grid grid-cols-12 items-baseline gap-3 border-b border-white/[0.04] py-3 transition-colors hover:bg-white/[0.015]"
+                  transition={{ duration: 0.4, delay: i * 0.03 }}
+                  className="grid grid-cols-12 items-center gap-3 border-b border-[#F0EDE5]/[0.06] py-4 group hover:bg-[#FF2D5F] hover:text-black transition-colors"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
-                  <span className="col-span-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#00FA9A]">
+                  <span className="col-span-2 text-[11px] uppercase tracking-[0.12em] text-[#FF2D5F] group-hover:text-black">
                     {f.code}
                   </span>
-                  <span className="col-span-6 text-[15px] text-white">{f.name}</span>
-                  <span className="col-span-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-500">
-                    {f.duration}
+                  <span className="col-span-6 text-[12px] uppercase tracking-[0.08em]">
+                    :: {f.name}
                   </span>
-                  <span className="col-span-2 text-right font-display text-base font-light text-[#00FA9A]">
+                  <span className="col-span-2 text-right text-[10px] uppercase tracking-[0.12em] opacity-60">
+                    {f.dur}
+                  </span>
+                  <span className="col-span-2 text-right text-[12px] uppercase tracking-[0.08em]" style={{ fontWeight: 600 }}>
                     {f.price}
                   </span>
                 </motion.li>
               ))}
             </ul>
+          </motion.div>
 
-            <div className="mt-8 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-neutral-500">
-              <span className="h-px w-8 bg-[#00FA9A]/40" />
-              <span>+ Bootcamps immersifs sur devis · Formations vidéo 24/7</span>
-            </div>
-          </motion.article>
-
-          {/* RIGHT COLUMN — CONSEIL & PRODUCTION */}
-          <motion.article style={{ y: yRight }} className="md:pl-12 lg:pl-20 md:border-l md:border-white/[0.06]">
-            <div className="mb-8 flex items-baseline justify-between border-b border-white/10 pb-6">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#00FA9A]">
-                  Pôle 02
-                </div>
-                <div className="mt-3 font-display text-5xl font-light tracking-[-0.03em] text-white md:text-6xl">
-                  <span className="font-playfair italic text-[#00FA9A]">Conseil</span> &{' '}
-                  <span className="font-playfair italic text-[#00FA9A]">Production</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-                  Partenariat
-                </div>
-                <div className="mt-1 font-mono text-xs text-[#00FA9A]">12 mois+</div>
-              </div>
+          {/* COL 2 CONSEIL & PRODUCTION */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6, delay: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
+            className="pt-16 md:pt-0 md:pl-12 border-t md:border-t-0 border-[#F0EDE5]/[0.08]"
+          >
+            <div className="flex items-start justify-between mb-8 border-b border-[#F0EDE5]/[0.08] pb-6">
+              <span
+                className="text-[12px] uppercase tracking-[0.18em] text-[#FF2D5F]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                [02] CONSEIL & PRODUCTION
+              </span>
+              <span
+                className="border border-[#F0EDE5]/[0.2] px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#F0EDE5]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                12 MOIS+
+              </span>
             </div>
 
-            <p className="mb-10 max-w-md text-lg font-light leading-relaxed text-neutral-300">
-              De l'<span className="font-playfair italic text-[#00FA9A]">audit</span> au{' '}
-              <span className="font-playfair italic text-[#00FA9A]">déploiement</span>. Un seul
-              interlocuteur, du diagnostic à l'autonomie.
+            <h3
+              className="leading-[0.9] tracking-[-0.04em] uppercase text-[#F0EDE5] mb-6"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(32px, 4vw, 56px)' }}
+            >
+              AUDIT.<br />DEPLOY.<br />OPERATE.
+            </h3>
+
+            <p
+              className="text-[13px] uppercase tracking-[0.06em] text-[#F0EDE5]/60 mb-10"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+            >
+              ONE INTERLOCUTEUR. END-TO-END.
             </p>
 
-            {/* Process list */}
-            <ul className="space-y-3">
-              {[
-                { n: '01', name: 'Audit IA', desc: 'Diagnostic, cartographie, scoring de maturité', price: '1 à 4 sem.' },
-                { n: '02', name: 'Conseil stratégique', desc: 'Roadmap priorisée, choix outils, plan d\'adoption', price: 'Sur devis' },
-                { n: '03', name: 'Déploiement & automatisation', desc: 'n8n, Make, Claude Code — clé en main', price: 'À partir de 1 200 €' },
-                { n: '04', name: 'Coaching individuel', desc: 'Référents, managers, dirigeants — sur mesure', price: '200 € / session' },
-                { n: '05', name: 'Production IA', desc: 'Vidéos, voix, visuels, sites no-code, decks', price: 'Sur devis' },
-                { n: '06', name: 'Suivi long terme', desc: 'Maintenance, évolutions, nouvelles opportunités', price: '80 € / mois' },
-              ].map((s, i) => (
+            <ul className="space-y-0 border-t border-[#F0EDE5]/[0.08]">
+              {conseil.map((c, i) => (
                 <motion.li
-                  key={s.n}
+                  key={c.n}
                   initial={{ opacity: 0, x: 16 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.4, delay: i * 0.05, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="group grid grid-cols-12 items-start gap-3 border-b border-white/[0.04] py-4 transition-colors hover:bg-white/[0.015]"
+                  transition={{ duration: 0.4, delay: i * 0.04 }}
+                  className="relative border-b border-[#F0EDE5]/[0.06] py-6 group overflow-hidden"
                 >
-                  <span className="col-span-2 font-display text-3xl font-light text-[#00FA9A]">
-                    {s.n}
+                  {/* Big watermark number */}
+                  <span
+                    aria-hidden
+                    className="absolute right-0 top-1/2 -translate-y-1/2 leading-none text-[#F0EDE5]/[0.04] pointer-events-none select-none"
+                    style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 900,
+                      fontSize: 'clamp(80px, 12vw, 200px)',
+                    }}
+                  >
+                    {c.n}
                   </span>
-                  <div className="col-span-7">
-                    <div className="text-[15px] text-white">{s.name}</div>
-                    <div className="mt-1 text-xs leading-relaxed text-neutral-500">{s.desc}</div>
+
+                  <div className="relative flex items-baseline gap-4">
+                    <span
+                      className="text-[11px] uppercase tracking-[0.18em] text-[#FF2D5F]"
+                      style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                    >
+                      [{c.n}]
+                    </span>
+                    <span
+                      className="text-[#F0EDE5] uppercase tracking-[-0.02em]"
+                      style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: 'clamp(20px, 2.4vw, 32px)' }}
+                    >
+                      {c.name}
+                    </span>
                   </div>
-                  <span className="col-span-3 text-right text-[11px] uppercase tracking-[0.14em] text-[#00FA9A]/80">
-                    {s.price}
-                  </span>
+                  <div
+                    className="relative mt-2 text-[11px] uppercase tracking-[0.14em] text-[#F0EDE5]/60"
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    {c.desc}
+                  </div>
                 </motion.li>
               ))}
             </ul>
-
-            <div className="mt-8 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-neutral-500">
-              <span className="h-px w-8 bg-[#00FA9A]/40" />
-              <span>Automatisation : 1 200–2 000 € · Abonnement 900 € + 80 €/mois</span>
-            </div>
-          </motion.article>
+          </motion.div>
         </div>
 
-        {/* === CONVERGENCE — Les deux pôles se rejoignent === */}
+        {/* Bottom convergence */}
         <motion.div
-          style={{ opacity: convergeOpacity }}
-          className="mt-32 text-center"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          className="mt-24 text-center"
         >
-          <div className="mx-auto mb-8 h-12 w-px bg-gradient-to-b from-[#00FA9A] to-transparent" />
-          <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-neutral-500 mb-6">
-            Convergence
+          <div
+            className="text-[#FF2D5F] uppercase tracking-[0.2em]"
+            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 'clamp(16px, 2.4vw, 28px)', fontWeight: 600 }}
+          >
+            ===&gt; ONE INTERLOCUTOR &lt;===
           </div>
-          <h3 className="font-display text-5xl font-light tracking-[-0.03em] text-white md:text-7xl">
-            Deux experts,{' '}
-            <span className="font-playfair italic text-[#00FA9A]">un seul</span>{' '}
-            interlocuteur.
-          </h3>
-          <p className="mx-auto mt-6 max-w-xl text-base font-light text-neutral-400 md:text-lg">
-            Pas de relais qui se perd entre équipes. Vous parlez à ceux qui livrent.
-          </p>
         </motion.div>
       </div>
     </section>

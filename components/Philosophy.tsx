@@ -1,147 +1,223 @@
-import React from 'react';
-import EditableText from './ui/EditableText';
-import { ArrowUpRight } from 'lucide-react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AnimatedCount, SpotlightCard, ScrollRevealWords } from './ui/wow';
 
-// Proposition X — Editorial Pure
-// Founders avec VRAIES données du PDF
+// BRUTALIST SWISS — FOUNDERS data-dump
+// Black + hot pink + Inter/JetBrains Mono
 const Philosophy: React.FC = () => {
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
+
   const clementImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg";
   const alexisImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png";
 
   const founders = [
     {
       img: clementImage,
-      tag: 'Stratégie · Formations',
-      name: 'Clément Predo',
-      school: 'ESSEC',
-      role: 'Co-fondateur',
-      pitch: 'Stratégie, formations, conseil et automatisation. Pilotage des missions audit et stratégie.',
+      bracket: '[ CLEMENT_PREDO ]',
+      name: 'CLEMENT',
+      surname: 'PREDO',
+      school: 'ESSEC // STRATEGY',
       bullets: [
-        '3 ans de terrain IA',
-        'Formations, conseil, automatisation',
-        'Pilotage missions audit & stratégie',
+        '3 YEARS OF AI FIELDWORK',
+        'TRAININGS · CONSULTING · AUTOMATION',
+        'AUDIT & STRATEGY MISSIONS LEAD',
       ],
-      stats: { value: 40000, label: 'abonnés LinkedIn' },
+      stat: '+40K',
+      statLabel: 'LINKEDIN FOLLOWERS',
       linkedin: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/',
     },
     {
       img: alexisImage,
-      tag: 'Tech · Déploiement',
-      name: 'Alexis Zeitoun',
-      school: 'Institut Polytechnique de Paris',
-      role: 'Co-fondateur',
-      pitch: "Déploiement terrain, expertise tech. Expérience secteur financier et fonds de Private Equity.",
+      bracket: '[ ALEXIS_ZEITOUN ]',
+      name: 'ALEXIS',
+      surname: 'ZEITOUN',
+      school: 'INSTITUT POLYTECHNIQUE DE PARIS // SYSTEMS',
       bullets: [
-        '3 ans de terrain IA',
-        'Déploiement terrain, équipes & dirigeants',
-        'Secteur financier · fonds Private Equity',
+        '3 YEARS OF AI FIELDWORK',
+        'FIELD DEPLOYMENT · TEAMS & EXECS',
+        'FINANCIAL SECTOR · PRIVATE EQUITY',
       ],
-      stats: { value: 15000, label: 'abonnés LinkedIn' },
+      stat: '+15K',
+      statLabel: 'LINKEDIN FOLLOWERS',
       linkedin: 'https://www.linkedin.com/in/alexiszeitoun/',
     },
   ];
 
   return (
-    <section id="qui-sommes-nous" className="relative border-t border-white/[0.06] bg-[#050505] py-32">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-20 grid grid-cols-12 gap-6">
-          <div className="col-span-12 md:col-span-3">
-            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-              <span className="h-2 w-2 bg-[#00FA9A]" />
-              <EditableText value="Fondateurs" storageKey="philo_badge" />
-            </div>
-          </div>
-          <div className="col-span-12 md:col-span-9">
-            <ScrollRevealWords
-              text="Deux experts, un seul interlocuteur."
-              className="font-display text-4xl font-light leading-[1.05] tracking-[-0.03em] md:text-6xl lg:text-7xl"
-              brightClass="text-white"
-              dimClass="text-white/15"
-            />
-            <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-neutral-400">
-              Pas une agence de plus, pas deux consultants génériques. L'excellence technique et la
-              stratégie business, fondues en une seule offre. Du diagnostic au déploiement.
-            </p>
-          </div>
+    <section
+      id="qui-sommes-nous"
+      className="relative border-t border-[#F0EDE5]/[0.08] bg-black"
+      style={{ fontFamily: "'Inter', sans-serif", color: '#F0EDE5' }}
+    >
+      {/* Subtle grid bg */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, #F0EDE5 1px, transparent 1px)',
+          backgroundSize: 'calc(100% / 12) 100%',
+        }}
+      />
+
+      {/* Top mono badge */}
+      <div className="relative border-b border-[#F0EDE5]/[0.08]">
+        <div className="mx-auto max-w-[1400px] px-6 py-4 flex items-center justify-between">
+          <span
+            className="text-[11px] uppercase tracking-[0.18em] text-[#FF2D5F]"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            // FOUNDERS_2026.txt
+          </span>
+          <span
+            className="text-[11px] uppercase tracking-[0.18em] text-[#F0EDE5]/50"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            [ 02 // 06 ]
+          </span>
+        </div>
+      </div>
+
+      <div className="relative mx-auto max-w-[1400px] px-6 py-24 md:py-32">
+        {/* HUGE caps title */}
+        <div className="mb-20">
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+            className="leading-[0.88] tracking-[-0.04em] uppercase"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(56px, 14vw, 220px)' }}
+          >
+            <span className="block text-[#F0EDE5]">TWO HUMANS.</span>
+            <span className="inline-block mt-2 bg-[#FF2D5F] text-black px-4">ONE STACK.</span>
+          </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-white/[0.06] md:grid-cols-2">
+        {/* 2 columns w/ vertical divider */}
+        <div className="grid grid-cols-1 md:grid-cols-2">
           {founders.map((f, idx) => (
-            <SpotlightCard
-              key={f.name}
-              className="group flex flex-col gap-6 border bg-[#0A0A0A] p-8 md:p-10"
-              spotlightColor="rgba(0,250,154,0.10)"
+            <motion.article
+              key={f.surname}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.6, delay: idx * 0.16, ease: [0.2, 0.8, 0.2, 1] }}
+              className={
+                idx === 0
+                  ? 'pr-0 pb-12 md:pr-12 md:pb-0'
+                  : 'pt-12 md:pt-0 md:pl-12 border-t md:border-t-0 md:border-l border-[#F0EDE5]/[0.08]'
+              }
             >
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.2, 0.8, 0.2, 1] }}
-                className="flex h-full flex-col gap-6"
+              {/* Bracket mono pink */}
+              <div
+                className="text-[12px] uppercase tracking-[0.18em] text-[#FF2D5F] mb-6"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                    {f.tag}
-                  </div>
-                  <motion.a
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 14 }}
-                    href={f.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-neutral-500 transition-colors hover:text-[#00FA9A]"
-                    aria-label={`LinkedIn de ${f.name}`}
+                {f.bracket}
+              </div>
+
+              {/* Photo bichromie */}
+              <div className="relative mb-8 w-full max-w-[280px]">
+                <img
+                  src={f.img}
+                  alt={`${f.name} ${f.surname}`}
+                  className="w-full h-auto block"
+                  style={{ filter: 'grayscale(1) contrast(1.2)' }}
+                />
+              </div>
+
+              {/* Name HUGE Inter 900 */}
+              <h3
+                className="leading-[0.9] tracking-[-0.04em] uppercase text-[#F0EDE5] mb-4"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(40px, 6vw, 64px)' }}
+              >
+                {f.name}<br />{f.surname}
+              </h3>
+
+              {/* School mono caps */}
+              <div
+                className="text-[11px] uppercase tracking-[0.18em] text-[#F0EDE5]/60 mb-8"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                {f.school}
+              </div>
+
+              {/* Bullets */}
+              <ul className="space-y-3 mb-10 border-t border-[#F0EDE5]/[0.08] pt-6">
+                {f.bullets.map((b) => (
+                  <li
+                    key={b}
+                    className="flex items-start gap-3 text-[13px] uppercase tracking-[0.06em] text-[#F0EDE5]/80"
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
                   >
-                    <ArrowUpRight className="h-5 w-5" />
-                  </motion.a>
-                </div>
+                    <span className="text-[#FF2D5F]">▸</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
 
-                <div className="flex items-center gap-5">
-                  <motion.img
-                    whileHover={{ scale: 1.05, rotate: idx === 0 ? -2 : 2 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 12 }}
-                    src={f.img}
-                    alt={f.name}
-                    className="h-20 w-20 rounded-full border border-white/10 object-cover md:h-24 md:w-24"
-                  />
-                  <div>
-                    <h3 className="font-display text-3xl font-light tracking-tight text-white md:text-4xl">
-                      {f.name}
-                    </h3>
-                    <p className="mt-1 font-playfair text-base italic text-[#00FA9A]">
-                      {f.role}
-                    </p>
-                    <p className="mt-0.5 text-xs uppercase tracking-[0.18em] text-neutral-500">
-                      {f.school}
-                    </p>
-                  </div>
-                </div>
+              {/* Stat HUGE */}
+              <div className="border-t border-[#F0EDE5]/[0.08] pt-6 flex items-baseline gap-4">
+                <span
+                  className="leading-none text-[#F0EDE5]"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 'clamp(56px, 8vw, 80px)' }}
+                >
+                  {f.stat}
+                </span>
+                <span
+                  className="text-[10px] uppercase tracking-[0.2em] text-[#F0EDE5]/50"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  {f.statLabel}
+                </span>
+              </div>
 
-                <p className="text-base leading-relaxed text-neutral-300">{f.pitch}</p>
-
-                <ul className="space-y-2.5 border-t border-white/[0.06] pt-5">
-                  {f.bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-3 text-sm text-neutral-400">
-                      <span className="mt-1.5 inline-block h-1 w-1 flex-shrink-0 bg-[#00FA9A]" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-auto flex items-baseline gap-3 border-t border-white/[0.06] pt-6">
-                  <span className="font-display text-5xl font-light text-[#00FA9A] md:text-6xl">
-                    +<AnimatedCount value={f.stats.value} />
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                    {f.stats.label}
-                  </span>
-                </div>
-              </motion.div>
-            </SpotlightCard>
+              {/* LinkedIn square button */}
+              <a
+                href={f.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-8 inline-flex items-center gap-3 border border-[#F0EDE5]/[0.2] px-5 py-3 text-[11px] uppercase tracking-[0.2em] text-[#F0EDE5] transition-colors hover:bg-[#FF2D5F] hover:text-[#F0EDE5] hover:border-[#FF2D5F]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                <span>LINKEDIN</span>
+                <span className="group-hover:translate-x-1 transition-transform">↗</span>
+              </a>
+            </motion.article>
           ))}
         </div>
+
+        {/* Quote bloc pink */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+          className="mt-24 bg-[#FF2D5F] px-6 py-16 md:py-24"
+        >
+          <div
+            className="text-[10px] uppercase tracking-[0.3em] text-black/80 mb-6"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            // QUOTE.txt
+          </div>
+          <p
+            className="leading-[0.9] tracking-[-0.04em] uppercase text-[#F0EDE5]"
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 900,
+              fontSize: 'clamp(40px, 10vw, 120px)',
+            }}
+          >
+            "WE SHIP.<br />WE DON'T PITCH."
+          </p>
+        </motion.div>
       </div>
     </section>
   );
