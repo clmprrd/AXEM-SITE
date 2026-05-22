@@ -50,7 +50,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden selection:bg-[#B7FF45]/30 text-white bg-[#050505] relative">
+    <div className="min-h-screen overflow-x-hidden selection:bg-[#00FA9A]/30 text-white bg-[#050505] relative">
       <BrowserRouter>
         <Routes>
           <Route

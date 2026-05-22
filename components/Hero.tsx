@@ -1,182 +1,273 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import EditableText from './ui/EditableText';
-import { ArrowUpRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { MagneticButton, MarqueeLogos } from './ui/wow';
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 
-// Direction A — "Linear Engineered" (v3, WOW edition)
-// Adds: magnetic CTAs, infinite marquee logos with fade mask, animated CTA shimmer,
-// shimmering accent halo with motion, mouse-tracked grid spotlight.
+// Proposition Y — "Dual Universe Magnetic"
 const Hero: React.FC = () => {
-  const scrollToNext = () => {
-    window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+  const sectionRef = useRef<HTMLElement>(null);
+  const divider = useMotionValue(50);
+  const dividerSpring = useSpring(divider, { stiffness: 90, damping: 22, mass: 0.6 });
+  const [hovered, setHovered] = useState<'left' | 'right' | null>(null);
+
+  useEffect(() => {
+    if (hovered !== null) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = (now - start) / 1000;
+      const wave = 50 + Math.sin(t * 0.7) * 1.2;
+      divider.set(wave);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [hovered, divider]);
+
+  const handleMove = (e: React.MouseEvent) => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    const clamped = Math.max(20, Math.min(80, pct));
+    const offset = clamped - 50;
+    const magnetic = 50 + offset * 1.18;
+    divider.set(Math.max(22, Math.min(78, magnetic)));
+    setHovered(clamped < 50 ? 'left' : 'right');
   };
+
+  const handleLeave = () => {
+    setHovered(null);
+    divider.set(50);
+  };
+
+  const leftWidth = useTransform(dividerSpring, (v) => `${v}%`);
+  const rightWidth = useTransform(dividerSpring, (v) => `${100 - v}%`);
+  const leftActive = useTransform(dividerSpring, (v) => (v - 50) / 30);
+  const leftScale = useTransform(leftActive, [-1, 0, 1], [0.94, 1, 1.05]);
+  const rightScale = useTransform(leftActive, [-1, 0, 1], [1.05, 1, 0.94]);
+  const leftOpacity = useTransform(leftActive, [-1, 0, 1], [0.55, 1, 1]);
+  const rightOpacity = useTransform(leftActive, [-1, 0, 1], [1, 1, 0.55]);
+  const dividerX = useTransform(dividerSpring, (v) => `${v}%`);
 
   return (
     <section
-      className="relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-6 pt-40 pb-32"
-      aria-label="AXEM IA — Hero"
+      ref={sectionRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className="relative isolate flex min-h-[100vh] cursor-ew-resize overflow-hidden bg-[#050505] text-white"
+      aria-label="AXEM IA — Dual Universe Hero"
     >
-      {/* === Background: grid + breathing halo === */}
-      <div className="absolute inset-0 -z-10">
-        <div
+      {/* LEFT UNIVERSE — FORMATION */}
+      <motion.div
+        style={{ width: leftWidth }}
+        className="relative flex flex-shrink-0 items-center justify-center overflow-hidden"
+      >
+        <motion.div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
+            background:
+              'radial-gradient(circle at 35% 50%, rgba(0,250,154,0.22), transparent 65%), linear-gradient(135deg, #050505 0%, #051F18 100%)',
+          }}
+          animate={{ opacity: [0.85, 1, 0.9] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: '56px 56px',
-            maskImage:
-              'radial-gradient(ellipse 80% 60% at 50% 30%, black 50%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 80% 60% at 50% 30%, black 50%, transparent 100%)',
+              "linear-gradient(to right, #00FA9A 1px, transparent 1px), linear-gradient(to bottom, #00FA9A 1px, transparent 1px)",
+            backgroundSize: '64px 64px',
           }}
         />
-        {/* breathing accent halo */}
+
+        <motion.div
+          style={{ scale: leftScale, opacity: leftOpacity }}
+          className="relative z-10 max-w-2xl px-8 md:px-16 lg:px-24"
+        >
+          <div className="mb-6 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
+            <span className="h-2 w-2 bg-[#00FA9A]" />
+            <EditableText value="Pôle 01 · Formation" storageKey="hero_left_eyebrow" />
+            <span className="rounded-sm border border-[#00FA9A]/40 bg-[#00FA9A]/10 px-1.5 py-0.5 text-[8px] tracking-[0.18em]">
+              Qualiopi
+            </span>
+          </div>
+          <h1 className="font-display text-[clamp(40px,6vw,96px)] font-light leading-[1.0] tracking-[-0.035em]">
+            <EditableText value="Vos équipes" storageKey="hero_left_t1" />
+            <br />
+            <span className="font-playfair italic font-normal text-[#00FA9A]">
+              <EditableText value="opérationnelles" storageKey="hero_left_t2" />
+            </span>
+            <br />
+            <EditableText value="dès J+1." storageKey="hero_left_t3" />
+          </h1>
+          <p className="mt-8 text-lg font-light leading-relaxed text-neutral-300 md:text-xl">
+            10 formations · 3 niveaux · 70 % pratique. De zéro à opérationnel en 1 journée.
+          </p>
+          <div className="mt-10 grid grid-cols-2 gap-6 border-l-2 border-[#00FA9A]/40 pl-4">
+            <div>
+              <div className="font-display text-4xl font-light text-[#00FA9A]">10</div>
+              <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                modules F01→F10
+              </div>
+            </div>
+            <div>
+              <div className="font-display text-4xl font-light text-[#00FA9A]">200–1250€</div>
+              <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                par pers / session
+              </div>
+            </div>
+          </div>
+          <a
+            href="#formations"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#00FA9A] px-7 py-3.5 text-sm font-semibold text-[#050505] shadow-[0_0_40px_-8px_rgba(0,250,154,0.6)] transition-transform hover:scale-[1.03]"
+          >
+            Voir le catalogue
+            <span>→</span>
+          </a>
+        </motion.div>
+
+        <AnimatePresence>
+          {hovered === 'left' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.6 }}
+              className="absolute right-12 top-1/2 -translate-y-1/2 font-display text-[20vw] font-light leading-none tracking-[-0.05em] text-[#00FA9A]/10 select-none pointer-events-none"
+            >
+              F
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* MAGNETIC DIVIDER */}
+      <motion.div
+        style={{ left: dividerX, x: '-50%' }}
+        className="absolute top-0 z-20 flex h-full flex-col items-center justify-center pointer-events-none"
+      >
+        <div className="h-full w-px bg-gradient-to-b from-transparent via-white/60 to-transparent" />
+        <motion.div
+          className="absolute top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#050505]/80 backdrop-blur-md"
+          animate={{ scale: hovered ? 1.1 : 1 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+        >
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white">
+            <motion.span
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              ⇄
+            </motion.span>
+          </div>
+        </motion.div>
+        <div className="absolute top-[calc(50%-72px)] -translate-y-full whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.32em] text-white/60">
+          ↑ Glisse pour explorer ↑
+        </div>
+      </motion.div>
+
+      {/* RIGHT UNIVERSE — CONSEIL & PRODUCTION */}
+      <motion.div
+        style={{ width: rightWidth }}
+        className="relative flex flex-shrink-0 items-center justify-center overflow-hidden"
+      >
         <motion.div
           aria-hidden="true"
-          className="absolute left-1/2 top-[10%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full blur-[140px]"
-          style={{ background: 'radial-gradient(closest-side, #B7FF45, transparent)' }}
-          animate={{ opacity: [0.18, 0.36, 0.22, 0.36, 0.18], scale: [1, 1.06, 1.0, 1.05, 1] }}
-          transition={{ duration: 9, ease: 'easeInOut', repeat: Infinity }}
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 65% 50%, rgba(167,139,250,0.22), transparent 65%), linear-gradient(225deg, #050505 0%, #0F0918 100%)',
+          }}
+          animate={{ opacity: [0.85, 1, 0.9] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* secondary cool halo */}
-        <motion.div
+        <div
           aria-hidden="true"
-          className="absolute right-[15%] top-[40%] h-[40vh] w-[40vw] rounded-full blur-[120px]"
-          style={{ background: 'radial-gradient(closest-side, #6FCDFF, transparent)' }}
-          animate={{ opacity: [0.05, 0.18, 0.08], x: [-20, 30, -20] }}
-          transition={{ duration: 14, ease: 'easeInOut', repeat: Infinity }}
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(167,139,250,0.4) 0 1px, transparent 1px 14px)",
+          }}
         />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#050505]" />
-      </div>
 
-      {/* === Eyebrow badge === */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-      >
-        <a
-          href="#realisations"
-          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-sm transition-all duration-200 hover:border-[#B7FF45]/40 hover:bg-[#B7FF45]/[0.06] hover:text-white"
+        <motion.div
+          style={{ scale: rightScale, opacity: rightOpacity }}
+          className="relative z-10 max-w-2xl px-8 md:px-16 lg:px-24"
         >
-          <motion.span
-            className="flex h-1.5 w-1.5 rounded-full bg-[#B7FF45]"
-            animate={{ boxShadow: ['0 0 0px #B7FF45', '0 0 12px #B7FF45', '0 0 0px #B7FF45'] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <span>Nouveau · Audit IA en 5 jours, livrable garanti</span>
-          <ArrowUpRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </a>
+          <div className="mb-6 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#A78BFA]">
+            <span className="h-2 w-2 bg-[#A78BFA]" />
+            <EditableText value="Pôle 02 · Conseil & Production" storageKey="hero_right_eyebrow" />
+            <span className="rounded-sm border border-[#A78BFA]/40 bg-[#A78BFA]/10 px-1.5 py-0.5 text-[8px] tracking-[0.18em]">
+              12 mois+
+            </span>
+          </div>
+          <h1 className="font-display text-[clamp(40px,6vw,96px)] font-light leading-[1.0] tracking-[-0.035em]">
+            <EditableText value="L'IA" storageKey="hero_right_t1" />{' '}
+            <span className="font-playfair italic font-normal text-[#A78BFA]">
+              <EditableText value="livrée" storageKey="hero_right_t2" />
+            </span>
+            <EditableText value=", pas" storageKey="hero_right_t3" />
+            <br />
+            <EditableText value="installée." storageKey="hero_right_t4" />
+          </h1>
+          <p className="mt-8 text-lg font-light leading-relaxed text-neutral-300 md:text-xl">
+            Audit · Conseil · Déploiement · Coaching · Production · Suivi. Un seul interlocuteur,
+            de l'audit à l'autonomie.
+          </p>
+          <div className="mt-10 grid grid-cols-2 gap-6 border-l-2 border-[#A78BFA]/40 pl-4">
+            <div>
+              <div className="font-display text-4xl font-light text-[#A78BFA]">1–4 sem</div>
+              <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                durée audit
+              </div>
+            </div>
+            <div>
+              <div className="font-display text-4xl font-light text-[#A78BFA]">1 200€+</div>
+              <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                automatisation
+              </div>
+            </div>
+          </div>
+          <a
+            href="#parcours"
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#A78BFA] px-7 py-3.5 text-sm font-semibold text-[#050505] shadow-[0_0_40px_-8px_rgba(167,139,250,0.6)] transition-transform hover:scale-[1.03]"
+          >
+            Voir notre méthode
+            <span>→</span>
+          </a>
+        </motion.div>
+
+        <AnimatePresence>
+          {hovered === 'right' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.6 }}
+              className="absolute left-12 top-1/2 -translate-y-1/2 font-display text-[20vw] font-light leading-none tracking-[-0.05em] text-[#A78BFA]/10 select-none pointer-events-none"
+            >
+              C
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
-      {/* === Title with letter stagger reveal === */}
-      <motion.h1
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
-        }}
-        className="mt-8 max-w-5xl text-center text-[40px] font-medium leading-[1.02] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[88px]"
-      >
-        {["L'IA d'entreprise,", 'simple, rentable, actionnable.'].map((line, lineIdx) => (
-          <span key={lineIdx} className={`block ${lineIdx === 1 ? 'bg-gradient-to-b from-white to-neutral-500 bg-clip-text text-transparent' : ''}`}>
-            {line.split(' ').map((word, i) => (
-              <motion.span
-                key={`${word}-${i}`}
-                variants={{
-                  hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
-                  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6, ease: [0.2, 0.8, 0.2, 1] } },
-                }}
-                className="mr-3 inline-block"
-              >
-                {word}
-              </motion.span>
-            ))}
-          </span>
-        ))}
-      </motion.h1>
-
-      {/* === Subtitle === */}
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="mt-7 max-w-2xl text-center text-base font-light leading-relaxed text-neutral-400 md:text-lg"
-      >
-        <EditableText
-          value="Formation, conseil, audit et déploiement d'agents IA pour PME et grands groupes. Livrables mesurables, exécution en jours."
-          storageKey="hero_subtitle"
-          isTextarea
-          className="w-full text-center"
-        />
-      </motion.p>
-
-      {/* === Magnetic CTAs === */}
+      {/* BOTTOM TAGLINE */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.95 }}
-        className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-3"
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="pointer-events-none absolute inset-x-0 bottom-10 z-30 flex flex-col items-center text-center"
       >
-        <MagneticButton
-          href="https://calendly.com/clem-pred/30min"
-          target="_blank"
-          rel="noopener noreferrer"
-          strength={0.4}
-          className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#B7FF45] px-7 py-3.5 text-sm font-semibold text-black shadow-[0_0_0_1px_rgba(183,255,69,0.4),0_0_40px_-8px_rgba(183,255,69,0.6)]"
-        >
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-          />
-          <span className="relative">Réserver un audit</span>
-          <ArrowUpRight className="relative h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
-        </MagneticButton>
-
-        <MagneticButton
-          href="/realisations"
-          strength={0.25}
-          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-6 py-3.5 text-sm font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
-        >
-          Voir nos réalisations
-          <ArrowUpRight className="h-4 w-4 opacity-60 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
-        </MagneticButton>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/60">
+          Rendre l'IA{' '}
+          <span className="font-playfair italic text-[#00FA9A]">simple</span>, rentable et{' '}
+          <span className="font-playfair italic text-[#A78BFA]">actionnable</span>.
+        </div>
+        <div className="mt-3 text-[10px] uppercase tracking-[0.24em] text-white/30">
+          Scroll ↓
+        </div>
       </motion.div>
-
-      {/* === Marquee logos with fade mask === */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.2 }}
-        className="mt-20 w-full max-w-5xl"
-      >
-        <p className="mb-5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">
-          Ils nous font confiance
-        </p>
-        <MarqueeLogos
-          logos={['SNCF', 'Capgemini', 'EY', 'BNP Paribas', 'Orange', 'Société Générale', 'Decathlon', 'L\'Oréal']}
-          speed={30}
-          itemClassName="text-[17px] font-medium text-neutral-400/80 tracking-tight"
-        />
-      </motion.div>
-
-      {/* Scroll cue */}
-      <motion.button
-        type="button"
-        onClick={scrollToNext}
-        aria-label="Faire défiler vers la suite"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, y: [0, 6, 0] }}
-        transition={{ opacity: { delay: 1.5 }, y: { duration: 2, repeat: Infinity } }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-neutral-500 transition-colors hover:text-white"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M12 5v14M5 12l7 7 7-7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </motion.button>
     </section>
   );
 };

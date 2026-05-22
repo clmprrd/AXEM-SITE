@@ -18,7 +18,7 @@ const caseStudiesData = [
         category: "Formation Scaling",
         content: `
           <h1>Formation : Déploiement IA à l'Échelle</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">+40% de productivité mesurée sur 200 collaborateurs sans aucun frais logistique.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">+40% de productivité mesurée sur 200 collaborateurs sans aucun frais logistique.</p>
           
           <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -36,12 +36,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">ROI Logistique :</strong> <span class="flex-1">Formation de masse avec zéro frais de déplacement.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Temps Sauvé :</strong> <span class="flex-1">Réduction de 40% du temps passé sur les process administratifs.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Autonomie :</strong> <span class="flex-1">Des employés capables de scripter l'IA sans faire appel au pôle IT.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">ROI Logistique :</strong> <span class="flex-1">Formation de masse avec zéro frais de déplacement.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Temps Sauvé :</strong> <span class="flex-1">Réduction de 40% du temps passé sur les process administratifs.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Autonomie :</strong> <span class="flex-1">Des employés capables de scripter l'IA sans faire appel au pôle IT.</span></li>
                 </ul>
             </div>
           </div>
@@ -54,7 +54,7 @@ const caseStudiesData = [
         category: "Bootcamp Intensif",
         content: `
           <h1>Formation : Le "Hackathon" IA en Présentiel</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">5 projets d'automatisation majeurs créés et déployés en 48 heures chrono.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">5 projets d'automatisation majeurs créés et déployés en 48 heures chrono.</p>
           
           <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -72,12 +72,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Time-to-Market :</strong> <span class="flex-1">5 outils opérationnels déployés en 2 jours, un processus qui prend normalement 6 mois.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Économies IT :</strong> <span class="flex-1">Des dizaines de milliers d'euros économisés en développement externe.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Culture :</strong> <span class="flex-1">Transformation totale des équipes : de spectateurs à bâtisseurs d'IA.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Time-to-Market :</strong> <span class="flex-1">5 outils opérationnels déployés en 2 jours, un processus qui prend normalement 6 mois.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Économies IT :</strong> <span class="flex-1">Des dizaines de milliers d'euros économisés en développement externe.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Culture :</strong> <span class="flex-1">Transformation totale des équipes : de spectateurs à bâtisseurs d'IA.</span></li>
                 </ul>
             </div>
           </div>
@@ -90,7 +90,7 @@ const caseStudiesData = [
         category: "Industrialisation",
         content: `
           <h1>Formation : Content Factory Marketing</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">Capacité de production x10 et division par 2 du budget agence.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">Capacité de production x10 et division par 2 du budget agence.</p>
           
           <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -108,12 +108,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">ROI Budgétaire :</strong> <span class="flex-1">-50% sur les coûts d'agence de communication externes.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Scalabilité :</strong> <span class="flex-1">Production de 30 posts et assets par semaine au lieu de 4, à effectif constant.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Réactivité :</strong> <span class="flex-1">Lancement d'une campagne multicanale de l'idée à la publication en moins de 2 heures.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">ROI Budgétaire :</strong> <span class="flex-1">-50% sur les coûts d'agence de communication externes.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Scalabilité :</strong> <span class="flex-1">Production de 30 posts et assets par semaine au lieu de 4, à effectif constant.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Réactivité :</strong> <span class="flex-1">Lancement d'une campagne multicanale de l'idée à la publication en moins de 2 heures.</span></li>
                 </ul>
             </div>
           </div>
@@ -132,7 +132,7 @@ const caseStudiesData = [
         category: "ERP & Flux Financiers",
         content: `
           <h1>Déploiement : Comptabilité "Zéro Saisie"</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">100% des pénalités de retard éliminées et temps de saisie divisé par 5.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">100% des pénalités de retard éliminées et temps de saisie divisé par 5.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -150,12 +150,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Cash-Flow Sauvé :</strong> <span class="flex-1">Éradication totale des amendes de retard et optimisation de la trésorerie.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Heures Récupérées :</strong> <span class="flex-1">-80% de temps passé sur la saisie de données pures.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Montée en Gamme :</strong> <span class="flex-1">Les comptables redeviennent des analystes financiers stratégiques.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Cash-Flow Sauvé :</strong> <span class="flex-1">Éradication totale des amendes de retard et optimisation de la trésorerie.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Heures Récupérées :</strong> <span class="flex-1">-80% de temps passé sur la saisie de données pures.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Montée en Gamme :</strong> <span class="flex-1">Les comptables redeviennent des analystes financiers stratégiques.</span></li>
                 </ul>
             </div>
           </div>
@@ -168,7 +168,7 @@ const caseStudiesData = [
         category: "Productivité Commerciale",
         content: `
           <h1>Déploiement : Synchronisation CRM Invisible</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">+15% de temps de vente récupéré par commercial et 100% de data fiable.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">+15% de temps de vente récupéré par commercial et 100% de data fiable.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -186,12 +186,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Force de Frappe :</strong> <span class="flex-1">Récupération de 5 heures par semaine par vendeur, réinvesties dans le closing.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Data Quality :</strong> <span class="flex-1">Un CRM toujours à jour, permettant un pilotage financier exact.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Risque Sécurisé :</strong> <span class="flex-1">La mémoire commerciale appartient enfin à l'entreprise, plus aux carnets d'adresses personnels.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Force de Frappe :</strong> <span class="flex-1">Récupération de 5 heures par semaine par vendeur, réinvesties dans le closing.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Data Quality :</strong> <span class="flex-1">Un CRM toujours à jour, permettant un pilotage financier exact.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Risque Sécurisé :</strong> <span class="flex-1">La mémoire commerciale appartient enfin à l'entreprise, plus aux carnets d'adresses personnels.</span></li>
                 </ul>
             </div>
           </div>
@@ -204,7 +204,7 @@ const caseStudiesData = [
         category: "Orchestration & Marque Employeur",
         content: `
           <h1>Déploiement : L'Onboarding RH Automatisé</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">3 heures d'administratif sauvées par recrutement et zéro friction d'accueil.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">3 heures d'administratif sauvées par recrutement et zéro friction d'accueil.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -222,12 +222,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Rentabilité Initiale :</strong> <span class="flex-1">L'employé est opérationnel à la seconde où il franchit la porte.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Gain de Temps RH :</strong> <span class="flex-1">Suppression totale du goulot d'étranglement administratif des RH et de l'IT.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Rétention :</strong> <span class="flex-1">Une expérience d'intégration premium qui réduit drastiquement le turn-over de la période d'essai.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Rentabilité Initiale :</strong> <span class="flex-1">L'employé est opérationnel à la seconde où il franchit la porte.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Gain de Temps RH :</strong> <span class="flex-1">Suppression totale du goulot d'étranglement administratif des RH et de l'IT.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Rétention :</strong> <span class="flex-1">Une expérience d'intégration premium qui réduit drastiquement le turn-over de la période d'essai.</span></li>
                 </ul>
             </div>
           </div>
@@ -246,7 +246,7 @@ const caseStudiesData = [
         category: "Machine à Leads",
         content: `
           <h1>Déploiement : L'Enrichissement B2B Instantané</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">Doublement de la capacité d'appels et taux de conversion en hausse de 45%.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">Doublement de la capacité d'appels et taux de conversion en hausse de 45%.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -264,12 +264,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Productivité Vente :</strong> <span class="flex-1">Les vendeurs ont le dossier en 30 secondes et peuvent doubler leur volume d'appels.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Conversion :</strong> <span class="flex-1">Des approches chirurgicales qui explosent le taux de prise de rendez-vous qualifiés.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">ROI Lead :</strong> <span class="flex-1">Rentabilisation maximale des dépenses d'acquisition marketing.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Productivité Vente :</strong> <span class="flex-1">Les vendeurs ont le dossier en 30 secondes et peuvent doubler leur volume d'appels.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Conversion :</strong> <span class="flex-1">Des approches chirurgicales qui explosent le taux de prise de rendez-vous qualifiés.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">ROI Lead :</strong> <span class="flex-1">Rentabilisation maximale des dépenses d'acquisition marketing.</span></li>
                 </ul>
             </div>
           </div>
@@ -282,7 +282,7 @@ const caseStudiesData = [
         category: "Séquençage & Closing",
         content: `
           <h1>Déploiement : Relance Automatisée "Zéro Fuite"</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">Réactivation de 35% des opportunités "mortes" et sécurisation totale du pipeline.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">Réactivation de 35% des opportunités "mortes" et sécurisation totale du pipeline.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -300,12 +300,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Chiffre d'Affaires :</strong> <span class="flex-1">Des dizaines de deals ressuscités grâce à la persévérance mécanique de la machine.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Charge Mentale :</strong> <span class="flex-1">Finis les post-its et les rappels, le système orchestre le suivi froid.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Étanchéité :</strong> <span class="flex-1">100% du pipeline de vente est exploité jusqu'au bout, sans aucune déperdition.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Chiffre d'Affaires :</strong> <span class="flex-1">Des dizaines de deals ressuscités grâce à la persévérance mécanique de la machine.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Charge Mentale :</strong> <span class="flex-1">Finis les post-its et les rappels, le système orchestre le suivi froid.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Étanchéité :</strong> <span class="flex-1">100% du pipeline de vente est exploité jusqu'au bout, sans aucune déperdition.</span></li>
                 </ul>
             </div>
           </div>
@@ -324,7 +324,7 @@ const caseStudiesData = [
         category: "Résolution Instantanée",
         content: `
           <h1>Déploiement : L'Agent de Support Client 24/7</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">70% de résolution au premier contact sans aucune intervention humaine.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">70% de résolution au premier contact sans aucune intervention humaine.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -342,12 +342,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Réduction des Coûts :</strong> <span class="flex-1">Traitement de milliers de requêtes simultanées pour un coût marginal proche de zéro.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Satisfaction Client :</strong> <span class="flex-1">Un support Premium qui répond instantanément, 365 jours par an.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Revalorisation :</strong> <span class="flex-1">Les équipes humaines se concentrent enfin sur la rétention des comptes clés (VIP).</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Réduction des Coûts :</strong> <span class="flex-1">Traitement de milliers de requêtes simultanées pour un coût marginal proche de zéro.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Satisfaction Client :</strong> <span class="flex-1">Un support Premium qui répond instantanément, 365 jours par an.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Revalorisation :</strong> <span class="flex-1">Les équipes humaines se concentrent enfin sur la rétention des comptes clés (VIP).</span></li>
                 </ul>
             </div>
           </div>
@@ -360,7 +360,7 @@ const caseStudiesData = [
         category: "Génération de Revenus",
         content: `
           <h1>Déploiement : L'Agent Prospecteur Autonome</h1>
-          <p class="text-xl text-[#B7FF45] mb-8 font-bold">+2,7M€ d'opportunités qualifiées générées en pilotage 100% automatique.</p>
+          <p class="text-xl text-[#00FA9A] mb-8 font-bold">+2,7M€ d'opportunités qualifiées générées en pilotage 100% automatique.</p>
           
            <div class="grid md:grid-cols-3 gap-8 mb-12">
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
@@ -378,12 +378,12 @@ const caseStudiesData = [
                 </ul>
             </div>
             <div class="bg-white/5 p-6 rounded-xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#B7FF45]"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00FA9A]"></div>
                 <h3 class="text-white font-bold uppercase tracking-widest text-sm mb-4">Le Gain Brut</h3>
                 <ul class="text-sm text-neutral-300 space-y-3 list-none p-0">
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Scale Infini :</strong> <span class="flex-1">Une machine capable de traiter le volume de 5 SDR à temps plein, sans fatigue.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Délivrance :</strong> <span class="flex-1">Les commerciaux humains n'ont plus qu'une mission : se connecter au zoom et closer la vente.</span></li>
-                    <li class="flex items-start gap-2"><strong class="text-[#B7FF45]">Explosion du Pipeline :</strong> <span class="flex-1">Une croissance mathématique, prédictible et scalable de l'acquisition B2B.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Scale Infini :</strong> <span class="flex-1">Une machine capable de traiter le volume de 5 SDR à temps plein, sans fatigue.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Délivrance :</strong> <span class="flex-1">Les commerciaux humains n'ont plus qu'une mission : se connecter au zoom et closer la vente.</span></li>
+                    <li class="flex items-start gap-2"><strong class="text-[#00FA9A]">Explosion du Pipeline :</strong> <span class="flex-1">Une croissance mathématique, prédictible et scalable de l'acquisition B2B.</span></li>
                 </ul>
             </div>
           </div>
@@ -484,7 +484,7 @@ const FolderShowcase: React.FC<FolderShowcaseProps> = ({ onOpenProject }) => {
     >
       {/* Background Gradient Static - No Mouse Tracking */}
       <div 
-        className="pointer-events-none absolute inset-0 z-0 bg-[#B7FF45]/5 opacity-30"
+        className="pointer-events-none absolute inset-0 z-0 bg-[#00FA9A]/5 opacity-30"
         style={{
             background: `radial-gradient(circle at 50% 50%, rgba(0, 250, 154, 0.03), transparent 70%)`
         }}
@@ -532,24 +532,24 @@ const FolderShowcase: React.FC<FolderShowcaseProps> = ({ onOpenProject }) => {
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* Decorative background glow */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#B7FF45]/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-700"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00FA9A]/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-700"></div>
                 
                 <div className="relative w-full transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] h-[120px] md:h-[140px] group-hover:h-[600px] rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/10 shadow-2xl transform-gpu">
                     
                     {/* Cover State (Visible when not hovered) */}
                     <div className="absolute inset-0 flex items-center justify-between px-6 md:px-12 transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-8">
                         {/* Background accents */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#B7FF45]/5 to-transparent pointer-events-none"></div>
-                        <div className="absolute right-0 top-0 w-64 h-64 bg-[#B7FF45]/10 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#00FA9A]/5 to-transparent pointer-events-none"></div>
+                        <div className="absolute right-0 top-0 w-64 h-64 bg-[#00FA9A]/10 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                         
                         <div className="relative z-10">
                             <h3 className="text-xl md:text-3xl font-medium text-white mb-2">Catalogue Formations IA</h3>
-                            <p className="text-[#B7FF45] font-mono text-xs md:text-sm tracking-widest uppercase">Édition 2025/2026</p>
+                            <p className="text-[#00FA9A] font-mono text-xs md:text-sm tracking-widest uppercase">Édition 2025/2026</p>
                         </div>
                         <div className="relative z-10 flex items-center gap-4">
                             <span className="hidden md:inline-block text-sm text-neutral-400 font-medium">Survolez pour explorer</span>
                             <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-                                <Download className="w-5 h-5 text-[#B7FF45]" />
+                                <Download className="w-5 h-5 text-[#00FA9A]" />
                             </div>
                         </div>
                     </div>
@@ -568,7 +568,7 @@ const FolderShowcase: React.FC<FolderShowcaseProps> = ({ onOpenProject }) => {
                                 href="https://github.com/AlexisZtn/Axem-IA/raw/b9c2e7deafb343bda455228e14a45556301829af/Photo/Catalogue%20FORMATIONS%20AXEM%20IA%202025-2026%20(1).pdf"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-[#B7FF45]/10 text-[#B7FF45] hover:bg-[#B7FF45]/20 rounded-full transition-all"
+                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-[#00FA9A]/10 text-[#00FA9A] hover:bg-[#00FA9A]/20 rounded-full transition-all"
                             >
                                 <Download className="w-3 h-3" />
                                 Télécharger le PDF
@@ -579,7 +579,7 @@ const FolderShowcase: React.FC<FolderShowcaseProps> = ({ onOpenProject }) => {
                         <div className="w-full flex-1 bg-neutral-900 flex items-center justify-center overflow-hidden relative">
                             {/* Loading state behind iframe */}
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-8 h-8 border-2 border-[#B7FF45]/20 border-t-[#B7FF45] rounded-full animate-spin"></div>
+                                <div className="w-8 h-8 border-2 border-[#00FA9A]/20 border-t-[#00FA9A] rounded-full animate-spin"></div>
                             </div>
                             {isHovered && (
                                 <iframe 

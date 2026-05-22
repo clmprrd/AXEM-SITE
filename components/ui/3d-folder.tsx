@@ -67,7 +67,7 @@ const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
           "group-hover/card:-translate-y-6 group-hover/card:shadow-2xl group-hover/card:shadow-accent/40 group-hover/card:ring-2 group-hover/card:ring-accent group-hover/card:scale-125"
         )}>
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-black flex items-center justify-center p-2 text-center pointer-events-none">
-             <span className="text-[10px] font-bold text-[#B7FF45] uppercase leading-tight drop-shadow-md z-10">{project.title}</span>
+             <span className="text-[10px] font-bold text-[#00FA9A] uppercase leading-tight drop-shadow-md z-10">{project.title}</span>
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
         </div>

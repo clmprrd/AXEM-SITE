@@ -19,7 +19,7 @@ const Difference: React.FC = () => {
         {/* Header */}
         <div className="mb-20 grid grid-cols-12 gap-6">
           <div className="col-span-12 md:col-span-3">
-            <div className="font-mono text-xs uppercase tracking-[0.18em] text-[#B7FF45]">
+            <div className="font-mono text-xs uppercase tracking-[0.18em] text-[#00FA9A]">
               <span className="text-white/30">02 —</span>{' '}
               <EditableText value="La différence" storageKey="diff_badge" />
             </div>
@@ -40,13 +40,13 @@ const Difference: React.FC = () => {
               className="group grid grid-cols-12 gap-4 bg-[#0A0A0A] px-8 py-7 transition-colors hover:bg-[#0C0C0C] md:px-10 md:py-8"
             >
               <div className="col-span-2 md:col-span-1">
-                <span className="font-mono text-sm font-medium text-[#B7FF45]">
+                <span className="font-mono text-sm font-medium text-[#00FA9A]">
                   <EditableText value={c.n} storageKey={`diff_n_${c.n}`} />
                 </span>
               </div>
               <div className="col-span-10 md:col-span-5">
                 <h3 className="flex items-center gap-2 text-xl font-medium tracking-tight text-white md:text-2xl">
-                  <span className="text-[#B7FF45] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <span className="text-[#00FA9A] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                     <Check className="h-4 w-4" strokeWidth={3} />
                   </span>
                   <EditableText value={c.t} storageKey={`diff_t_${c.n}`} />

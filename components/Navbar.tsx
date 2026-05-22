@@ -124,8 +124,8 @@ const Navbar: React.FC<NavbarProps> = ({ customLogo }) => {
                     className={`
                         relative group overflow-hidden rounded-full flex items-center gap-2 font-bold tracking-tight transition-all duration-300
                         ${scrolled
-                            ? 'bg-[#B7FF45] text-black px-5 py-2.5 text-sm shadow-[0_0_20px_rgba(183,255,69,0.3)] hover:shadow-[0_0_30px_rgba(183,255,69,0.6)] hover:scale-105'
-                            : 'bg-[#B7FF45] text-black px-6 py-3 text-base shadow-[0_0_0px_rgba(183,255,69,0)] hover:shadow-[0_0_25px_rgba(183,255,69,0.5)] hover:scale-105'
+                            ? 'bg-[#00FA9A] text-black px-5 py-2.5 text-sm shadow-[0_0_20px_rgba(0,250,154,0.3)] hover:shadow-[0_0_30px_rgba(0,250,154,0.6)] hover:scale-105'
+                            : 'bg-[#00FA9A] text-black px-6 py-3 text-base shadow-[0_0_0px_rgba(0,250,154,0)] hover:shadow-[0_0_25px_rgba(0,250,154,0.5)] hover:scale-105'
                         }
                     `}
                 >
@@ -146,7 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ customLogo }) => {
          <a
             href="https://calendly.com/clem-pred/30min"
             target="_blank"
-            className="flex items-center justify-center w-14 h-14 bg-[#B7FF45] text-black rounded-full shadow-[0_0_20px_rgba(183,255,69,0.4)]"
+            className="flex items-center justify-center w-14 h-14 bg-[#00FA9A] text-black rounded-full shadow-[0_0_20px_rgba(0,250,154,0.4)]"
          >
             <ArrowUpRight className="w-6 h-6" strokeWidth={2.5} />
          </a>

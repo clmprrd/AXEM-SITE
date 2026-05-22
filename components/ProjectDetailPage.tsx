@@ -34,7 +34,7 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({ projectId, initialDat
            {data.category || "Projet"} / {data.title}
         </div>
         <div className="flex items-center gap-2">
-            <span className="text-xs text-[#B7FF45] flex items-center gap-1">
+            <span className="text-xs text-[#00FA9A] flex items-center gap-1">
                 <Save className="w-3 h-3" />
                 Sauvegardé
             </span>
@@ -73,13 +73,13 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({ projectId, initialDat
         {/* CTA SECTION */}
         <div className="mt-20 pt-16 border-t border-white/5 flex flex-col items-center">
             <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#B7FF45] to-emerald-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00FA9A] to-emerald-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                 <div className="relative">
                     <a 
                         href="https://calendly.com/clem-pred/30min"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-[#B7FF45] text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(183,255,69,0.3)] flex items-center gap-3"
+                        className="bg-[#00FA9A] text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,250,154,0.3)] flex items-center gap-3"
                     >
                         <span>Projet similaire ? Prendre rendez-vous</span>
                         <ArrowRight className="w-5 h-5" />
