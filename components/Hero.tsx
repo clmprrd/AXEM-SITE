@@ -1,221 +1,236 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import EditableText from './ui/EditableText';
-import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
-import { MagneticButton, AnimatedCount, MarqueeLogos } from './ui/wow';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
-// === FINAL AXEM HERO ===
-// DA Linear (grid + halo + magnetic + marquee) en couleurs AXEM officielles.
-// Vert #00FA9A + Bricolage Grotesque + Playfair italic mots-pivots.
-// + Spotlight cursor-tracked sur le grid (effet "torche").
-// + Stats animés avec AnimatedCount.
-// + Marquee logos clients réels du PDF.
+// =====================================================
+// CONCEPT A — "EDITORIAL PRINT MAGAZINE"
+// Inspi : Drift, Are.na, Wallpaper*, The Browser Company, NYT
+// Vibe : light cream, serif géant, drop cap géométrique, vertical type
+// Palette HORS-DA AXEM : crème #F4EFE6, encre #0F1A2E, vermillon #C8553D
+// Fonts : Fraunces (serif display contemporary) + Inter (body)
+// =====================================================
 const Hero: React.FC = () => {
-  const ref = useRef<HTMLElement>(null);
-
-  // Mouse-tracked spotlight on the grid
-  const mx = useMotionValue(50);
-  const my = useMotionValue(30);
-  const smx = useSpring(mx, { stiffness: 80, damping: 26 });
-  const smy = useSpring(my, { stiffness: 80, damping: 26 });
-  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${smx}% ${smy}%, rgba(0,250,154,0.10), transparent 60%)`;
-
+  // Inject Fraunces font dynamically (override AXEM body)
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const el = ref.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      mx.set(((e.clientX - r.left) / r.width) * 100);
-      my.set(((e.clientY - r.top) / r.height) * 100);
-    };
-    window.addEventListener('mousemove', handler);
-    return () => window.removeEventListener('mousemove', handler);
-  }, [mx, my]);
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
 
-  const titleVariants = {
-    hidden: { opacity: 0, y: 30, filter: 'blur(12px)' },
-    visible: (i: number) => ({
-      opacity: 1, y: 0, filter: 'blur(0px)',
-      transition: { delay: 0.15 + i * 0.08, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as any },
-    }),
-  };
+  const { scrollYProgress } = useScroll();
+  const dropCapRotate = useTransform(scrollYProgress, [0, 0.3], [0, 8]);
 
   return (
     <section
-      ref={ref}
-      className="relative isolate flex min-h-[100vh] flex-col justify-center overflow-hidden bg-[#050505] px-6 pt-32 pb-24"
-      aria-label="AXEM IA — Hero"
+      className="relative isolate flex min-h-[100vh] flex-col overflow-hidden"
+      style={{
+        background: '#F4EFE6',
+        color: '#0F1A2E',
+        fontFamily: 'Inter, sans-serif',
+      }}
+      aria-label="AXEM IA — Editorial Print"
     >
-      {/* === BACKGROUND : grid + halo + cursor spotlight === */}
-      <div className="absolute inset-0 -z-10" aria-hidden="true">
-        {/* fine grid */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: '64px 64px',
-            maskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
-          }}
-        />
-        {/* breathing accent halo */}
-        <motion.div
-          className="absolute left-1/2 top-[18%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full blur-[160px]"
-          style={{ background: 'radial-gradient(closest-side, #00FA9A, transparent)' }}
-          animate={{ opacity: [0.16, 0.30, 0.18], scale: [1, 1.05, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* CURSOR SPOTLIGHT — illumine le grid à la position de la souris */}
-        <motion.div className="absolute inset-0" style={{ background: spotlight }} />
-        {/* bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-[#050505]" />
+      {/* === FILLET TOP (style journal) === */}
+      <div className="absolute inset-x-0 top-0 h-12 border-b" style={{ borderColor: '#0F1A2E' }}>
+        <div className="mx-auto flex h-full max-w-[1320px] items-center justify-between px-8 text-[10px] uppercase tracking-[0.32em]" style={{ color: '#0F1A2E' }}>
+          <span style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>axem · vol. 01</span>
+          <span>Le partenaire IA · 2025 — 2026</span>
+          <span>№ 01 · Paris</span>
+        </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[1280px]">
-        {/* === Eyebrow vert + carré pulsant === */}
+      {/* === VERTICAL TYPE LEFT (magazine signature) === */}
+      <div className="absolute left-8 top-1/2 hidden -translate-y-1/2 origin-left -rotate-90 lg:block">
+        <div className="text-[10px] uppercase tracking-[0.5em]" style={{ color: '#0F1A2E', opacity: 0.5 }}>
+          Issue Premier · Manifeste
+        </div>
+      </div>
+
+      {/* === MAIN === */}
+      <div className="relative mx-auto grid w-full max-w-[1320px] flex-1 grid-cols-12 gap-6 px-8 pt-32 pb-20">
+        {/* Eyebrow + meta */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-10"
+          className="col-span-12 mb-10 flex items-baseline gap-6"
         >
-          <a
-            href="#dualite"
-            className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-sm transition-all duration-200 hover:border-[#00FA9A]/40 hover:bg-[#00FA9A]/[0.06]"
-          >
+          <span className="text-[11px] uppercase tracking-[0.42em]" style={{ color: '#C8553D', fontWeight: 600 }}>
+            Manifeste · Édition Hiver
+          </span>
+          <span className="hidden flex-1 border-b md:block" style={{ borderColor: '#0F1A2E', opacity: 0.2 }} />
+          <span className="text-[11px] uppercase tracking-[0.28em]" style={{ color: '#0F1A2E', opacity: 0.6 }}>
+            12 min de lecture
+          </span>
+        </motion.div>
+
+        {/* DROP CAP + HEADLINE editorial */}
+        <div className="col-span-12 md:col-span-9">
+          <h1 className="relative" style={{ fontFamily: 'Fraunces, serif' }}>
+            {/* DROP CAP géant qui draws itself */}
             <motion.span
-              className="h-1.5 w-1.5 rounded-full bg-[#00FA9A]"
-              animate={{ boxShadow: ['0 0 0 #00FA9A', '0 0 14px #00FA9A', '0 0 0 #00FA9A'] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#00FA9A]">
-              <EditableText value="Présentation Commerciale · 2025 / 2026" storageKey="hero_eyebrow" />
-            </span>
-            <span className="text-xs text-[#00FA9A] transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
-          </a>
-        </motion.div>
-
-        {/* === Title — Bricolage Grotesque 160px light + Playfair italic vert === */}
-        <h1 className="font-display text-[clamp(48px,8.5vw,148px)] font-light leading-[1.02] tracking-[-0.04em] text-white">
-          <motion.span variants={titleVariants} custom={0} initial="hidden" animate="visible" className="block">
-            <EditableText value="Rendre l'IA" storageKey="hero_title_1" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="simple," storageKey="hero_title_simple" />
-            </span>
-          </motion.span>
-          <motion.span variants={titleVariants} custom={1} initial="hidden" animate="visible" className="block">
-            <EditableText value="rentable et" storageKey="hero_title_2" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="actionnable." storageKey="hero_title_actionnable" />
-            </span>
-          </motion.span>
-        </h1>
-
-        {/* === Subtitle === */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.65 }}
-          className="mt-10 max-w-2xl text-lg font-light leading-snug text-neutral-400 md:text-xl"
-        >
-          <EditableText
-            value="Votre partenaire IA, de l'audit à la montée en compétences. Formation Qualiopi, conseil stratégique, déploiement & production."
-            storageKey="hero_subtitle"
-            isTextarea
-            className="w-full"
-          />
-        </motion.p>
-
-        {/* === Stats animés === */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-14 grid max-w-3xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-12"
-        >
-          {[
-            { value: 10, suffix: '', label: 'formations' },
-            { value: 3, suffix: '', label: 'niveaux' },
-            { value: 70, suffix: ' %', label: 'de pratique' },
-            { value: null as null | number, label: 'opérationnel' }, // J+1 static
-          ].map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 + i * 0.08 }}
-              whileHover={{ x: 4 }}
-              className="cursor-default border-l-2 border-[#00FA9A]/40 pl-4 transition-colors hover:border-[#00FA9A]"
+              style={{
+                fontFamily: 'Fraunces, serif',
+                fontSize: 'clamp(140px, 22vw, 320px)',
+                fontWeight: 300,
+                lineHeight: 0.82,
+                color: '#C8553D',
+                float: 'left',
+                marginRight: '14px',
+                marginTop: '-12px',
+                fontStyle: 'italic',
+                rotate: dropCapRotate as any,
+                transformOrigin: '50% 50%',
+              }}
+              initial={{ opacity: 0, scale: 0.5, rotate: -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 1.1, ease: [0.2, 0.8, 0.2, 1] }}
             >
-              <div className="font-display text-5xl font-light text-[#00FA9A] md:text-6xl">
-                {s.value !== null ? (
-                  <>
-                    <AnimatedCount value={s.value} suffix={s.suffix} />
-                  </>
-                ) : (
-                  'J+1'
-                )}
-              </div>
-              <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-                {s.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              L'
+            </motion.span>
 
-        {/* === CTAs magnétiques === */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.2 }}
-          className="mt-14 flex flex-col items-start gap-3 sm:flex-row sm:gap-4"
-        >
-          <MagneticButton
-            href="https://calendly.com/clem-pred/30min"
-            target="_blank"
-            rel="noopener noreferrer"
-            strength={0.4}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#00FA9A] px-8 py-4 text-sm font-semibold text-[#050505] shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_40px_-8px_rgba(0,250,154,0.6)]"
-          >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-            />
-            <span className="relative">Diagnostic gratuit · 30 min</span>
-            <span className="relative transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-          </MagneticButton>
-          <MagneticButton
-            href="#dualite"
-            strength={0.25}
-            className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-7 py-4 text-sm font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/30 hover:bg-white/[0.05]"
-          >
-            Voir notre méthode
-            <span className="opacity-60 transition-transform duration-200 group-hover:translate-y-0.5">↓</span>
-          </MagneticButton>
-        </motion.div>
+            <motion.span
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.3 }}
+              className="block"
+              style={{
+                fontFamily: 'Fraunces, serif',
+                fontSize: 'clamp(48px, 7.5vw, 120px)',
+                fontWeight: 300,
+                lineHeight: 0.98,
+                letterSpacing: '-0.02em',
+                color: '#0F1A2E',
+              }}
+            >
+              IA n'a pas besoin{' '}
+              <span style={{ fontStyle: 'italic', color: '#C8553D' }}>de plus</span>{' '}
+              de promesses.
+            </motion.span>
 
-        {/* === Marquee logos clients (RÉELS du PDF) avec fade mask === */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.5 }}
-          className="mt-24 w-full"
+            <motion.span
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.55 }}
+              className="mt-6 block"
+              style={{
+                fontFamily: 'Fraunces, serif',
+                fontSize: 'clamp(48px, 7.5vw, 120px)',
+                fontWeight: 300,
+                lineHeight: 0.98,
+                letterSpacing: '-0.02em',
+                color: '#0F1A2E',
+              }}
+            >
+              Elle a besoin{' '}
+              <span style={{ fontStyle: 'italic', color: '#C8553D' }}>d'opérateurs</span>.
+            </motion.span>
+          </h1>
+        </div>
+
+        {/* SIDEBAR right (avec stats inline manuscrits) */}
+        <motion.aside
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          className="col-span-12 mt-8 border-l pl-6 md:col-span-3 md:mt-0 md:pl-8"
+          style={{ borderColor: '#C8553D' }}
         >
-          <div className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-500">
-            <span className="h-px w-8 bg-neutral-700" />
-            Ils nous font confiance
-            <span className="h-px flex-1 bg-neutral-800" />
+          <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: '#C8553D', fontWeight: 600 }}>
+            En quelques chiffres
           </div>
-          <MarqueeLogos
-            logos={['Carrefour', 'Blackfin Capital', 'Avantis', 'KIT France', 'Espace 2', 'Socos Services', 'Gravotech', 'Cegos', 'myconnecting', 'synapse ia', 'ASphere', 'SENZA Formations']}
-            speed={36}
-            itemClassName="font-display text-2xl font-light text-neutral-400/85 tracking-tight"
-          />
+          <dl className="mt-6 space-y-5">
+            {[
+              { v: '10', l: 'formations Qualiopi' },
+              { v: '+55k', l: 'abonnés LinkedIn' },
+              { v: '12 mois+', l: 'partenariat moyen' },
+              { v: '0', l: 'PoC sans suite' },
+            ].map((s) => (
+              <div key={s.l}>
+                <dt
+                  style={{
+                    fontFamily: 'Fraunces, serif',
+                    fontSize: '40px',
+                    fontWeight: 400,
+                    lineHeight: 0.9,
+                    fontStyle: 'italic',
+                    color: '#0F1A2E',
+                  }}
+                >
+                  {s.v}
+                </dt>
+                <dd className="mt-1 text-[11px] uppercase tracking-[0.16em]" style={{ color: '#0F1A2E', opacity: 0.6 }}>
+                  {s.l}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </motion.aside>
+
+        {/* Bottom row : sous-titre + CTAs (style éditorial print) */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.95 }}
+          className="col-span-12 mt-16 flex flex-col gap-8 md:col-span-9 md:flex-row md:items-end md:justify-between"
+        >
+          <p
+            className="max-w-xl"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '18px',
+              lineHeight: 1.6,
+              color: '#0F1A2E',
+              opacity: 0.75,
+            }}
+          >
+            Pendant trois ans, nous avons regardé les agences IA vendre des slides. Nous, on vend
+            des équipes opérationnelles, des workflows en production, et des résultats mesurés.
+            <span style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic' }}>
+              {' '}Le reste est du marketing.
+            </span>
+          </p>
+
+          <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row md:flex-col">
+            <a
+              href="https://calendly.com/clem-pred/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center gap-3 px-7 py-4 text-sm font-semibold transition-all hover:scale-[1.02]"
+              style={{
+                background: '#0F1A2E',
+                color: '#F4EFE6',
+                fontFamily: 'Inter, sans-serif',
+                letterSpacing: '0.02em',
+              }}
+            >
+              <span>Réserver un diagnostic</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic' }}>→</span>
+            </a>
+            <a
+              href="#dualite"
+              className="inline-flex items-center gap-2 px-7 py-4 text-sm font-medium transition-colors hover:bg-[#0F1A2E]/5"
+              style={{
+                border: '1px solid #0F1A2E',
+                color: '#0F1A2E',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Lire le manifeste complet
+            </a>
+          </div>
         </motion.div>
+      </div>
+
+      {/* === FOOTER LIGNE editoriale === */}
+      <div className="absolute inset-x-0 bottom-0 border-t" style={{ borderColor: '#0F1A2E' }}>
+        <div className="mx-auto flex h-12 max-w-[1320px] items-center justify-between px-8 text-[10px] uppercase tracking-[0.32em]" style={{ color: '#0F1A2E' }}>
+          <span>Clément Predo · ESSEC</span>
+          <span style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>—</span>
+          <span>Alexis Zeitoun · Polytechnique</span>
+        </div>
       </div>
     </section>
   );
