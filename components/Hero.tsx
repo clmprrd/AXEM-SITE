@@ -1,88 +1,121 @@
-
 import React from 'react';
 import EditableText from './ui/EditableText';
-import ColorBends from './ColorBends';
+import { ArrowUpRight, Sparkles, Workflow, BookOpen } from 'lucide-react';
 
+// Direction C — "Attio Warm Light"
+// Inspired by Attio, Cal.com, Notion
+// Light surface, warm pastels (peach + violet), glassmorphism, product-feel
 const Hero: React.FC = () => {
-  const scrollToRealisations = (e: React.MouseEvent) => {
-    // Check if target is not the editable span
-    if ((e.target as HTMLElement).tagName !== 'INPUT') {
-        e.preventDefault();
-        const element = document.getElementById('realisations');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-[100vh] z-10 pt-40 pr-4 pb-32 pl-3 relative items-center justify-center overflow-hidden">
-      {/* Background Effect - ColorBends with Vibrant Green Theme & Provided Settings */}
-      <div className="absolute inset-0 z-[-1]">
-        <div className="absolute inset-0 opacity-100">
-            <ColorBends 
-                colors={["#00FA9A", "#00FF7F", "#39FF14"]} // AXEM Green Theme preserved
-                rotation={4}
-                speed={0.55}
-                scale={1.1} // Updated from snippet
-                frequency={1} // Updated from snippet
-                warpStrength={1} // Updated from snippet
-                mouseInfluence={1.7}
-                parallax={1.05}
-                noise={0.1}
-                transparent
-                autoRotate={0}
-                color="#00FA9A"
-            />
-        </div>
-        {/* Lighter gradient to let the green shine through */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/60 to-[#050505] pointer-events-none"></div>
-      </div>
-
-      <div className="animate-reveal [animation-delay:100ms] text-center mb-10 space-y-2 opacity-0 flex flex-col items-center">
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight text-white flex flex-wrap justify-center gap-x-4">
-          <span className="font-playfair italic font-normal text-neutral-300">
-             <EditableText value="Rendre" storageKey="hero_title_1" />
-          </span>
-          <span className="font-medium tracking-tighter">
-             <EditableText value="l'IA simple," storageKey="hero_title_2" />
-          </span>
-        </h1>
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight font-medium text-white">
-             <EditableText value="rentable et actionnable" storageKey="hero_title_3" />
-        </h1>
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight font-medium text-neutral-500">
-             <EditableText value="pour votre croissance." storageKey="hero_title_4" />
-        </h1>
-      </div>
-      
-      <div className="max-w-2xl text-center text-neutral-400 text-sm md:text-lg font-light leading-relaxed mb-12 animate-reveal [animation-delay:200ms] opacity-0 w-full px-4">
-        <EditableText 
-            value="Formation, Conseil, Audit, Production & Automatisation IA." 
-            storageKey="hero_subtitle" 
-            isTextarea={true}
-            className="w-full text-center"
+    <section
+      className="relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-6 pt-40 pb-40"
+      aria-label="AXEM IA — Hero"
+      style={{ background: 'linear-gradient(180deg, #FAFAF7 0%, #F5F1EC 100%)' }}
+    >
+      {/* === Warm gradient blobs === */}
+      <div className="absolute inset-0 -z-10" aria-hidden="true">
+        <div
+          className="absolute -left-32 top-10 h-[40vw] w-[40vw] rounded-full opacity-60 blur-[120px]"
+          style={{ background: 'radial-gradient(closest-side, #FFB59E, transparent)' }}
+        />
+        <div
+          className="absolute -right-32 top-32 h-[36vw] w-[36vw] rounded-full opacity-50 blur-[110px]"
+          style={{ background: 'radial-gradient(closest-side, #C4B5FD, transparent)' }}
+        />
+        <div
+          className="absolute left-1/2 top-1/2 h-[24vw] w-[24vw] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[90px]"
+          style={{ background: 'radial-gradient(closest-side, #FDE68A, transparent)' }}
+        />
+        {/* dotted grid */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, rgba(15,23,42,0.07) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+            maskImage:
+              'radial-gradient(ellipse 70% 50% at 50% 40%, black 30%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 70% 50% at 50% 40%, black 30%, transparent 100%)',
+          }}
         />
       </div>
-      
-      <div className="flex flex-col animate-reveal [animation-delay:300ms] sm:flex-row gap-x-5 gap-y-5 items-center opacity-0">
-        <a 
-          href="#realisations"
-          onClick={scrollToRealisations}
-          className="px-8 py-3.5 rounded-full bg-neutral-200 text-[#050505] font-playfair italic text-lg hover:bg-white hover:scale-105 transition-all duration-300 shadow-[0_0_25px_-5px_rgba(255,255,255,0.3)] flex items-center justify-center cursor-pointer"
-        >
-           <EditableText value="Découvrir nos travaux" storageKey="hero_cta_1" className="bg-transparent hover:bg-transparent border-none hover:border-none hover:shadow-none" />
-        </a>
-        <a 
-          href="https://calendly.com/clem-pred/30min" 
-          target="_blank" 
+
+      {/* === Eyebrow chip === */}
+      <div className="animate-reveal opacity-0 [animation-delay:60ms]">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-900/8 bg-white/70 px-3.5 py-1.5 text-xs font-medium text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.08)] backdrop-blur-md">
+          <Sparkles className="h-3.5 w-3.5 text-violet-500" strokeWidth={2.5} />
+          <span>Backed by ESSEC · 30k+ on LinkedIn</span>
+        </div>
+      </div>
+
+      {/* === Title === */}
+      <h1 className="animate-reveal mt-8 max-w-5xl text-center text-[44px] font-medium leading-[1.02] tracking-[-0.035em] text-slate-900 opacity-0 [animation-delay:120ms] sm:text-7xl md:text-[88px]">
+        <EditableText value="L'IA pour" storageKey="hero_title_1" />{' '}
+        <span className="relative inline-block">
+          <span
+            className="bg-clip-text text-transparent"
+            style={{ backgroundImage: 'linear-gradient(120deg, #F97362 0%, #A78BFA 100%)' }}
+          >
+            <EditableText value="équipes ambitieuses." storageKey="hero_title_2" />
+          </span>
+        </span>
+        <br />
+        <span className="font-playfair italic font-normal text-slate-500">
+          <EditableText value="Sans le bullshit." storageKey="hero_title_3" />
+        </span>
+      </h1>
+
+      {/* === Subtitle === */}
+      <p className="animate-reveal mt-7 max-w-2xl text-center text-base font-normal leading-relaxed text-slate-600 opacity-0 [animation-delay:180ms] md:text-xl">
+        <EditableText
+          value="Audit IA, agents intelligents, formations sur-mesure. On livre des outils que vos équipes utilisent vraiment, en jours pas en mois."
+          storageKey="hero_subtitle"
+          isTextarea
+          className="w-full text-center"
+        />
+      </p>
+
+      {/* === CTAs === */}
+      <div className="animate-reveal mt-10 flex flex-col items-center gap-3 opacity-0 [animation-delay:240ms] sm:flex-row">
+        <a
+          href="https://calendly.com/clem-pred/30min"
+          target="_blank"
           rel="noopener noreferrer"
-          className="px-8 py-3.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-neutral-200 text-sm font-medium hover:border-[#00FA9A]/50 hover:bg-[#00FA9A]/10 hover:text-white hover:shadow-[0_0_20px_-5px_rgba(0,250,154,0.3)] transition-all duration-300 flex items-center justify-center"
+          className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_2px_4px_rgba(15,23,42,0.15),0_12px_32px_-8px_rgba(15,23,42,0.4)] transition-all duration-200 hover:bg-slate-800 hover:scale-[1.02]"
         >
-           <EditableText value="Prendre rendez-vous" storageKey="hero_cta_2" className="bg-transparent hover:bg-transparent border-none hover:border-none hover:shadow-none" />
+          Réserver un audit
+          <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
+        </a>
+        <a
+          href="/realisations"
+          className="group inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/60 px-6 py-3.5 text-sm font-medium text-slate-800 backdrop-blur-md transition-all duration-200 hover:border-slate-900/20 hover:bg-white/80"
+        >
+          Voir nos réalisations
+          <ArrowUpRight className="h-4 w-4 opacity-50 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
         </a>
       </div>
-    </div>
+
+      {/* === Feature pills (glassmorphism row) === */}
+      <div className="animate-reveal mt-20 flex flex-wrap items-center justify-center gap-3 opacity-0 [animation-delay:340ms]">
+        {[
+          { icon: BookOpen, label: 'Formations IA', color: 'text-orange-500' },
+          { icon: Workflow, label: 'Agents & Automatisations', color: 'text-violet-500' },
+          { icon: Sparkles, label: 'Audit stratégique', color: 'text-amber-500' },
+        ].map(({ icon: Icon, label, color }) => (
+          <div
+            key={label}
+            className="inline-flex items-center gap-2 rounded-2xl border border-slate-900/8 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_20px_-12px_rgba(0,0,0,0.1)] backdrop-blur-md transition-all duration-200 hover:scale-[1.02] hover:bg-white/90"
+          >
+            <Icon className={`h-4 w-4 ${color}`} strokeWidth={2.2} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* === Transition fade to dark (rest of the site stays dark) === */}
+      <div className="absolute inset-x-0 -bottom-px h-32 bg-gradient-to-b from-transparent via-[#050505]/70 to-[#050505]" />
+    </section>
   );
 };
 
