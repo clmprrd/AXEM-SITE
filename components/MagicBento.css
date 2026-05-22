@@ -1,6 +1,6 @@
 
 :root {
-  --hue: 155; /* Approximate for #B7FF45 */
+  --hue: 155; /* Approximate for #00FA9A */
   --sat: 100%;
   --white: hsl(0, 0%, 100%);
   --green-primary: rgba(0, 250, 154, 1);

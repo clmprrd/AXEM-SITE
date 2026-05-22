@@ -31,14 +31,14 @@ const ServicesCatalog: React.FC = () => {
 
   return (
     <section id="services" className="py-32 bg-[#050505] border-t border-white/5 relative overflow-hidden">
-      <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#B7FF45]/5 blur-[150px] rounded-full pointer-events-none -mr-40"></div>
+      <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#00FA9A]/5 blur-[150px] rounded-full pointer-events-none -mr-40"></div>
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Vue d'ensemble */}
         <div className="mb-24">
           <Reveal>
-            <span className="inline-block px-3 py-1 mb-6 text-[10px] tracking-widest text-[#B7FF45] border border-[#B7FF45]/20 rounded-full bg-[#B7FF45]/5 uppercase">
+            <span className="inline-block px-3 py-1 mb-6 text-[10px] tracking-widest text-[#00FA9A] border border-[#00FA9A]/20 rounded-full bg-[#00FA9A]/5 uppercase">
               <EditableText value="Offre & Tarification" storageKey="srv_badge" />
             </span>
           </Reveal>
@@ -59,14 +59,14 @@ const ServicesCatalog: React.FC = () => {
               </div>
               {servicesOverview.map((s, i) => (
                 <div key={s.n} className={`flex flex-col lg:grid lg:grid-cols-[80px_1.5fr_2fr_1fr_1.5fr] gap-4 lg:gap-6 p-6 ${i !== servicesOverview.length - 1 ? 'border-b border-white/5' : ''} items-start lg:items-center`}>
-                  <span className="font-mono text-sm text-[#B7FF45] tracking-widest hidden lg:block">{s.n}</span>
+                  <span className="font-mono text-sm text-[#00FA9A] tracking-widest hidden lg:block">{s.n}</span>
                   <div className="lg:hidden flex justify-between w-full mb-2">
-                    <span className="font-mono text-xs text-[#B7FF45] tracking-widest">{s.n}</span>
-                    <span className="text-sm font-semibold text-[#B7FF45] tracking-tight">{s.price}</span>
+                    <span className="font-mono text-xs text-[#00FA9A] tracking-widest">{s.n}</span>
+                    <span className="text-sm font-semibold text-[#00FA9A] tracking-tight">{s.price}</span>
                   </div>
                   <span className="text-xl md:text-2xl font-medium text-white tracking-tight">{s.name}</span>
                   <span className="text-neutral-400 leading-relaxed text-sm md:text-base">{s.d}</span>
-                  <span className="font-medium text-lg text-[#B7FF45] hidden lg:block whitespace-nowrap">{s.price}</span>
+                  <span className="font-medium text-lg text-[#00FA9A] hidden lg:block whitespace-nowrap">{s.price}</span>
                   <span className="text-xs text-neutral-500 font-semibold tracking-widest uppercase">{s.priceLabel}</span>
                 </div>
               ))}
@@ -99,18 +99,18 @@ const ServicesCatalog: React.FC = () => {
                 {col.map(r => (
                   <Reveal key={r[0]} className="w-full">
                     <div className="grid grid-cols-[1fr_auto] md:grid-cols-[60px_1fr_80px_100px] gap-2 md:gap-4 py-5 border-b border-white/5 items-center">
-                      <span className="font-mono text-xs text-[#B7FF45] hidden md:block tracking-widest">{r[0]}</span>
+                      <span className="font-mono text-xs text-[#00FA9A] hidden md:block tracking-widest">{r[0]}</span>
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-base md:text-lg text-white font-medium">{r[1]}</span>
                         <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-sm w-fit ${
-                          r[4] === 'Découverte' ? 'bg-[#B7FF45]/10 text-[#B7FF45]' : 
+                          r[4] === 'Découverte' ? 'bg-[#00FA9A]/10 text-[#00FA9A]' : 
                           r[4] === 'Métier' ? 'bg-white/10 text-white' : 'bg-neutral-800 text-neutral-400'
                         }`}>
                           {r[4]}
                         </span>
                       </div>
                       <span className="text-xs text-neutral-400 font-semibold tracking-widest uppercase hidden md:block">{r[2]}</span>
-                      <span className="text-right font-semibold text-[#B7FF45] whitespace-nowrap">{r[3]}</span>
+                      <span className="text-right font-semibold text-[#00FA9A] whitespace-nowrap">{r[3]}</span>
                     </div>
                   </Reveal>
                 ))}
@@ -126,7 +126,7 @@ const ServicesCatalog: React.FC = () => {
                     Formations construites de A à Z selon vos besoins, vos contraintes et vos cas d'usage. Financement OPCO possible.
                   </p>
                </div>
-               <div className="whitespace-nowrap text-[#B7FF45] font-semibold tracking-wide">
+               <div className="whitespace-nowrap text-[#00FA9A] font-semibold tracking-wide">
                  Sur devis
                </div>
             </div>

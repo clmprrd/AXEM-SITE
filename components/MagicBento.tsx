@@ -527,7 +527,7 @@ const MagicBento: React.FC<MagicBentoProps> = ({
                   <div className="magic-bento-card__label">
                      <EditableText value={card.subtitle} storageKey={`bento_sub_${index}`} />
                   </div>
-                  <card.icon className="w-8 h-8 text-[#B7FF45]" />
+                  <card.icon className="w-8 h-8 text-[#00FA9A]" />
                 </div>
                 <div className="magic-bento-card__content">
                   <h2 className="magic-bento-card__title">
