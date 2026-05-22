@@ -1,285 +1,121 @@
-
-import React, { useEffect, useRef, useState } from 'react';
-import { Cpu, Briefcase } from 'lucide-react';
+import React from 'react';
 import EditableText from './ui/EditableText';
+import { ArrowUpRight } from 'lucide-react';
 
+// Direction B — Stripe Cinematic Editorial
+// Philosophy as huge editorial quote + side-by-side founder narrative
 const Philosophy: React.FC = () => {
-  const textRef = useRef<HTMLParagraphElement>(null);
-
-  // Image States
-  const [clementImage, setClementImage] = useState<string>("https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg");
-  const [alexisImage, setAlexisImage] = useState<string>("https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png");
-
-  const linkedInLogoUrl = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/7531dd6d3606f2dca4d497bf97657e3a28406302/Photo/linkedin-logo-linkedin-icon-transparent-free-png.webp";
-
-  // Updated Text Content as requested
-  const defaultTextContent = "La rencontre de deux mondes : L'Excellence Technique & La Stratégie Business. Plus qu'une agence, nous sommes votre pont entre la complexité des machines et la réalité de votre croissance.";
-  const [mainTextContent, setMainTextContent] = useState(defaultTextContent);
-
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    // Load saved images
-    const savedClement = localStorage.getItem('axem_philosophy_clement');
-    const savedAlexis = localStorage.getItem('axem_philosophy_alexis');
-    if (savedClement) setClementImage(savedClement);
-    if (savedAlexis) setAlexisImage(savedAlexis);
-
-    // Load saved main text or use updated default
-    const savedText = localStorage.getItem('philo_main_text');
-    if (savedText) {
-        setMainTextContent(savedText);
-    } else {
-        setMainTextContent(defaultTextContent);
-    }
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (!isVisible || ticking) return;
-      
-      ticking = true;
-      requestAnimationFrame(() => {
-        // Text Highlight Logic
-        if (textRef.current) {
-          const spans = textRef.current.querySelectorAll('span');
-          const windowHeight = window.innerHeight;
-          const centerPoint = windowHeight / 2;
-
-          spans.forEach(span => {
-            const rect = span.getBoundingClientRect();
-            const spanCenter = rect.top + (rect.height / 2);
-            const distanceFromCenter = Math.abs(spanCenter - centerPoint);
-            let opacity = 1 - (distanceFromCenter / 300);
-            opacity = Math.max(0.2, Math.min(1, opacity));
-            
-            span.style.opacity = opacity.toString();
-            span.style.color = opacity > 0.8 ? '#ffffff' : 'inherit';
-            span.style.textShadow = opacity > 0.8 ? '0 0 20px rgba(255,255,255,0.3)' : 'none';
-          });
-        }
-        ticking = false;
-      });
-    };
-
-    if (isVisible) {
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      window.addEventListener('resize', handleScroll);
-      handleScroll(); // Initial check
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, [isVisible]);
+  const clementImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg";
+  const alexisImage = "https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png";
 
   return (
-    <section ref={sectionRef} id="qui-sommes-nous" className="relative z-10 py-24 border-t border-white/5 bg-[#050505] min-h-[90vh] flex flex-col items-center justify-center">
-      <div className="max-w-7xl mx-auto px-6 w-full">
-        <div className="flex justify-center md:justify-center">
-            <span className="inline-block px-3 py-1 mb-8 text-[10px] tracking-widest text-[#00FA9A] border border-[#00FA9A]/20 rounded-full bg-[#00FA9A]/5 uppercase">
-                <EditableText value="Qui sommes-nous ?" storageKey="philo_badge" />
+    <section id="qui-sommes-nous" className="relative isolate overflow-hidden border-t border-white/[0.06] bg-[#060606] py-32">
+      {/* === Ambient gradient orbs === */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10">
+        <div
+          className="absolute -left-40 top-1/4 h-[40vw] w-[40vw] rounded-full opacity-40 blur-[140px]"
+          style={{ background: 'radial-gradient(closest-side, #F472B6, transparent)' }}
+        />
+        <div
+          className="absolute -right-40 bottom-1/4 h-[36vw] w-[36vw] rounded-full opacity-35 blur-[130px]"
+          style={{ background: 'radial-gradient(closest-side, #A78BFA, transparent)' }}
+        />
+      </div>
+
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Editorial eyebrow */}
+        <div className="mb-12 flex items-center justify-center gap-3 text-[11px] font-medium uppercase tracking-[0.32em] text-white/60">
+          <span className="h-px w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+          <EditableText value="Qui sommes-nous" storageKey="philo_badge" />
+          <span className="h-px w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        </div>
+
+        {/* Massive editorial quote */}
+        <div className="mx-auto mb-24 max-w-5xl text-center">
+          <h2 className="text-4xl leading-[1.05] tracking-[-0.02em] text-white md:text-6xl lg:text-7xl">
+            <span className="font-playfair italic text-white/90">L'excellence technique</span>
+            <br />
+            <span className="font-medium">rencontre</span>{' '}
+            <span className="font-playfair italic bg-gradient-to-r from-[#FFB59E] via-[#F472B6] to-[#A78BFA] bg-clip-text text-transparent">
+              la stratégie business.
             </span>
+          </h2>
+          <p className="mt-8 mx-auto max-w-2xl text-base font-light leading-relaxed text-white/60 md:text-lg">
+            Plus qu'une agence : votre pont entre la complexité des machines et la réalité de votre croissance.
+          </p>
         </div>
-        
-        {/* Main Text - Centered, Wider, Bigger Font */}
-        <div className="relative group mb-36 w-full">
-            <p ref={textRef} className="text-4xl md:text-6xl lg:text-7xl font-medium leading-[1.2] text-neutral-500 relative cursor-default text-center w-full">
-            {mainTextContent.split(' ').map((word, i) => (
-                <span key={i} className="transition-opacity duration-300">{word} </span>
-            ))}
-            </p>
-        </div>
-        
-        {/* Diagram */}
-        <div 
-          className="w-full max-w-6xl mx-auto mb-10 flex flex-col items-center scale-105"
-        >
-          {/* Root Node */}
-          <div className="flex flex-col w-full items-center">
-            <div className="z-10 bg-neutral-900/80 border-white/10 border rounded-2xl pt-6 pr-12 pb-6 pl-12 shadow-[0_0_50px_-15px_rgba(255,255,255,0.15)] backdrop-blur-md">
-              <h3 className="md:text-6xl text-4xl italic text-white tracking-wide font-playfair font-medium">
-                  <EditableText value="AXEM IA" storageKey="philo_diagram_root" />
-              </h3>
-            </div>
-            {/* Vertical Connector */}
-            <div className="h-16 w-px bg-gradient-to-b from-white/30 to-white/10"></div>
-            
-            {/* Branch Splitter */}
-            <div className="w-[70%] md:w-[60%] h-px bg-white/10 relative">
-              <div className="absolute left-0 top-0 h-10 w-px bg-white/10 origin-top"></div>
-              <div className="absolute right-0 top-0 h-10 w-px bg-white/10 origin-top"></div>
-            </div>
-          </div>
 
-          {/* Children Nodes */}
-          <div className="grid grid-cols-2 gap-8 md:gap-32 w-full mt-10">
-            
-            {/* Left Branch - Clément (Strategy & ESSEC) */}
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center gap-6">
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 bg-[#050505] px-4 relative z-10 -mt-3">
-                    <EditableText value="Stratégie & Business" storageKey="philo_left_tag_v3" />
-                </span>
-                
-                {/* Image Avatar - Clément with LinkedIn Interaction */}
-                <div className="relative group/avatar mb-4">
-                    <div className="w-40 h-40 md:w-56 md:h-56 rounded-full bg-neutral-800 border-2 border-white/10 overflow-hidden relative shadow-2xl group-hover/avatar:scale-105 transition-transform duration-500">
-                        <img src={clementImage} alt="Clément" className="opacity-100 w-full h-full object-cover" />
-                    </div>
-
-                    <a 
-                        href="https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute bottom-0 right-0 md:bottom-1 md:right-1 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.4)] z-30 transition-transform duration-300 hover:scale-110 hover:rotate-3 overflow-hidden border border-white/50"
-                        title="Voir le profil LinkedIn"
-                    >
-                        <img src={linkedInLogoUrl} alt="LinkedIn" className="w-full h-full object-cover" />
-                    </a>
-                </div>
-
-                <div className="text-3xl md:text-5xl font-medium text-white">
-                    <EditableText value="Clément" storageKey="philo_left_name_v3" />
-                </div>
-                <div className="text-sm md:text-lg text-[#00FA9A] uppercase tracking-widest font-bold">
-                    <EditableText value="ESSEC" storageKey="philo_left_role_v3" />
-                </div>
-                <p className="text-center text-base md:text-xl text-neutral-400 max-w-[320px] leading-relaxed">
-                   <EditableText isTextarea value="Le stratège. Celui qui traduit la technologie en rentabilité et en leviers de croissance." storageKey="philo_left_desc_v3" />
-                </p>
-
-                <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-white/10 w-full max-w-[280px]">
-                   <div className="flex items-baseline gap-2 text-[#00FA9A]">
-                       <span className="font-medium text-3xl md:text-4xl">
-                           <EditableText value="+30 000" storageKey="philo_left_stat_val" />
-                       </span>
-                       <span className="text-xs uppercase tracking-widest font-bold opacity-80">
-                           <EditableText value="abonnés LinkedIn" storageKey="philo_left_stat_label" />
-                       </span>
-                   </div>
-                   <ul className="text-sm text-neutral-400 space-y-2 mt-2 w-full">
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="3 ans de terrain IA" storageKey="philo_left_b1" /></span>
-                       </li>
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="Formations, conseil, automatisation" storageKey="philo_left_b2" /></span>
-                       </li>
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="Pilotage de missions audit et stratégie" storageKey="philo_left_b3" /></span>
-                       </li>
-                   </ul>
-                </div>
-
-                <div className="h-10 w-px border-l border-dashed border-white/20 my-2"></div>
-                
-                <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#00FA9A]/20 to-blue-500/20 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-                  <div className="relative px-8 py-4 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center gap-4">
-                    <Briefcase className="w-6 h-6 text-[#00FA9A]" />
-                    <span className="text-base md:text-xl font-medium text-white">
-                        <EditableText value="Vision Business" storageKey="philo_left_skill_v3" />
-                    </span>
+        {/* Founders — editorial split */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+          {[
+            {
+              img: clementImage,
+              name: 'Clément Predo',
+              school: 'ESSEC · Stratégie',
+              quote: '« Le stratège. Je traduis la technologie en rentabilité et leviers de croissance. »',
+              stat: { v: '30k+', l: 'Abonnés LinkedIn' },
+              linkedin: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/',
+              gradient: 'from-[#FFB59E] to-[#F472B6]',
+            },
+            {
+              img: alexisImage,
+              name: 'Alexis Zeitoun',
+              school: 'Télécom Paris · Tech',
+              quote: "« L'ingénieur. Je forge les systèmes et automatise l'intelligence en moteur de production. »",
+              stat: { v: '10k+', l: 'Abonnés LinkedIn' },
+              linkedin: 'https://www.linkedin.com/in/alexiszeitoun/',
+              gradient: 'from-[#A78BFA] to-[#F472B6]',
+            },
+          ].map((f) => (
+            <article key={f.name} className="group relative">
+              <div
+                className={`absolute -inset-px rounded-3xl bg-gradient-to-br ${f.gradient} opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-30`}
+                aria-hidden="true"
+              />
+              <div className="relative flex flex-col gap-8 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-md md:p-10">
+                <div className="flex items-start gap-6">
+                  <div className={`flex-shrink-0 rounded-full bg-gradient-to-br ${f.gradient} p-[1.5px]`}>
+                    <img
+                      src={f.img}
+                      alt={f.name}
+                      className="h-20 w-20 rounded-full object-cover md:h-24 md:w-24"
+                    />
                   </div>
+                  <div className="flex-1">
+                    <h3 className="text-3xl font-medium tracking-tight text-white md:text-4xl">
+                      {f.name}
+                    </h3>
+                    <p className="mt-1 text-sm uppercase tracking-[0.16em] text-white/50">
+                      {f.school}
+                    </p>
+                  </div>
+                  <a
+                    href={f.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/40 transition-colors hover:text-white"
+                    aria-label={`LinkedIn de ${f.name}`}
+                  >
+                    <ArrowUpRight className="h-5 w-5" />
+                  </a>
+                </div>
+
+                <blockquote className="border-l-2 border-white/10 pl-6 font-playfair text-xl italic leading-relaxed text-white/85 md:text-2xl">
+                  {f.quote}
+                </blockquote>
+
+                <div className="flex items-baseline gap-3 border-t border-white/[0.08] pt-6">
+                  <span className={`font-playfair text-5xl italic bg-gradient-to-br ${f.gradient} bg-clip-text text-transparent md:text-6xl`}>
+                    {f.stat.v}
+                  </span>
+                  <span className="text-xs uppercase tracking-[0.18em] text-white/50">
+                    {f.stat.l}
+                  </span>
                 </div>
               </div>
-            </div>
-
-            {/* Right Branch - Alexis (Tech & Télécom) */}
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center gap-6">
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 bg-[#050505] px-4 relative z-10 -mt-3">
-                    <EditableText value="Tech & Système" storageKey="philo_right_tag_v3" />
-                </span>
-                
-                {/* Image Avatar - Alexis */}
-                <div className="relative group/avatar mb-4">
-                    <div className="w-40 h-40 md:w-56 md:h-56 rounded-full bg-neutral-800 border-2 border-white/10 overflow-hidden relative shadow-2xl group-hover/avatar:scale-105 transition-transform duration-500">
-                        <img src={alexisImage} alt="Alexis" className="opacity-100 w-full h-full object-cover" />
-                    </div>
-
-                    <a 
-                        href="https://www.linkedin.com/in/alexiszeitoun/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute bottom-0 right-0 md:bottom-1 md:right-1 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.4)] z-30 transition-transform duration-300 hover:scale-110 hover:rotate-3 overflow-hidden border border-white/50"
-                        title="Voir le profil LinkedIn"
-                    >
-                        <img src={linkedInLogoUrl} alt="LinkedIn" className="w-full h-full object-cover" />
-                    </a>
-                </div>
-
-                <div className="text-3xl md:text-5xl font-medium text-white">
-                    <EditableText value="Alexis" storageKey="philo_right_name_v3" />
-                </div>
-                <div className="text-sm md:text-lg text-[#00FA9A] uppercase tracking-widest font-bold">
-                    <EditableText value="Télécom Paris" storageKey="philo_right_role_v3" />
-                </div>
-                <p className="text-center text-base md:text-xl text-neutral-400 max-w-[320px] leading-relaxed">
-                   <EditableText isTextarea value="L'ingénieur. Celui qui forge les systèmes et automatise l'intelligence pour transformer la vision en moteur de production." storageKey="philo_right_desc_v3" />
-                </p>
-
-                <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-white/10 w-full max-w-[280px]">
-                   <div className="flex items-baseline gap-2 text-[#00FA9A]">
-                       <span className="font-medium text-3xl md:text-4xl">
-                           <EditableText value="+10 000" storageKey="philo_right_stat_val" />
-                       </span>
-                       <span className="text-xs uppercase tracking-widest font-bold opacity-80">
-                           <EditableText value="abonnés LinkedIn" storageKey="philo_right_stat_label" />
-                       </span>
-                   </div>
-                   <ul className="text-sm text-neutral-400 space-y-2 mt-2 w-full">
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="3 ans de terrain IA" storageKey="philo_right_b1" /></span>
-                       </li>
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="Déploiement terrain, équipes et dirigeants" storageKey="philo_right_b2" /></span>
-                       </li>
-                       <li className="flex gap-2 items-start">
-                           <span className="text-[#00FA9A]">→</span>
-                           <span><EditableText value="Expérience terrain dans le secteur financier" storageKey="philo_right_b3" /></span>
-                       </li>
-                   </ul>
-                </div>
-
-                <div className="h-10 w-px border-l border-dashed border-white/20 my-2"></div>
-                
-                <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#00FA9A]/20 to-blue-500/20 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-                  <div className="relative px-8 py-4 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center gap-4">
-                    <Cpu className="w-6 h-6 text-[#00FA9A]" />
-                    <span className="text-base md:text-xl font-medium text-white">
-                        <EditableText value="Expertise Tech" storageKey="philo_right_skill_v3" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
+            </article>
+          ))}
         </div>
-
       </div>
     </section>
   );
