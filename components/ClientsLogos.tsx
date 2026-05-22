@@ -1,148 +1,358 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// Proposition X — Clients & Partenaires (Editorial)
-// Style éditorial : 2 colonnes claires (CLIENTS / PARTENAIRES FORMATION),
-// avec marquee infini en bas pour les cas clients sectoriels
-const ClientsLogos: React.FC = () => {
-  const clients = ['Carrefour', 'Blackfin', 'Avantis', 'KIT France', 'Espace 2', 'Socos', 'Gravotech'];
-  const partners = ['myconnecting', 'synapse ia', 'ASphere', 'AI sisters', 'SENZA', 'Cegos'];
+// =====================================================
+// CONCEPT C — "SYNTHWAVE NEURAL" — TRUST NETWORK
+// =====================================================
+const clients = ['Carrefour', 'Blackfin', 'Avantis', 'KIT France', 'Espace 2', 'Socos', 'Gravotech'];
+const partners = ['myconnecting', 'synapse ia', 'ASphere', 'AI sisters', 'SENZA', 'Cegos'];
 
-  const sectors = [
-    'Éditeur logiciel · Médico-social',
-    'BTP · Rénovation & Structure',
-    'Administration judiciaire',
-    'Adhésifs · Aéronautique & Ferroviaire',
-    'Promotion immobilière',
-    'Industrie · Manufacturing',
-    'Conseil & Expertise',
-    'Grande distribution',
-  ];
+const sectors = [
+  'Éditeur logiciel · Médico-social',
+  'BTP · Rénovation & Structure',
+  'Administration judiciaire',
+  'Adhésifs · Aéronautique & Ferroviaire',
+  'Promotion immobilière',
+  'Industrie · Manufacturing',
+  'Conseil & Expertise',
+  'Grande distribution',
+];
+
+const ClientsLogos: React.FC = () => {
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
+  // Doubled lists for seamless marquee
+  const clientsRow = [...clients, ...clients, ...clients];
+  const partnersRow = [...partners, ...partners, ...partners];
 
   return (
-    <section className="relative isolate overflow-hidden border-t border-white/[0.06] bg-[#050505] py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
-        <div className="mb-16 flex items-center justify-between border-b border-white/10 pb-6">
-          <div>
-            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-              <span className="h-2 w-2 bg-[#00FA9A]" />
-              Nos références
-            </div>
-            <h2 className="mt-4 font-display text-4xl font-light tracking-[-0.03em] text-white md:text-6xl">
-              Ils nous font <span className="font-playfair italic text-[#00FA9A]">confiance</span>.
-            </h2>
-          </div>
-          <div className="hidden text-right md:block">
-            <div className="font-display text-5xl font-light text-[#00FA9A]">5</div>
-            <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
-              missions clients · résultats mesurés
-            </div>
-          </div>
-        </div>
+    <section
+      id="trust"
+      className="relative isolate overflow-hidden py-32"
+      style={{
+        background: 'linear-gradient(180deg, #0A001F 0%, #1A0033 50%, #0A001F 100%)',
+        color: '#F5F0FF',
+        fontFamily: 'Space Grotesk, sans-serif',
+      }}
+      aria-label="Trust Network — Synthwave Neural"
+    >
+      {/* Background ambient */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px, transparent 1px, transparent 3px)',
+        }}
+      />
 
-        {/* Two columns : Clients / Partenaires */}
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-20">
-          {/* Clients */}
-          <div>
-            <div className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-              <span className="h-px w-8 bg-[#00FA9A]" />
-              Clients
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
-              {clients.map((c, i) => (
-                <motion.div
-                  key={c}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.45, delay: i * 0.05 }}
-                  whileHover={{ y: -3, borderColor: 'rgba(0,250,154,0.3)' }}
-                  className="group flex h-20 items-center justify-center rounded-xl border border-white/10 bg-white/[0.02] px-4 transition-colors"
-                >
-                  <span className="font-display text-xl font-light text-white/85 transition-colors group-hover:text-white md:text-2xl">
-                    {c}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Partenaires */}
-          <div>
-            <div className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#00FA9A]">
-              <span className="h-px w-8 bg-[#00FA9A]" />
-              Organismes de formation partenaires
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
-              {partners.map((p, i) => (
-                <motion.div
-                  key={p}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.45, delay: i * 0.05 }}
-                  whileHover={{ y: -3, borderColor: 'rgba(0,250,154,0.3)' }}
-                  className="group flex h-20 items-center justify-center rounded-xl border border-white/10 bg-white/[0.02] px-4 transition-colors"
-                >
-                  <span className="font-display text-xl font-light text-white/85 transition-colors group-hover:text-white md:text-2xl">
-                    {p}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom : marquee infini des secteurs */}
-        <div className="mt-20 border-t border-white/[0.06] pt-12">
-          <div className="mb-6 text-center text-[10px] font-semibold uppercase tracking-[0.32em] text-neutral-500">
-            5 missions · 5 secteurs · des résultats mesurés
-          </div>
-          <div
-            className="relative overflow-hidden"
+      <div className="relative z-10 mx-auto max-w-[1320px] px-8">
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+          className="mb-10 flex items-center gap-3"
+        >
+          <motion.span
+            className="h-2 w-2 rounded-full"
+            style={{ background: '#FF00C8', boxShadow: '0 0 16px #FF00C8' }}
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+          <span
             style={{
-              maskImage:
-                'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
-              WebkitMaskImage:
-                'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 11,
+              letterSpacing: '0.32em',
+              color: '#FF00C8',
+              textTransform: 'uppercase',
+              textShadow: '0 0 10px rgba(255,0,200,0.5)',
             }}
           >
-            <motion.div
-              className="flex w-max gap-10 py-3"
-              animate={{ x: ['0%', '-50%'] }}
-              transition={{ duration: 38, ease: 'linear', repeat: Infinity }}
-            >
-              {[...sectors, ...sectors].map((s, i) => (
-                <span
-                  key={`${s}-${i}`}
-                  className="flex shrink-0 items-center gap-4 whitespace-nowrap font-playfair text-2xl italic text-neutral-400/70"
+            // TRUST_NETWORK::ACTIVE
+          </span>
+        </motion.div>
+
+        {/* Title */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+          style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontWeight: 700,
+            fontSize: 'clamp(40px, 6vw, 80px)',
+            lineHeight: 1,
+            letterSpacing: '-0.03em',
+            color: '#F5F0FF',
+            textShadow: '0 0 28px rgba(245,240,255,0.35)',
+          }}
+        >
+          They shipped with us.
+        </motion.h2>
+
+        {/* Clients Grid 4 cols */}
+        <div className="mt-16">
+          <div
+            className="mb-6 flex items-center gap-3"
+            style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              letterSpacing: '0.28em',
+              color: '#00F0FF',
+              textTransform: 'uppercase',
+              textShadow: '0 0 8px rgba(0,240,255,0.5)',
+            }}
+          >
+            <span>// CLIENTS_LIVE</span>
+            <span style={{ flex: 1, height: 1, background: 'rgba(0,240,255,0.2)' }} />
+            <span style={{ opacity: 0.6 }}>{clients.length} entities</span>
+          </div>
+          <div className="grid grid-cols-2 gap-px md:grid-cols-4">
+            {clients.map((c, i) => {
+              const color = i % 2 === 0 ? '#FF00C8' : '#00F0FF';
+              return (
+                <motion.div
+                  key={c}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.06 }}
+                  whileHover={{
+                    boxShadow: `0 0 40px -8px ${color}88, inset 0 0 24px ${color}33`,
+                  }}
+                  className="flex items-center justify-center px-6 py-8 transition-all"
+                  style={{
+                    background: 'rgba(10,0,31,0.6)',
+                    border: '1px solid rgba(245,240,255,0.08)',
+                    borderRadius: 8,
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontWeight: 500,
+                    fontSize: 18,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: '#F5F0FF',
+                  }}
                 >
-                  <span className="h-1.5 w-1.5 bg-[#00FA9A]" />
-                  {s}
-                </span>
-              ))}
-            </motion.div>
+                  {c}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Qualiopi badge */}
-        <div className="mt-20 flex items-center justify-center gap-6 border-t border-white/[0.06] pt-12">
-          <div className="text-right">
-            <div className="font-display text-3xl font-light text-white md:text-4xl">
-              <span className="font-playfair italic text-[#00FA9A]">Qualiopi</span> processus certifié
-            </div>
-            <div className="mt-2 text-xs uppercase tracking-[0.18em] text-neutral-500">
-              Formations finançables OPCO · IZY for pro
+        {/* Marquee section */}
+        <div className="mt-20">
+          <div
+            className="mb-6 flex items-center gap-3"
+            style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              letterSpacing: '0.28em',
+              color: '#FF00C8',
+              textTransform: 'uppercase',
+              textShadow: '0 0 8px rgba(255,0,200,0.5)',
+            }}
+          >
+            <span>// PARTNERS_STREAM</span>
+            <span style={{ flex: 1, height: 1, background: 'rgba(255,0,200,0.2)' }} />
+          </div>
+
+          {/* Row 1 — clients marquee */}
+          <div
+            className="group relative overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            }}
+          >
+            <div
+              className="flex gap-12 whitespace-nowrap py-4 group-hover:[animation-play-state:paused]"
+              style={{
+                animation: 'marquee-left 50s linear infinite',
+              }}
+            >
+              {clientsRow.map((c, i) => (
+                <span
+                  key={`${c}-${i}`}
+                  style={{
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontWeight: 600,
+                    fontSize: 24,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: '#FF00C8',
+                    textShadow: '0 0 14px rgba(255,0,200,0.5)',
+                  }}
+                >
+                  {c} <span style={{ color: '#00F0FF', opacity: 0.5, margin: '0 12px' }}>·</span>
+                </span>
+              ))}
             </div>
           </div>
-          <div className="h-12 w-px bg-white/10" />
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🇫🇷</span>
-            <span className="font-display text-sm font-light text-white">République Française</span>
+
+          {/* Row 2 — partners marquee */}
+          <div
+            className="group relative overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            }}
+          >
+            <div
+              className="flex gap-12 whitespace-nowrap py-4 group-hover:[animation-play-state:paused]"
+              style={{
+                animation: 'marquee-right 70s linear infinite',
+              }}
+            >
+              {partnersRow.map((p, i) => (
+                <span
+                  key={`${p}-${i}`}
+                  style={{
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontWeight: 500,
+                    fontSize: 22,
+                    letterSpacing: '0.04em',
+                    color: '#00F0FF',
+                    textShadow: '0 0 12px rgba(0,240,255,0.5)',
+                  }}
+                >
+                  {p} <span style={{ color: '#FF00C8', opacity: 0.5, margin: '0 12px' }}>·</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Sectors — node style */}
+        <div className="mt-24">
+          <div
+            className="mb-8 flex items-center gap-3"
+            style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              letterSpacing: '0.28em',
+              color: '#00F0FF',
+              textTransform: 'uppercase',
+              textShadow: '0 0 8px rgba(0,240,255,0.5)',
+            }}
+          >
+            <span>// SECTORS_DEPLOYED</span>
+            <span style={{ flex: 1, height: 1, background: 'rgba(0,240,255,0.2)' }} />
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {sectors.map((s, i) => {
+              const color = i % 2 === 0 ? '#FF00C8' : '#00F0FF';
+              return (
+                <motion.div
+                  key={s}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.05 }}
+                  className="flex items-center gap-3 p-5"
+                  style={{
+                    background: 'rgba(10,0,31,0.55)',
+                    border: `1px solid ${color}33`,
+                    borderRadius: 8,
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  <motion.span
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ background: color, boxShadow: `0 0 14px ${color}` }}
+                    animate={{ opacity: [1, 0.4, 1] }}
+                    transition={{ duration: 2 + (i % 3) * 0.5, repeat: Infinity }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: 12,
+                      color: '#F5F0FF',
+                      opacity: 0.85,
+                    }}
+                  >
+                    {s}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Qualiopi badge card */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-16 flex items-center justify-center"
+        >
+          <div
+            className="flex items-center gap-4 px-6 py-4"
+            style={{
+              background: 'rgba(10,0,31,0.75)',
+              border: '1px solid rgba(0,240,255,0.4)',
+              borderRadius: 8,
+              backdropFilter: 'blur(12px)',
+              boxShadow: '0 0 30px -10px rgba(0,240,255,0.5)',
+            }}
+          >
+            <motion.span
+              className="h-2 w-2 rounded-full"
+              style={{ background: '#00F0FF', boxShadow: '0 0 14px #00F0FF' }}
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+            <span
+              style={{
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: 12,
+                letterSpacing: '0.28em',
+                color: '#00F0FF',
+                textTransform: 'uppercase',
+                textShadow: '0 0 8px rgba(0,240,255,0.5)',
+              }}
+            >
+              CERTIFIED ::
+            </span>
+            <span
+              style={{
+                fontFamily: 'Space Grotesk, sans-serif',
+                fontWeight: 600,
+                fontSize: 14,
+                color: '#F5F0FF',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Qualiopi · Formations finançables OPCO / CPF / FAF
+            </span>
+          </div>
+        </motion.div>
       </div>
+
+      <style>{`
+        @keyframes marquee-left {
+          from { transform: translateX(0%); }
+          to { transform: translateX(-33.333%); }
+        }
+        @keyframes marquee-right {
+          from { transform: translateX(-33.333%); }
+          to { transform: translateX(0%); }
+        }
+      `}</style>
     </section>
   );
 };
