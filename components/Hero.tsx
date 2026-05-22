@@ -1,88 +1,122 @@
-
 import React from 'react';
 import EditableText from './ui/EditableText';
-import ColorBends from './ColorBends';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 
+// Direction A — "Linear Sharp"
+// Inspired by Linear.app, Vercel, Resend, Mintlify
+// Ultra-tight typography, precision grid, single accent color, engineered feel
 const Hero: React.FC = () => {
-  const scrollToRealisations = (e: React.MouseEvent) => {
-    // Check if target is not the editable span
-    if ((e.target as HTMLElement).tagName !== 'INPUT') {
-        e.preventDefault();
-        const element = document.getElementById('realisations');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
+  const scrollToNext = () => {
+    window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
   };
 
   return (
-    <div className="flex flex-col min-h-[100vh] z-10 pt-40 pr-4 pb-32 pl-3 relative items-center justify-center overflow-hidden">
-      {/* Background Effect - ColorBends with Vibrant Green Theme & Provided Settings */}
-      <div className="absolute inset-0 z-[-1]">
-        <div className="absolute inset-0 opacity-100">
-            <ColorBends 
-                colors={["#00FA9A", "#00FF7F", "#39FF14"]} // AXEM Green Theme preserved
-                rotation={4}
-                speed={0.55}
-                scale={1.1} // Updated from snippet
-                frequency={1} // Updated from snippet
-                warpStrength={1} // Updated from snippet
-                mouseInfluence={1.7}
-                parallax={1.05}
-                noise={0.1}
-                transparent
-                autoRotate={0}
-                color="#00FA9A"
-            />
-        </div>
-        {/* Lighter gradient to let the green shine through */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/60 to-[#050505] pointer-events-none"></div>
+    <section
+      className="relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-6 pt-40 pb-32"
+      aria-label="AXEM IA — Hero"
+    >
+      {/* === Background: grid + radial halo === */}
+      <div className="absolute inset-0 -z-10">
+        {/* fine grid */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: '56px 56px',
+            maskImage:
+              'radial-gradient(ellipse 80% 60% at 50% 30%, black 50%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 80% 60% at 50% 30%, black 50%, transparent 100%)',
+          }}
+        />
+        {/* accent halo */}
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 top-[10%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full opacity-30 blur-[140px]"
+          style={{ background: 'radial-gradient(closest-side, #00FA9A, transparent)' }}
+        />
+        {/* bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#050505]" />
       </div>
 
-      <div className="animate-reveal [animation-delay:100ms] text-center mb-10 space-y-2 opacity-0 flex flex-col items-center">
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight text-white flex flex-wrap justify-center gap-x-4">
-          <span className="font-playfair italic font-normal text-neutral-300">
-             <EditableText value="Rendre" storageKey="hero_title_1" />
-          </span>
-          <span className="font-medium tracking-tighter">
-             <EditableText value="l'IA simple," storageKey="hero_title_2" />
-          </span>
-        </h1>
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight font-medium text-white">
-             <EditableText value="rentable et actionnable" storageKey="hero_title_3" />
-        </h1>
-        <h1 className="text-5xl md:text-7xl lg:text-[90px] leading-[1.1] tracking-tight font-medium text-neutral-500">
-             <EditableText value="pour votre croissance." storageKey="hero_title_4" />
-        </h1>
-      </div>
-      
-      <div className="max-w-2xl text-center text-neutral-400 text-sm md:text-lg font-light leading-relaxed mb-12 animate-reveal [animation-delay:200ms] opacity-0 w-full px-4">
-        <EditableText 
-            value="Formation, Conseil, Audit, Production & Automatisation IA." 
-            storageKey="hero_subtitle" 
-            isTextarea={true}
-            className="w-full text-center"
-        />
-      </div>
-      
-      <div className="flex flex-col animate-reveal [animation-delay:300ms] sm:flex-row gap-x-5 gap-y-5 items-center opacity-0">
-        <a 
+      {/* === Eyebrow badge === */}
+      <div className="animate-reveal opacity-0 [animation-delay:60ms]">
+        <a
           href="#realisations"
-          onClick={scrollToRealisations}
-          className="px-8 py-3.5 rounded-full bg-neutral-200 text-[#050505] font-playfair italic text-lg hover:bg-white hover:scale-105 transition-all duration-300 shadow-[0_0_25px_-5px_rgba(255,255,255,0.3)] flex items-center justify-center cursor-pointer"
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-sm transition-all duration-200 hover:border-[#00FA9A]/40 hover:bg-[#00FA9A]/[0.06] hover:text-white"
         >
-           <EditableText value="Découvrir nos travaux" storageKey="hero_cta_1" className="bg-transparent hover:bg-transparent border-none hover:border-none hover:shadow-none" />
-        </a>
-        <a 
-          href="https://calendly.com/clem-pred/30min" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="px-8 py-3.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-neutral-200 text-sm font-medium hover:border-[#00FA9A]/50 hover:bg-[#00FA9A]/10 hover:text-white hover:shadow-[0_0_20px_-5px_rgba(0,250,154,0.3)] transition-all duration-300 flex items-center justify-center"
-        >
-           <EditableText value="Prendre rendez-vous" storageKey="hero_cta_2" className="bg-transparent hover:bg-transparent border-none hover:border-none hover:shadow-none" />
+          <span className="flex h-1.5 w-1.5 rounded-full bg-[#00FA9A] shadow-[0_0_8px_#00FA9A]" />
+          <span>Nouveau · Audit IA en 5 jours, livrable garanti</span>
+          <ArrowUpRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </a>
       </div>
-    </div>
+
+      {/* === Title === */}
+      <h1 className="animate-reveal mt-8 max-w-5xl text-center text-[40px] font-medium leading-[1.02] tracking-[-0.04em] text-white opacity-0 [animation-delay:120ms] sm:text-6xl md:text-7xl lg:text-[88px]">
+        <EditableText value="L'IA d'entreprise," storageKey="hero_title_2" />
+        <br />
+        <span className="bg-gradient-to-b from-white to-neutral-500 bg-clip-text text-transparent">
+          <EditableText value="simple, rentable, actionnable." storageKey="hero_title_3" />
+        </span>
+      </h1>
+
+      {/* === Subtitle === */}
+      <p className="animate-reveal mt-7 max-w-2xl text-center text-base font-light leading-relaxed text-neutral-400 opacity-0 [animation-delay:180ms] md:text-lg">
+        <EditableText
+          value="Formation, conseil, audit et déploiement d'agents IA pour PME et grands groupes. Livrables mesurables, exécution en jours, pas en mois."
+          storageKey="hero_subtitle"
+          isTextarea
+          className="w-full text-center"
+        />
+      </p>
+
+      {/* === CTAs === */}
+      <div className="animate-reveal mt-10 flex flex-col items-center gap-3 opacity-0 [animation-delay:240ms] sm:flex-row sm:gap-3">
+        <a
+          href="https://calendly.com/clem-pred/30min"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 rounded-full bg-[#00FA9A] px-6 py-3 text-sm font-semibold text-black shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_30px_-8px_rgba(0,250,154,0.6)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_0_1px_rgba(0,250,154,0.6),0_0_40px_-4px_rgba(0,250,154,0.7)]"
+        >
+          Réserver un audit
+          <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
+        </a>
+        <a
+          href="/realisations"
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-6 py-3 text-sm font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+        >
+          Voir nos réalisations
+          <ArrowUpRight className="h-4 w-4 opacity-60 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
+        </a>
+      </div>
+
+      {/* === Social proof row === */}
+      <div className="animate-reveal mt-20 flex flex-col items-center gap-5 opacity-0 [animation-delay:340ms]">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+          Ils nous font confiance
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-4 text-[15px] font-medium text-neutral-400">
+          <span className="opacity-70 transition-opacity hover:opacity-100">SNCF</span>
+          <span className="opacity-70 transition-opacity hover:opacity-100">Capgemini</span>
+          <span className="opacity-70 transition-opacity hover:opacity-100">EY</span>
+          <span className="opacity-70 transition-opacity hover:opacity-100">BNP Paribas</span>
+          <span className="opacity-70 transition-opacity hover:opacity-100">Orange</span>
+          <span className="opacity-70 transition-opacity hover:opacity-100">Société Générale</span>
+        </div>
+      </div>
+
+      {/* === Subtle scroll cue === */}
+      <button
+        type="button"
+        onClick={scrollToNext}
+        aria-label="Faire défiler vers la suite"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-neutral-500 transition-colors hover:text-white"
+      >
+        <Sparkles className="h-4 w-4 animate-pulse" />
+      </button>
+    </section>
   );
 };
 
