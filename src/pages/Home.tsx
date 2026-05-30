@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
-  useScroll, useInView, useReducedMotion,
+  motion, useMotionValue, useSpring,
+  useInView, useReducedMotion,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
 import Grainient from '../components/Grainient';
@@ -17,23 +17,8 @@ const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194
 const ease = [0.16, 1, 0.3, 1] as const;
 
 // =====================================================================
-// BACKGROUND HERO — Grainient (OGL). 3 mix de couleurs virales SaaS.
-// Change ACTIVE_PALETTE pour basculer : 'emerald' | 'cobalt' | 'solar'
+// BACKGROUND HERO — Grainient (OGL), palette emerald (#00FA9A → teal → forêt)
 // =====================================================================
-const PALETTES = {
-  // 1 · AXEM Emerald — vert mint de marque → teal → forêt profonde (cohérent #00FA9A)
-  emerald: { color1: '#00FA9A', color2: '#0BA37F', color3: '#04140F' },
-  // 2 · Cobalt AI — cyan → bleu électrique/indigo → navy profond (vibe Linear/Stripe/OpenAI)
-  cobalt:  { color1: '#3CE0FF', color2: '#3B5BFF', color3: '#070B2A' },
-  // 3 · Solar Sunset — or/ambre → corail → prune profonde (vibe Framer/Gumroad, chaud)
-  solar:   { color1: '#FFC24B', color2: '#FF5E5B', color3: '#2B0B3F' },
-} as const;
-const DEFAULT_PALETTE: keyof typeof PALETTES = 'emerald';
-const PALETTE_META: Record<keyof typeof PALETTES, { label: string; dot: string }> = {
-  emerald: { label: 'Emerald', dot: '#00FA9A' },
-  cobalt:  { label: 'Cobalt',  dot: '#3B5BFF' },
-  solar:   { label: 'Solar',   dot: '#FF5E5B' },
-};
 const GRAINIENT = {
   timeSpeed: 0.16, warpStrength: 1.0, warpFrequency: 4.0, warpSpeed: 1.5,
   warpAmplitude: 62.0, blendAngle: 18.0, blendSoftness: 0.12, rotationAmount: 360.0,
@@ -123,135 +108,121 @@ const Nav: React.FC = () => {
   );
 };
 
-// ---------- FUSION : Alexis × Clément → AXEM ----------
-const Fusion: React.FC = () => {
-  const [phase, setPhase] = useState<0 | 1 | 2>(0);
-  useEffect(() => { const a = setTimeout(() => setPhase(1), 1100); const b = setTimeout(() => setPhase(2), 2000); return () => { clearTimeout(a); clearTimeout(b); }; }, []);
-  return (
-    <div className="flex h-7 items-center justify-center" aria-label="Alexis et Clément égalent AXEM">
-      <AnimatePresence mode="wait">
-        {phase < 2 ? (
-          <motion.div key="n" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(6px)' }} transition={{ duration: 0.4 }}
-            className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.4em] text-cream-soft">
-            <motion.span animate={phase === 1 ? { opacity: 0.3 } : {}} transition={{ duration: 0.6 }}>Alexis</motion.span>
-            <motion.span animate={{ rotate: phase === 1 ? 90 : 0, scale: phase === 1 ? 1.5 : 1 }} transition={{ duration: 0.5 }} className="text-green">×</motion.span>
-            <motion.span animate={phase === 1 ? { opacity: 0.3 } : {}} transition={{ duration: 0.6 }}>Clément</motion.span>
-          </motion.div>
-        ) : (
-          <motion.div key="a" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease }} className="flex items-center gap-0.5">
-            {'AXEM'.split('').map((l, i) => (
-              <motion.span key={l + i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-                className="font-display text-base tracking-tight text-cream" style={{ fontWeight: 900 }}>{l}</motion.span>
-            ))}
-            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="ml-1 font-display text-base text-green" style={{ fontWeight: 900 }}>IA</motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// ---------- HERO : "AXEM" plein écran, typo architecture ----------
+// ---------- HERO : "SPLIT DUO" — texte + fondateurs mis en avant (façon AI Sisters) ----------
 const Hero: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const reduce = useReducedMotion();
-  const scale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.35]);
-  const yWord = useTransform(scrollYProgress, [0, 1], reduce ? ['0%', '0%'] : ['0%', '-22%']);
-  const op = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
-  const [pal, setPal] = useState<keyof typeof PALETTES>(() => {
-    if (typeof window !== 'undefined') {
-      const p = new URLSearchParams(window.location.search).get('p');
-      if (p && p in PALETTES) return p as keyof typeof PALETTES;
-    }
-    return DEFAULT_PALETTE;
-  });
+
+  // Cartes fondateurs (colonne droite)
+  const founders = [
+    { img: CLEMENT_IMG, name: 'Clément', sticker: '+40 000', rotate: -3 },
+    { img: ALEXIS_IMG, name: 'Alexis', sticker: '+15 000', rotate: 3 },
+  ];
 
   return (
-    <section id="top" ref={ref} className="relative overflow-hidden px-5 pt-32 md:px-8">
-      {/* BACKGROUND — Grainient animé (OGL) */}
+    <section id="top" className="relative overflow-hidden px-5 pb-4 pt-28 md:px-8 md:pt-36">
+      {/* BACKGROUND — Grainient animé (OGL), palette emerald */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
-        <Grainient {...GRAINIENT} {...PALETTES[pal]} className="h-full w-full" />
+        <Grainient {...GRAINIENT} color1="#00FA9A" color2="#0BA37F" color3="#04140F" className="h-full w-full" />
       </div>
-      {/* scrim lisibilité + fondu vers le fond #0F0F0F */}
+      {/* scrim lisibilité (renforcé côté gauche/texte) + fondu vers le fond #0F0F0F */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.5) 0%, rgba(15,15,15,0.28) 30%, rgba(15,15,15,0.66) 74%, #0F0F0F 100%)' }} />
+        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.55) 0%, rgba(15,15,15,0.34) 32%, rgba(15,15,15,0.7) 78%, #0F0F0F 100%)' }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 hidden md:block"
+        style={{ background: 'linear-gradient(90deg, rgba(15,15,15,0.78) 0%, rgba(15,15,15,0.45) 42%, rgba(15,15,15,0) 70%)' }} />
 
-      {/* SÉLECTEUR DE PALETTE (démo — à retirer une fois choisie) */}
-      <div className="fixed right-3 top-20 z-50 flex flex-col gap-1.5 rounded-2xl border border-cream/15 bg-ink/70 p-2 backdrop-blur-md md:right-5">
-        <span className="px-1 pb-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-cream-dim">Fond hero</span>
-        {(Object.keys(PALETTES) as (keyof typeof PALETTES)[]).map((k) => (
-          <button key={k} type="button" onClick={() => setPal(k)}
-            className={`flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide transition ${pal === k ? 'bg-cream/15 text-cream' : 'text-cream-soft hover:bg-cream/10'}`}>
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: PALETTE_META[k].dot }} />
-            {PALETTE_META[k].label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mx-auto max-w-[1400px]">
-        {/* top label */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="mb-10 flex flex-col items-center gap-4 md:mb-14">
-          <Fusion />
-          <div className="inline-flex items-center gap-2 border border-cream/15 px-4 py-1.5 text-center">
+      <div className="mx-auto grid max-w-[1400px] items-center gap-12 md:grid-cols-2 md:gap-14 lg:gap-20">
+        {/* ===== COLONNE GAUCHE — texte ===== */}
+        <div className="order-2 md:order-1">
+          {/* badge */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+            className="inline-flex items-center gap-2 rounded-full border border-cream/15 bg-ink/40 px-4 py-1.5 backdrop-blur-sm">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-cream-soft md:text-[11px]">Agence d'IA & organisme de formation certifié Qualiopi</span>
-          </div>
-        </motion.div>
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-cream-soft md:text-[11px]">Agence d'IA & organisme de formation certifié Qualiopi</span>
+          </motion.div>
 
-        {/* MOT GÉANT : AXEM en architecture */}
-        <motion.div style={{ scale, y: yWord, opacity: op }} className="relative flex origin-top justify-center">
-          <h1 className="select-none text-center font-display leading-[0.78] text-cream tighter"
-            style={{ fontWeight: 900, fontSize: 'clamp(96px, 27vw, 420px)' }}>
-            <span className="sr-only">AXEM = Alexis × Clément. Votre partenaire IA, de A à Z.</span>
-            <span aria-hidden className="flex justify-center">
-              {'AXEM'.split('').map((l, i) => (
-                <motion.span key={i} initial={{ y: '120%' }} animate={{ y: 0 }}
-                  transition={{ duration: 1, delay: 0.15 + i * 0.08, ease }}
-                  className={`inline-block ${l === 'X' || l === 'E' ? 'text-green' : ''}`}>{l}</motion.span>
-              ))}
+          {/* H1 taille humaine */}
+          <h1 className="mt-7 font-display leading-[0.98] text-cream tight" style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 76px)' }}>
+            <span className="sr-only">Votre partenaire IA, de A à Z.</span>
+            <span aria-hidden>
+              <RiseWords text="Votre partenaire IA," delay={0.1} />{' '}
+              <span className="text-green"><RiseWords text="de A à Z." delay={0.35} /></span>
             </span>
           </h1>
-        </motion.div>
 
-        {/* sous-mot explicatif */}
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.7 }}
-          className="mt-2 text-center font-display text-sm font-bold uppercase tracking-[0.3em] text-cream-soft md:text-base">
-          A<span className="text-green">XE</span>M = Alexis <span className="text-green">×</span> Clément
-        </motion.p>
-      </div>
-
-      {/* phrase architecture */}
-      <div className="mx-auto mt-16 max-w-[1400px] md:mt-24">
-        <h2 className="font-display leading-[0.92] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 9vw, 150px)' }}>
-          <RiseWords text="Votre partenaire" delay={0.2} /> <span className="text-green"><RiseWords text="IA," delay={0.4} /></span><br />
-          <RiseWords text="de A à Z." delay={0.5} />
-        </h2>
-
-        <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1.2fr_1fr] md:items-end">
-          <Reveal delay={0.1}>
-            <p className="font-display text-2xl leading-[1.05] text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>
+          {/* sous-ligne */}
+          <Reveal delay={0.2}>
+            <p className="mt-6 font-display text-xl leading-[1.15] text-cream tight md:text-2xl" style={{ fontWeight: 800 }}>
               On vous forme, on vous conseille, on déploie. <span className="text-green">Et on reste.</span>
             </p>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-cream-soft md:text-lg">
+          </Reveal>
+
+          {/* description */}
+          <Reveal delay={0.3}>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-cream-soft">
               AXEM IA est une agence spécialisée en intelligence artificielle générative et un organisme de formation certifié Qualiopi.
               Nous accompagnons les entreprises, les administrations et les particuliers via des formations IA, du conseil stratégique,
               de l'audit et de l'automatisation — pour concevoir et déployer des solutions IA concrètes.
             </p>
           </Reveal>
 
-          <Reveal delay={0.2} className="md:justify-self-end">
-            <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
-              className="group relative inline-flex items-center gap-3 overflow-hidden bg-green px-9 py-5 text-base uppercase tracking-[0.04em] text-ink" style={{ fontWeight: 900 }}>
-              <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
-              <span className="relative">Prendre rendez-vous</span>
-              <span className="relative transition-transform group-hover:translate-x-1">→</span>
-            </Magnetic>
-            <a href="#prestations" className="group mt-5 block text-sm font-bold uppercase tracking-[0.1em] text-cream-soft hover:text-cream">
-              <span className="border-b border-transparent pb-0.5 transition-colors group-hover:border-cream">Découvrir nos prestations</span> ↓
-            </a>
+          {/* CTA */}
+          <Reveal delay={0.4}>
+            <div className="mt-9 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+              <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
+                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-green px-8 py-4 text-[15px] uppercase tracking-[0.04em] text-ink" style={{ fontWeight: 900 }}>
+                <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
+                <span className="relative">Prendre rendez-vous</span>
+                <span className="relative transition-transform group-hover:translate-x-1">→</span>
+              </Magnetic>
+              <a href="#prestations" className="group inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-[0.1em] text-cream-soft hover:text-cream">
+                <span className="border-b border-transparent pb-0.5 transition-colors group-hover:border-cream">Découvrir nos prestations</span>
+                <span className="transition-transform group-hover:translate-y-0.5">↓</span>
+              </a>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* ===== COLONNE DROITE — le DUO mis en avant ===== */}
+        <div className="order-1 md:order-2">
+          <div className="relative mx-auto flex max-w-[460px] items-center justify-center gap-4 sm:gap-6">
+            {founders.map((f, i) => (
+              <motion.figure
+                key={f.name}
+                initial={{ opacity: 0, y: 30, rotate: reduce ? 0 : f.rotate }}
+                animate={{ opacity: 1, y: 0, rotate: reduce ? 0 : f.rotate }}
+                transition={{ duration: 0.9, delay: 0.2 + i * 0.12, ease }}
+                whileHover={reduce ? undefined : { y: -10, rotate: 0, scale: 1.04 }}
+                style={{ zIndex: i === 0 ? 2 : 1 }}
+                className="group relative w-1/2"
+              >
+                {/* halo mint */}
+                <span aria-hidden className="pointer-events-none absolute -inset-3 -z-10 rounded-[28px] bg-green/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="relative overflow-hidden rounded-[22px] border border-cream/15 ring-1 ring-green/30 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)]">
+                  <img src={f.img} alt={`${f.name}, co-fondateur d'AXEM IA`} loading="eager" decoding="async"
+                    className="aspect-[3/4] w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0" />
+                  <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  {/* nom */}
+                  <figcaption className="absolute bottom-3 left-3 font-display text-sm text-cream tight" style={{ fontWeight: 800 }}>{f.name}</figcaption>
+                  {/* sticker abonnés */}
+                  <span className="absolute right-2.5 top-2.5 rounded-full bg-green px-2.5 py-1 font-display text-[11px] text-ink shadow-lg" style={{ fontWeight: 900 }}>{f.sticker}</span>
+                </div>
+              </motion.figure>
+            ))}
+          </div>
+
+          {/* accroche duo + social proof */}
+          <Reveal delay={0.4}>
+            <div className="mt-8 text-center">
+              <p className="font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 900 }}>
+                Ensemble, <span className="text-green">AXEM.</span>
+              </p>
+              <p className="mt-2 inline-flex items-center gap-2 rounded-full border border-cream/12 bg-ink/40 px-4 py-1.5 text-sm text-cream-soft backdrop-blur-sm">
+                <svg className="h-4 w-4 shrink-0 text-green" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34V9.99H5.67v8.35h2.67zM7 8.84a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.5v-4.58c0-2.45-1.31-3.59-3.06-3.59-1.41 0-2.04.78-2.4 1.33v-1.14h-2.66c.04.75 0 8.35 0 8.35h2.66v-4.66c0-.24.02-.48.09-.65.19-.48.63-.97 1.36-.97.96 0 1.35.73 1.35 1.8v4.48h2.66z" /></svg>
+                <span className="font-display text-cream" style={{ fontWeight: 900 }}><Counter value={55000} prefix="+" /></span>
+                <span className="font-semibold">abonnés LinkedIn</span>
+              </p>
+            </div>
           </Reveal>
         </div>
       </div>
@@ -276,13 +247,20 @@ const Trust: React.FC = () => {
     { src: '/logos/senza.png', alt: 'SENZA' },
   ];
   return (
-    <section id="references" className="mt-28 border-y border-cream/10 bg-ink-2 py-10 md:mt-36">
-      <p className="mb-8 px-5 text-center text-[11px] font-bold uppercase tracking-[0.28em] text-cream-dim">Ils nous font confiance</p>
-      <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)' }}>
-        <div className="flex w-max items-center gap-12 px-6 group-hover:[animation-play-state:paused] md:gap-16" style={{ animation: 'marquee 48s linear infinite' }}>
+    <section id="references" className="mt-24 border-y border-cream/10 bg-ink-2 py-16 md:mt-32 md:py-20">
+      <div className="mx-auto mb-12 max-w-[1400px] px-5 text-center md:mb-14 md:px-8">
+        <div className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green">
+          <span className="h-1.5 w-1.5 bg-green" />Références
+        </div>
+        <h2 className="font-display leading-[0.95] text-cream tight" style={{ fontWeight: 900, fontSize: 'clamp(26px, 4vw, 48px)' }}>
+          Ils nous font <span className="text-green">confiance.</span>
+        </h2>
+      </div>
+      <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
+        <div className="flex w-max items-center gap-16 px-8 group-hover:[animation-play-state:paused] md:gap-24" style={{ animation: 'marquee 52s linear infinite' }}>
           {[...logos, ...logos].map((l, i) => (
             <img key={l.alt + i} src={l.src} alt={l.alt} loading="lazy" decoding="async"
-              className="h-6 w-auto max-w-[170px] shrink-0 object-contain opacity-55 brightness-0 invert transition duration-300 hover:opacity-100 hover:brightness-100 hover:invert-0 md:h-8" />
+              className="h-9 w-auto max-w-[210px] shrink-0 object-contain opacity-60 brightness-0 invert transition duration-300 hover:scale-105 hover:opacity-100 hover:brightness-100 hover:invert-0 md:h-12" />
           ))}
         </div>
       </div>
