@@ -1,18 +1,99 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import EditableText from './ui/EditableText';
-import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
-import { MagneticButton, AnimatedCount, MarqueeLogos } from './ui/wow';
+import { motion, useMotionValue, useSpring, useMotionTemplate, AnimatePresence } from 'framer-motion';
+import { MagneticButton } from './ui/wow';
 
-// === FINAL AXEM HERO ===
-// DA Linear (grid + halo + magnetic + marquee) en couleurs AXEM officielles.
-// Vert #00FA9A + Bricolage Grotesque + Playfair italic mots-pivots.
-// + Spotlight cursor-tracked sur le grid (effet "torche").
-// + Stats animés avec AnimatedCount.
-// + Marquee logos clients réels du PDF.
+// ============================================================
+// HERO AXEM — "Votre partenaire IA, de A à Z."
+// Structure AI Sisters + DA AXEM officielle (vert #00FA9A, Bricolage Grotesque)
+// Signature : fusion ALEXIS + CLÉMENT → AXEM au chargement
+// ============================================================
+
+const CALENDLY = 'https://calendly.com/clem-pred/30min';
+
+// --- Animation de fusion des prénoms ---
+// "ALEXIS" + "CLÉMENT" → les lettres A·X·E·M survivent → AXEM
+function FusionWordmark() {
+  const [phase, setPhase] = useState<0 | 1 | 2>(0);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase(1), 1100); // les prénoms s'effacent partiellement
+    const t2 = setTimeout(() => setPhase(2), 2000); // AXEM apparaît
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  return (
+    <div className="relative flex h-10 items-center justify-center md:h-12" aria-label="ALEXIS + CLÉMENT = AXEM">
+      <AnimatePresence mode="wait">
+        {phase < 2 ? (
+          <motion.div
+            key="names"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, filter: 'blur(6px)' }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center gap-3 font-mono text-sm uppercase tracking-[0.4em] md:text-base"
+          >
+            <motion.span
+              animate={phase === 1 ? { opacity: 0.25, letterSpacing: '0.1em' } : {}}
+              transition={{ duration: 0.6 }}
+              className="text-white/70"
+            >
+              Alexis
+            </motion.span>
+            <motion.span
+              animate={{ rotate: phase === 1 ? 90 : 0, scale: phase === 1 ? 1.3 : 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-[#00FA9A]"
+            >
+              +
+            </motion.span>
+            <motion.span
+              animate={phase === 1 ? { opacity: 0.25, letterSpacing: '0.1em' } : {}}
+              transition={{ duration: 0.6 }}
+              className="text-white/70"
+            >
+              Clément
+            </motion.span>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="axem"
+            initial={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+            className="flex items-center gap-1.5"
+          >
+            {['A', 'X', 'E', 'M'].map((l, i) => (
+              <motion.span
+                key={l}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.4 }}
+                className="font-display text-2xl font-medium tracking-tight text-white md:text-3xl"
+              >
+                {l}
+              </motion.span>
+            ))}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="ml-1.5 font-display text-2xl font-medium tracking-tight text-[#00FA9A] md:text-3xl"
+            >
+              IA
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 const Hero: React.FC = () => {
   const ref = useRef<HTMLElement>(null);
 
-  // Mouse-tracked spotlight on the grid
+  // Mouse-tracked spotlight
   const mx = useMotionValue(50);
   const my = useMotionValue(30);
   const smx = useSpring(mx, { stiffness: 80, damping: 26 });
@@ -31,190 +112,125 @@ const Hero: React.FC = () => {
     return () => window.removeEventListener('mousemove', handler);
   }, [mx, my]);
 
-  const titleVariants = {
-    hidden: { opacity: 0, y: 30, filter: 'blur(12px)' },
-    visible: (i: number) => ({
-      opacity: 1, y: 0, filter: 'blur(0px)',
-      transition: { delay: 0.15 + i * 0.08, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as any },
-    }),
-  };
-
   return (
     <section
       ref={ref}
-      className="relative isolate flex min-h-[100vh] flex-col justify-center overflow-hidden bg-[#050505] px-6 pt-32 pb-24"
+      className="relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden bg-[#050505] px-6 pt-32 pb-24 text-center"
       aria-label="AXEM IA — Hero"
     >
-      {/* === BACKGROUND : grid + halo + cursor spotlight === */}
+      {/* === BACKGROUND === */}
       <div className="absolute inset-0 -z-10" aria-hidden="true">
-        {/* fine grid */}
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
               "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
             backgroundSize: '64px 64px',
-            maskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 85% 65% at 50% 35%, black 50%, transparent 100%)',
+            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black 50%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 35%, black 50%, transparent 100%)',
           }}
         />
-        {/* breathing accent halo */}
         <motion.div
-          className="absolute left-1/2 top-[18%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full blur-[160px]"
+          className="absolute left-1/2 top-[14%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full blur-[160px]"
           style={{ background: 'radial-gradient(closest-side, #00FA9A, transparent)' }}
-          animate={{ opacity: [0.16, 0.30, 0.18], scale: [1, 1.05, 1] }}
+          animate={{ opacity: [0.14, 0.26, 0.16], scale: [1, 1.05, 1] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* CURSOR SPOTLIGHT — illumine le grid à la position de la souris */}
         <motion.div className="absolute inset-0" style={{ background: spotlight }} />
-        {/* bottom fade */}
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-[#050505]" />
       </div>
 
-      <div className="mx-auto w-full max-w-[1280px]">
-        {/* === Eyebrow vert + carré pulsant === */}
+      <div className="mx-auto flex w-full max-w-[1080px] flex-col items-center">
+        {/* === Fusion wordmark + label === */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-10"
+          className="mb-8 flex flex-col items-center gap-4"
         >
-          <a
-            href="#dualite"
-            className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-sm transition-all duration-200 hover:border-[#00FA9A]/40 hover:bg-[#00FA9A]/[0.06]"
-          >
-            <motion.span
-              className="h-1.5 w-1.5 rounded-full bg-[#00FA9A]"
-              animate={{ boxShadow: ['0 0 0 #00FA9A', '0 0 14px #00FA9A', '0 0 0 #00FA9A'] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#00FA9A]">
-              <EditableText value="Présentation Commerciale · 2025 / 2026" storageKey="hero_eyebrow" />
+          <FusionWordmark />
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#00FA9A]/20 bg-[#00FA9A]/[0.06] px-4 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#00FA9A]" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#00FA9A]">
+              <EditableText value="Agence d'IA & organisme de formation certifié Qualiopi" storageKey="hero_label" />
             </span>
-            <span className="text-xs text-[#00FA9A] transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
-          </a>
+          </div>
         </motion.div>
 
-        {/* === Title — Bricolage Grotesque 160px light + Playfair italic vert === */}
-        <h1 className="font-display text-[clamp(48px,8.5vw,148px)] font-light leading-[1.02] tracking-[-0.04em] text-white">
-          <motion.span variants={titleVariants} custom={0} initial="hidden" animate="visible" className="block">
-            <EditableText value="Rendre l'IA" storageKey="hero_title_1" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="simple," storageKey="hero_title_simple" />
-            </span>
-          </motion.span>
-          <motion.span variants={titleVariants} custom={1} initial="hidden" animate="visible" className="block">
-            <EditableText value="rentable et" storageKey="hero_title_2" />{' '}
-            <span className="font-playfair italic font-normal text-[#00FA9A]">
-              <EditableText value="actionnable." storageKey="hero_title_actionnable" />
-            </span>
-          </motion.span>
-        </h1>
+        {/* === Titre principal === */}
+        <motion.h1
+          initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+          className="font-display text-[clamp(44px,8vw,128px)] font-light leading-[1.02] tracking-[-0.04em] text-white"
+        >
+          <EditableText value="Votre partenaire IA," storageKey="hero_title_1" />{' '}
+          <span className="font-playfair italic font-normal text-[#00FA9A]">
+            <EditableText value="de A à Z." storageKey="hero_title_2" />
+          </span>
+        </motion.h1>
 
-        {/* === Subtitle === */}
+        {/* === Sous-ligne === */}
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.65 }}
-          className="mt-10 max-w-2xl text-lg font-light leading-snug text-neutral-400 md:text-xl"
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="mt-7 text-xl font-light text-neutral-300 md:text-2xl"
+        >
+          <EditableText value="On vous forme, on vous conseille, on déploie. Et on reste." storageKey="hero_subline" />
+        </motion.p>
+
+        {/* === Description (style AI Sisters) === */}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mt-7 max-w-2xl text-base font-light leading-relaxed text-neutral-400 md:text-lg"
         >
           <EditableText
-            value="Votre partenaire IA, de l'audit à la montée en compétences. Formation Qualiopi, conseil stratégique, déploiement & production."
-            storageKey="hero_subtitle"
+            value="AXEM IA est une agence spécialisée en intelligence artificielle générative et un organisme de formation certifié Qualiopi. Nous accompagnons les entreprises, les administrations et les particuliers via des formations IA, du conseil stratégique, de l'audit et de l'automatisation — pour concevoir et déployer des solutions IA concrètes."
+            storageKey="hero_description"
             isTextarea
-            className="w-full"
+            className="w-full text-center"
           />
         </motion.p>
 
-        {/* === Stats animés === */}
+        {/* === GROS BOUTON RDV (Calendly) === */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-14 grid max-w-3xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-12"
-        >
-          {[
-            { value: 10, suffix: '', label: 'formations' },
-            { value: 3, suffix: '', label: 'niveaux' },
-            { value: 70, suffix: ' %', label: 'de pratique' },
-            { value: null as null | number, label: 'opérationnel' }, // J+1 static
-          ].map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 + i * 0.08 }}
-              whileHover={{ x: 4 }}
-              className="cursor-default border-l-2 border-[#00FA9A]/40 pl-4 transition-colors hover:border-[#00FA9A]"
-            >
-              <div className="font-display text-5xl font-light text-[#00FA9A] md:text-6xl">
-                {s.value !== null ? (
-                  <>
-                    <AnimatedCount value={s.value} suffix={s.suffix} />
-                  </>
-                ) : (
-                  'J+1'
-                )}
-              </div>
-              <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
-                {s.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* === CTAs magnétiques === */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.2 }}
-          className="mt-14 flex flex-col items-start gap-3 sm:flex-row sm:gap-4"
+          transition={{ duration: 0.7, delay: 0.9 }}
+          className="mt-12 flex flex-col items-center gap-4 sm:flex-row"
         >
           <MagneticButton
-            href="https://calendly.com/clem-pred/30min"
+            href={CALENDLY}
             target="_blank"
             rel="noopener noreferrer"
-            strength={0.4}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#00FA9A] px-8 py-4 text-sm font-semibold text-[#050505] shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_40px_-8px_rgba(0,250,154,0.6)]"
+            strength={0.35}
+            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-[#00FA9A] px-10 py-5 text-base font-bold text-[#050505] shadow-[0_0_0_1px_rgba(0,250,154,0.4),0_0_60px_-12px_rgba(0,250,154,0.7)]"
           >
             <span
               aria-hidden="true"
               className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full"
             />
-            <span className="relative">Diagnostic gratuit · 30 min</span>
-            <span className="relative transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+            <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+            </svg>
+            <span className="relative">Prendre rendez-vous</span>
+            <span className="relative transition-transform duration-200 group-hover:translate-x-1">→</span>
           </MagneticButton>
-          <MagneticButton
-            href="#dualite"
-            strength={0.25}
-            className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-7 py-4 text-sm font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/30 hover:bg-white/[0.05]"
+          <a
+            href="https://wa.me/33600000000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-7 py-5 text-base font-medium text-neutral-200 backdrop-blur-sm transition-all duration-200 hover:border-white/30 hover:bg-white/[0.05]"
           >
-            Voir notre méthode
-            <span className="opacity-60 transition-transform duration-200 group-hover:translate-y-0.5">↓</span>
-          </MagneticButton>
-        </motion.div>
-
-        {/* === Marquee logos clients (RÉELS du PDF) avec fade mask === */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.5 }}
-          className="mt-24 w-full"
-        >
-          <div className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-neutral-500">
-            <span className="h-px w-8 bg-neutral-700" />
-            Ils nous font confiance
-            <span className="h-px flex-1 bg-neutral-800" />
-          </div>
-          <MarqueeLogos
-            logos={['Carrefour', 'Blackfin Capital', 'Avantis', 'KIT France', 'Espace 2', 'Socos Services', 'Gravotech', 'Cegos', 'myconnecting', 'synapse ia', 'ASphere', 'SENZA Formations']}
-            speed={36}
-            itemClassName="font-display text-2xl font-light text-neutral-400/85 tracking-tight"
-          />
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3a3 3 0 0 0-1 2.3c0 1.3 1 2.6 1.1 2.8.1.2 1.9 3 4.7 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.4-.6 1.6-1.2.2-.6.2-1.1.1-1.2l-.4-.2z" />
+            </svg>
+            WhatsApp
+          </a>
         </motion.div>
       </div>
     </section>
