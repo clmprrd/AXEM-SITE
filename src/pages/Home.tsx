@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
+  motion, AnimatePresence, MotionConfig, useMotionValue, useSpring, useTransform,
   useScroll, useInView, useReducedMotion,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
@@ -98,6 +98,142 @@ const Counter: React.FC<{ value: number; prefix?: string; suffix?: string; class
   }, [inView, value, reduce]);
   const fmt = n >= 1000 ? n.toLocaleString('fr-FR') : String(n);
   return <span ref={ref} className={className}>{prefix}{fmt}{suffix}</span>;
+};
+
+// =====================================================================
+// FX SCROLL CINÉMATIQUE — interactions only (transform/opacity/clip-path)
+// Sticky-scrub/parallax/word-reveal = desktop (md+) ; mobile = reveal simple.
+// reduced-motion : tout retombe sur des fades grâce à <MotionConfig reducedMotion="user">.
+// =====================================================================
+
+// Détecte desktop (md+) côté client pour activer/désactiver les effets lourds.
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const apply = () => setIsDesktop(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+  return isDesktop;
+};
+
+// MaskReveal — un item monte depuis un masque (overflow:hidden, y:100%→0).
+// Façon Linear/Apple. whileInView once. initial toujours défini. (utilisé dans Services + Method)
+const MaskReveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => (
+  // pb/-mb : marge interne pour ne pas couper les jambages (g, p, é) au repos.
+  <span className={`block overflow-hidden pb-[0.14em] -mb-[0.14em] ${className ?? ''}`}>
+    <motion.span
+      className="block"
+      initial={{ y: '120%' }}
+      whileInView={{ y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.7, delay, ease }}
+    >
+      {children}
+    </motion.span>
+  </span>
+);
+
+// ScrollOpacityWords — reveal mot-à-mot piloté par le scroll (gris→net).
+// Sticky non requis : on lie l'opacité de chaque mot à scrollYProgress de la section.
+// Desktop only ; mobile = reveal mask simple (RiseWords-like) pour rester lisible.
+const ScrollOpacityWords: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const isDesktop = useIsDesktop();
+  const reduce = useReducedMotion();
+  const words = text.split(' ');
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 0.85', 'start 0.3'],
+  });
+  // Effet scrub uniquement desktop + motion autorisé. Sinon fade in simple.
+  if (!isDesktop || reduce) {
+    return (
+      <motion.p
+        ref={ref}
+        className={className}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.8, ease }}
+      >
+        {text}
+      </motion.p>
+    );
+  }
+  return (
+    <p ref={ref} className={className} aria-label={text}>
+      {words.map((w, i) => (
+        <Word key={i} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>
+          {w}{i < words.length - 1 ? ' ' : ''}
+        </Word>
+      ))}
+    </p>
+  );
+};
+const Word: React.FC<{ children: React.ReactNode; progress: any; range: [number, number] }> = ({ children, progress, range }) => {
+  const opacity = useTransform(progress, range, [0.18, 1]);
+  return (
+    <span className="relative inline-block">
+      <motion.span style={{ opacity }}>{children}</motion.span>
+    </span>
+  );
+};
+
+// ParallaxItem — translation Y douce liée au scroll (amplitude faible).
+// Desktop only ; reduced-motion ⇒ pas de y (MotionConfig neutralise déjà).
+const ParallaxItem: React.FC<{ children: React.ReactNode; amount?: number; className?: string }> = ({ children, amount = 40, className }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isDesktop = useIsDesktop();
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], [amount, -amount]);
+  const active = isDesktop && !reduce;
+  return (
+    <div ref={ref} className={className}>
+      <motion.div style={active ? { y } : undefined}>{children}</motion.div>
+    </div>
+  );
+};
+
+// ClipReveal — l'image se dévoile via clip-path (inset) à l'entrée.
+const ClipReveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => (
+  <motion.div
+    className={className}
+    initial={{ clipPath: 'inset(0 0 100% 0)' }}
+    whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
+    viewport={{ once: true, margin: '-60px' }}
+    transition={{ duration: 0.9, delay, ease }}
+  >
+    {children}
+  </motion.div>
+);
+
+// StickyStackCard — carte sticky qui se superpose/scale légèrement au scroll
+// (recette Olivier Larose « cards-parallax »). Desktop only ; sur mobile, le
+// conteneur rend une simple liste révélée (cf. Proof).
+const StickyStackCard: React.FC<{
+  i: number;
+  total: number;
+  progress: any;
+  children: React.ReactNode;
+}> = ({ i, total, progress, children }) => {
+  const isLast = i === total - 1;
+  // scale cible : la carte rétrécit légèrement quand les suivantes la recouvrent.
+  // La dernière (jamais recouverte) reste à 1.
+  const targetScale = isLast ? 1 : 1 - (total - 1 - i) * 0.05;
+  const range: [number, number] = [i / total, 1];
+  const scale = useTransform(progress, range, [1, targetScale]);
+  const top = `calc(14vh + ${i * 26}px)`;
+  return (
+    <div className="sticky flex justify-center" style={{ top }}>
+      <motion.div style={{ scale }} className="w-full origin-top">
+        {children}
+      </motion.div>
+    </div>
+  );
 };
 
 // ---------- NAV ----------
@@ -274,7 +410,11 @@ const Trust: React.FC = () => {
     <section id="references" className="relative border-y border-white/10 bg-ink-2 py-14 md:py-16">
       <div className="mb-10 flex flex-col items-center gap-2 px-5 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-cream-dim">Ils nous font confiance</p>
-        <p className="font-display text-lg text-cream/90 md:text-2xl" style={{ fontWeight: 700 }}>Des PME aux grands comptes &amp; administrations.</p>
+        {/* FX5 — reveal mot-à-mot lié au scroll (gris→net) sur le titre manifeste de la 1re section */}
+        <ScrollOpacityWords
+          text="Des PME aux grands comptes & administrations."
+          className="font-display text-lg font-bold text-cream/90 md:text-2xl"
+        />
       </div>
       <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
         <div className="flex w-max items-center gap-16 px-8 group-hover:[animation-play-state:paused] md:gap-24" style={{ animation: 'marquee 50s linear infinite' }}>
@@ -309,18 +449,21 @@ const Services: React.FC = () => {
           </h2>
         </Reveal>
 
+        {/* FX4 — reveal ligne par ligne en mask (overflow:hidden, y:100%→0, stagger) façon Linear/Apple */}
         <div className="mt-16 border-t border-cream/12">
           {items.map((s, i) => (
-            <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
-                </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
-              </a>
-            </Reveal>
+            <a key={s.n} href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
+                <MaskReveal delay={(i % 3) * 0.05} className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl">
+                  <span style={{ fontWeight: 900 }}>{s.n}</span>
+                </MaskReveal>
+                <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>
+                  <MaskReveal delay={(i % 3) * 0.05 + 0.04}>{s.t}</MaskReveal>
+                </h3>
+                <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
+              </div>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
+            </a>
           ))}
         </div>
       </div>
@@ -351,12 +494,15 @@ const Duo: React.FC = () => {
           {founders.map((f, i) => (
             <Reveal key={f.name} delay={i * 0.1}>
               <div className="group flex h-full flex-col overflow-hidden border border-cream/12 bg-ink transition-colors hover:border-green/40">
-                <div className="relative overflow-hidden">
-                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
-                  <a href={f.li} target="_blank" rel="noopener noreferrer" className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center bg-green text-ink shadow-lg transition-transform hover:scale-110" aria-label={`LinkedIn ${f.name}`}>
+                {/* FX3 — clip-path reveal à l'entrée + parallax doux (amplitudes opposées) sur le portrait */}
+                <ClipReveal className="relative overflow-hidden" delay={i * 0.08}>
+                  <ParallaxItem amount={i === 0 ? 26 : -26}>
+                    <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full scale-[1.12] object-cover grayscale transition-all duration-500 group-hover:scale-[1.15] group-hover:grayscale-0" />
+                  </ParallaxItem>
+                  <a href={f.li} target="_blank" rel="noopener noreferrer" className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center bg-green text-ink shadow-lg transition-transform hover:scale-110" aria-label={`LinkedIn ${f.name}`}>
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34V9.99H5.67v8.35h2.67zM7 8.84a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.5v-4.58c0-2.45-1.31-3.59-3.06-3.59-1.41 0-2.04.78-2.4 1.33v-1.14h-2.66c.04.75 0 8.35 0 8.35h2.66v-4.66c0-.24.02-.48.09-.65.19-.48.63-.97 1.36-.97.96 0 1.35.73 1.35 1.8v4.48h2.66z" /></svg>
                   </a>
-                </div>
+                </ClipReveal>
                 <div className="flex flex-1 flex-col gap-3 p-7 md:p-9">
                   <div>
                     <h3 className="font-display text-3xl text-cream tighter md:text-4xl" style={{ fontWeight: 900 }}>{f.name}</h3>
@@ -386,7 +532,28 @@ const Duo: React.FC = () => {
 // ---------- PROOF : chiffres géants ----------
 const Proof: React.FC = () => {
   const stats = [{ v: 55000, p: '+', l: 'abonnés LinkedIn' }, { v: 10, p: '', l: 'formations Qualiopi' }, { v: 70, p: '', s: ' %', l: 'de pratique' }, { v: null, l: 'opérationnel', txt: 'J+1' }];
-  const cases = [{ sector: 'BTP · Chiffrage', r: '80 %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' }, { sector: 'Administration · OCR', r: '×4', d: 'plus rapide · fiabilité 100 % par double vérification' }, { sector: 'Industrie · Conformité ADV', r: '317 h', d: 'libérées par mois · anomalies détectées > 98 %' }];
+  const cases = [
+    { sector: 'BTP · Chiffrage', val: 80, pfx: '', sfx: ' %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' },
+    { sector: 'Administration · OCR', val: 4, pfx: '×', sfx: '', d: 'plus rapide · fiabilité 100 % par double vérification' },
+    { sector: 'Industrie · Conformité ADV', val: 317, pfx: '', sfx: ' h', d: 'libérées par mois · anomalies détectées > 98 %' },
+  ];
+  const stackRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useIsDesktop();
+  const reduce = useReducedMotion();
+  const stackOn = isDesktop && !reduce; // sticky-scrub desktop only, off si reduced-motion
+  const { scrollYProgress: stackProgress } = useScroll({ target: stackRef, offset: ['start start', 'end end'] });
+
+  const Card = (c: typeof cases[number]) => (
+    <div className="group flex flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3 md:p-12">
+      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
+      {/* Chiffre clé en GROS avec count-up */}
+      <span className="font-display leading-[0.85] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(64px, 11vw, 150px)' }}>
+        <Counter value={c.val} prefix={c.pfx} suffix={c.sfx} />
+      </span>
+      <p className="max-w-md text-base leading-relaxed text-cream-soft md:text-lg">{c.d}</p>
+    </div>
+  );
+
   return (
     <section className="px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
@@ -409,47 +576,118 @@ const Proof: React.FC = () => {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {cases.map((c, i) => (
-            <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
+        {/* FX1 — STICKY STACKING CARDS (cards-parallax) desktop ; liste révélée en mobile / reduced-motion */}
+        {stackOn ? (
+          <div ref={stackRef} className="relative mt-14">
+            {cases.map((c, i) => (
+              <div key={c.sector} className="min-h-[58vh]">
+                <StickyStackCard i={i} total={cases.length} progress={stackProgress}>
+                  {Card(c)}
+                </StickyStackCard>
               </div>
-            </Reveal>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-14 grid gap-6">
+            {cases.map((c, i) => (
+              <Reveal key={c.sector} delay={i * 0.08}>{Card(c)}</Reveal>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 };
 
 // ---------- METHOD ----------
+type Step = { n: string; t: string; d: string; meta: string };
+const METHOD_STEPS: Step[] = [
+  { n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' },
+  { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' },
+  { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' },
+];
+
+// Carte d'étape : s'illumine quand l'étape active dépasse son seuil (scrollYProgress).
+const MethodStep: React.FC<{ s: Step; i: number; total: number; progress: any }> = ({ s, i, total, progress }) => {
+  const start = i / total;
+  const end = (i + 1) / total;
+  // opacité du contenu : passe de 0.45 (en attente) à 1 (actif) sur sa plage.
+  const opacity = useTransform(progress, [start - 0.08, start + 0.04], [0.45, 1]);
+  const numColor = useTransform(progress, [start, start + 0.02], ['#FAFAF7', '#00FA9A']);
+  return (
+    <motion.div style={{ opacity }} className="border border-cream/12 bg-ink p-8 md:p-10">
+      <div className="flex items-center justify-between">
+        <motion.span className="font-display text-7xl tighter md:text-8xl" style={{ fontWeight: 900, color: numColor }}>{s.n}</motion.span>
+        <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+      </div>
+      <h3 className="mt-4 font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
+      <p className="mt-3 text-base leading-relaxed text-cream-soft">{s.d}</p>
+    </motion.div>
+  );
+};
+
 const Method: React.FC = () => {
-  const steps = [{ n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
+  const steps = METHOD_STEPS;
+  const isDesktop = useIsDesktop();
+  const reduce = useReducedMotion();
+  const pinOn = isDesktop && !reduce; // sticky-pin + scrub desktop only, off si reduced-motion
+  const ref = useRef<HTMLDivElement>(null);
+  // FX2 — useScroll target sur la section : pilote l'étape active + la ligne de progression.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.6', 'end 0.9'] });
+  const lineScale = useTransform(scrollYProgress, [0, 1], [0.04, 1]);
+
   return (
     <section id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
-      <div className="mx-auto max-w-[1400px]">
-        <Reveal>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
-            En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
-          </h2>
-        </Reveal>
-        <div className="mt-16 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10">
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-7xl text-cream transition-colors group-hover:text-green tighter md:text-8xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+      <div ref={ref} className="mx-auto max-w-[1400px]">
+        {pinOn ? (
+          <div className="grid gap-16 md:grid-cols-[0.9fr_1.1fr]">
+            {/* Colonne titre/intro PINNÉE (sticky) pendant que les étapes défilent */}
+            <div className="self-start md:sticky md:top-28">
+              <Reveal>
+                <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 6vw, 110px)' }}>
+                  En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
+                </h2>
+              </Reveal>
+              {/* Ligne de progression verticale qui se remplit (scaleY lié au scroll) */}
+              <div className="mt-10 flex items-stretch gap-4">
+                <div className="relative w-[3px] overflow-hidden bg-cream/12">
+                  <motion.div className="absolute inset-x-0 top-0 h-full origin-top bg-green" style={{ scaleY: lineScale }} />
                 </div>
-                <h3 className="font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
-                <p className="text-base leading-relaxed text-cream-soft">{s.d}</p>
+                <p className="max-w-xs self-end text-sm leading-relaxed text-cream-soft">
+                  Du premier appel à la mise en production. Vous savez toujours où vous en êtes.
+                </p>
               </div>
+            </div>
+            {/* Étapes qui défilent ; l'active s'illumine */}
+            <div className="flex flex-col gap-6">
+              {steps.map((s, i) => (
+                <MethodStep key={s.n} s={s} i={i} total={steps.length} progress={scrollYProgress} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            <Reveal>
+              <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
+                En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
+              </h2>
             </Reveal>
-          ))}
-        </div>
+            <div className="mt-12 grid gap-px overflow-hidden border border-cream/12 bg-cream/12">
+              {steps.map((s, i) => (
+                <Reveal key={s.n} delay={i * 0.08}>
+                  <div className="flex h-full flex-col gap-4 bg-ink-2 p-8">
+                    <div className="flex items-center justify-between">
+                      <span className="font-display text-7xl text-cream tighter" style={{ fontWeight: 900 }}>{s.n}</span>
+                      <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+                    </div>
+                    <h3 className="font-display text-3xl text-cream tight" style={{ fontWeight: 800 }}>{s.t}</h3>
+                    <p className="text-base leading-relaxed text-cream-soft">{s.d}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -458,7 +696,14 @@ const Method: React.FC = () => {
 // ---------- FINAL CTA : aplat mint massif ----------
 const FinalCTA: React.FC = () => (
   <section className="px-5 py-28 md:px-8 md:py-36">
-    <div className="mx-auto max-w-[1400px] bg-green px-6 py-24 text-center md:px-16 md:py-32">
+    {/* FX7 — reveal à l'entrée + scale doux du bloc (bouton déjà magnétique) */}
+    <motion.div
+      className="mx-auto max-w-[1400px] bg-green px-6 py-24 text-center md:px-16 md:py-32"
+      initial={{ opacity: 0, scale: 0.94 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.9, ease }}
+    >
       <Reveal>
         <h2 className="mx-auto font-display leading-[0.86] text-ink tighter" style={{ fontWeight: 900, fontSize: 'clamp(46px, 9vw, 170px)' }}>
           Parlons<br />de votre projet.
@@ -471,7 +716,7 @@ const FinalCTA: React.FC = () => (
           Réserver un diagnostic gratuit <span className="transition-transform group-hover:translate-x-1">→</span>
         </Magnetic>
       </Reveal>
-    </div>
+    </motion.div>
   </section>
 );
 
@@ -511,11 +756,14 @@ const Footer: React.FC = () => (
 );
 
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  // reducedMotion="user" : parallax / sticky-scrub / word-reveal retombent en fades.
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <Nav />
+      <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
