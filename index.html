@@ -39,7 +39,11 @@
       ::selection { background:#00FA9A; color:#0A0A0A; }
       .no-scrollbar::-webkit-scrollbar { display:none; }
       .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
-      @media (pointer:fine) { body { cursor:none; } }
+      @keyframes axem-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+      @keyframes axem-drift1 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(8%,5%) scale(1.12) } }
+      @keyframes axem-drift2 { 0%,100% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-7%,6%) scale(1) } }
+      @keyframes axem-drift3 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(5%,-6%) scale(1.1) } }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
     </style>
   </head>
   <body>
