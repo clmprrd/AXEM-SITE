@@ -13,16 +13,16 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
+              noir: "#0A0A0A",
+              "noir-2": "#111111",
+              bone: "#F5F3EF",
+              "bone-soft": "#8A8A85",
               green: "#00FA9A",
               "green-deep": "#00B86F",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
+              display: ["'Fraunces'", "Georgia", "serif"],
               serif: ["'Instrument Serif'", "serif"],
             }
           },
@@ -31,24 +31,24 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
       html { scroll-padding-top: 90px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #0A0A0A;
+        color: #F5F3EF;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
+      .font-display { font-family: 'Fraunces', Georgia, serif; letter-spacing: -0.02em; font-weight: 300; }
       .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      ::selection { background: #00FA9A; color: #0A0A0A; }
+      ::-moz-selection { background: #00FA9A; color: #0A0A0A; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
+      /* green underline accent */
       .mark-green {
-        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
-        padding: 0 0.05em;
+        background: linear-gradient(180deg, transparent 60%, rgba(0,250,154,0.30) 60%);
+        padding: 0 0.04em;
       }
     </style>
   </head>
