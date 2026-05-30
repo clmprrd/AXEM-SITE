@@ -165,19 +165,19 @@ const Hero: React.FC = () => {
   });
 
   return (
-    <section id="top" className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-32 md:px-8">
-      {/* BACKGROUND — Grainient vif (OGL) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-32 md:px-8">
+      {/* BACKGROUND — Grainient vif (OGL) — z-0 dans le stacking context de la section */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0F0F0F]">
         <Grainient {...GRAINIENT} {...PALETTES[pal]} className="h-full w-full" />
       </div>
       {/* lisibilité MINIMALE — on garde le fond LUMINEUX comme la démo React Bits */}
       {/* léger spot derrière le texte seulement (le reste reste vif) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'radial-gradient(70% 52% at 50% 44%, rgba(6,6,12,0.34) 0%, rgba(6,6,12,0.12) 46%, transparent 72%)' }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: 'radial-gradient(64% 48% at 50% 42%, rgba(7,7,13,0.5) 0%, rgba(7,7,13,0.22) 44%, transparent 70%)' }} />
       {/* fondu bas vers le fond du site + voile haut discret pour la nav */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[24%]"
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[24%]"
         style={{ background: 'linear-gradient(180deg, transparent, #0F0F0F)' }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24"
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-24"
         style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.42), transparent)' }} />
 
       {/* SÉLECTEUR DE PALETTE (démo — retiré une fois la couleur choisie) */}
@@ -193,7 +193,7 @@ const Hero: React.FC = () => {
       </div>
 
       {/* CONTENU */}
-      <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center">
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
         <Reveal>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
