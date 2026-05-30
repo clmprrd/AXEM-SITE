@@ -70,20 +70,26 @@ const Spotlight: React.FC<{ children: React.ReactNode; className?: string }> = (
   );
 };
 
-// ---------- HERO BACKGROUND PREMIUM (mesh gradient animé subtil) ----------
+// ---------- HERO BACKGROUND — AURORA (21st.dev, recoloré AXEM) ----------
 const HeroBackground: React.FC = () => (
   <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-    {/* mesh : 3 nappes de couleur floues qui dérivent doucement */}
-    <div className="absolute left-[-15%] top-[-10%] h-[70vh] w-[60vw] rounded-full blur-[130px]"
-      style={{ background: 'radial-gradient(closest-side, rgba(0,250,154,0.30), transparent)', animation: 'axem-drift1 22s ease-in-out infinite' }} />
-    <div className="absolute right-[-10%] top-[-5%] h-[60vh] w-[50vw] rounded-full blur-[140px]"
-      style={{ background: 'radial-gradient(closest-side, rgba(22,120,90,0.45), transparent)', animation: 'axem-drift2 26s ease-in-out infinite' }} />
-    <div className="absolute bottom-[-20%] left-1/3 h-[55vh] w-[45vw] rounded-full blur-[120px]"
-      style={{ background: 'radial-gradient(closest-side, rgba(0,250,154,0.16), transparent)', animation: 'axem-drift3 30s ease-in-out infinite' }} />
-    {/* grille très fine masquée */}
-    <div className="absolute inset-0 opacity-[0.55]" style={{ backgroundImage: 'linear-gradient(rgba(245,243,239,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,243,239,0.035) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(ellipse 75% 55% at 50% 35%, black, transparent)', WebkitMaskImage: 'radial-gradient(ellipse 75% 55% at 50% 35%, black, transparent)' }} />
+    {/* Aurora animée : gradients verts qui ondulent (technique 21st.dev) */}
+    <div className="absolute inset-0 overflow-hidden opacity-[0.40]">
+      <motion.div className="absolute inset-[-100%]"
+        style={{ background: 'repeating-linear-gradient(100deg, #00FA9A 10%, #0A0A0A 15%, #16785A 20%, #00FA9A 25%, #0A0A0A 30%)', backgroundSize: '300% 100%', filter: 'blur(90px)' }}
+        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+        transition={{ duration: 26, repeat: Infinity, ease: 'linear' }} />
+      <motion.div className="absolute inset-[-10px]"
+        style={{ background: 'repeating-linear-gradient(100deg, rgba(0,250,154,0.10) 0%, rgba(0,250,154,0.10) 7%, transparent 10%, transparent 12%, rgba(0,250,154,0.10) 16%), repeating-linear-gradient(100deg, #00FA9A 10%, #16785A 15%, #0EA371 20%, #00FA9A 25%, #16785A 30%)', backgroundSize: '200%, 100%', backgroundPosition: '50% 50%, 50% 50%', mixBlendMode: 'difference' as any }}
+        animate={{ backgroundPosition: ['50% 50%, 50% 50%', '100% 50%, 150% 50%', '50% 50%, 50% 50%'] }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} />
+    </div>
+    {/* grille fine masquée */}
+    <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'linear-gradient(rgba(245,243,239,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,243,239,0.035) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(ellipse 75% 55% at 50% 35%, black, transparent)', WebkitMaskImage: 'radial-gradient(ellipse 75% 55% at 50% 35%, black, transparent)' }} />
+    {/* vignette : garde le centre lisible */}
+    <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 60% at 50% 38%, transparent 0%, rgba(10,10,10,0.55) 72%, #0A0A0A 100%)' }} />
     {/* grain doux */}
-    <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
+    <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
     {/* fade bas vers le noir */}
     <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-ink" />
   </div>
