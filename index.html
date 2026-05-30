@@ -13,16 +13,21 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
+              cream: "#FFFDF9",
+              sand: "#FBF6EE",
+              ink: "#161616",
+              "ink-soft": "#6E6A63",
+              mint: "#00FA9A",
+              "mint-deep": "#00B86F",
+              coral: "#FF6B4A",
+              "coral-deep": "#E5482A",
+              // legacy aliases kept so existing class names still resolve
               green: "#00FA9A",
               "green-deep": "#00B86F",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
+              display: ["'Hanken Grotesque'", "Inter", "sans-serif"],
               serif: ["'Instrument Serif'", "serif"],
             }
           },
@@ -31,25 +36,35 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesque:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
       html { scroll-padding-top: 90px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #FFFDF9;
+        color: #161616;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
+      .font-display { font-family: 'Hanken Grotesque', 'Inter', sans-serif; letter-spacing: -0.02em; }
       .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      ::selection { background: #00FA9A; color: #161616; }
+      ::-moz-selection { background: #00FA9A; color: #161616; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
-      .mark-green {
+      /* highlight markers — duo colors */
+      .mark-mint {
         background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
         padding: 0 0.05em;
       }
+      .mark-coral {
+        background: linear-gradient(180deg, transparent 58%, rgba(255,107,74,0.40) 58%);
+        padding: 0 0.05em;
+      }
+      /* organic blob shapes */
+      .blob-1 { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
+      .blob-2 { border-radius: 63% 37% 38% 62% / 49% 57% 43% 51%; }
+      .blob-3 { border-radius: 50% 50% 47% 53% / 58% 47% 53% 42%; }
+      @keyframes float-soft { 0%,100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-14px) rotate(3deg) } }
+      .float-soft { animation: float-soft 7s ease-in-out infinite; }
     </style>
   </head>
   <body>
