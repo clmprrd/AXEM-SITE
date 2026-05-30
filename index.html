@@ -13,43 +13,62 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
+              cream: "#FBF7F0",
+              paper: "#FFFFFF",
+              ink: "#1A1A1A",
+              "ink-soft": "#5A5A55",
               green: "#00FA9A",
               "green-deep": "#00B86F",
+              yellow: "#FFD43B",
+              lavender: "#C4B5FD",
+              coral: "#FF8A65",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
               display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
               serif: ["'Instrument Serif'", "serif"],
-            }
+            },
+            boxShadow: {
+              hard: "6px 6px 0 #1A1A1A",
+              "hard-sm": "4px 4px 0 #1A1A1A",
+              "hard-lg": "8px 8px 0 #1A1A1A",
+              "hard-green": "6px 6px 0 #00B86F",
+            },
           },
         },
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
       html { scroll-padding-top: 90px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #FBF7F0;
+        color: #1A1A1A;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
+      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.02em; }
       .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      ::selection { background: #FFD43B; color: #1A1A1A; }
+      ::-moz-selection { background: #FFD43B; color: #1A1A1A; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
+      /* highlight markers (playful sticker style) */
       .mark-green {
-        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
-        padding: 0 0.05em;
+        background: linear-gradient(180deg, transparent 55%, #00FA9A 55%);
+        padding: 0 0.08em;
+        border-radius: 0.1em;
       }
+      .mark-yellow {
+        background: linear-gradient(180deg, transparent 55%, #FFD43B 55%);
+        padding: 0 0.08em;
+      }
+      @keyframes wiggle {
+        0%, 100% { transform: rotate(-3deg); }
+        50% { transform: rotate(3deg); }
+      }
+      .hover-wiggle:hover { animation: wiggle 0.4s ease-in-out; }
     </style>
   </head>
   <body>
