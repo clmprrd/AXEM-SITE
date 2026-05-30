@@ -13,17 +13,19 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
-              green: "#00FA9A",
-              "green-deep": "#00B86F",
+              cream: "#F4F1EA",
+              paper: "#FAF8F2",
+              ink: "#1A1A1A",
+              "ink-soft": "#5C574E",
+              "ink-faint": "#8A857A",
+              line: "#1A1A1A",
+              green: "#00C77A",
+              "green-deep": "#00A865",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
-              serif: ["'Instrument Serif'", "serif"],
+              display: ["Fraunces", "Georgia", "serif"],
+              quote: ["Newsreader", "Georgia", "serif"],
             }
           },
         },
@@ -31,24 +33,26 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
     <style>
-      html { scroll-padding-top: 90px; }
+      html { scroll-padding-top: 96px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #F4F1EA;
+        color: #1A1A1A;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
-      .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      .font-display { font-family: 'Fraunces', Georgia, serif; }
+      .font-quote { font-family: 'Newsreader', Georgia, serif; }
+      .italic-accent { font-family: 'Fraunces', Georgia, serif; font-style: italic; }
+      ::selection { background: #1A1A1A; color: #F4F1EA; }
+      ::-moz-selection { background: #1A1A1A; color: #F4F1EA; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
-      .mark-green {
-        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
-        padding: 0 0.05em;
+      /* small caps numerals / editorial */
+      .tnum { font-variant-numeric: tabular-nums; }
+      /* fine underline accent for the touch of green */
+      .rule-green {
+        background-image: linear-gradient(180deg, transparent 62%, rgba(0,199,122,0.5) 62%, rgba(0,199,122,0.5) 92%, transparent 92%);
       }
     </style>
   </head>
