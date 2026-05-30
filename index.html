@@ -1,46 +1,29 @@
 
 <!DOCTYPE html>
-<html lang="en" class="antialiased scroll-smooth">
+<html lang="fr" class="antialiased scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AXEM IA - Rendre l'IA Simple, Rentable et Actionnable</title>
+    <title>AXEM IA — Votre partenaire IA, de A à Z.</title>
+    <meta name="description" content="AXEM IA, agence d'IA & organisme de formation certifié Qualiopi. Audit, conseil, automatisation et formation IA pour les entreprises, administrations et particuliers." />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: ["class"],
         theme: {
           extend: {
             colors: {
-              background: "#050505",
-              foreground: "#ffffff",
-              card: "#0a0a0a",
-              "card-foreground": "#ffffff",
-              popover: "#0a0a0a",
-              "popover-foreground": "#ffffff",
-              primary: "#00FA9A",
-              "primary-foreground": "#000000",
-              secondary: "#1a1a1a",
-              "secondary-foreground": "#ffffff",
-              muted: "#1a1a1a",
-              "muted-foreground": "#a3a3a3",
-              accent: "#00FA9A",
-              "accent-foreground": "#000000",
-              destructive: "#ef4444",
-              "destructive-foreground": "#ffffff",
-              border: "#262626",
-              input: "#262626",
-              ring: "#00FA9A",
-            },
-            borderRadius: {
-              lg: "0.5rem",
-              md: "calc(0.5rem - 2px)",
-              sm: "calc(0.5rem - 4px)",
+              cream: "#FBFAF8",
+              sand: "#F4F1EB",
+              ink: "#0D0D0D",
+              "ink-soft": "#6B6B66",
+              green: "#00FA9A",
+              "green-deep": "#00B86F",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              playfair: ["Playfair Display", "serif"],
+              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
+              serif: ["'Instrument Serif'", "serif"],
             }
           },
         },
@@ -48,86 +31,29 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500&family=Inter:wght@300;400;500;600;800;900&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
-      :root {
-        --bg-color: #050505;
-        --accent-color: #00FA9A;
-        /* Custom Folder Variables */
-        --folder-back: #e73827;
-        --folder-tab: #f85032;
-        --folder-front: #e73827;
-      }
-      html {
-        scroll-padding-top: 100px; /* Évite que la navbar cache le titre de la section */
-      }
+      html { scroll-padding-top: 90px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: var(--bg-color);
-        color: white;
+        background-color: #FBFAF8;
+        color: #0D0D0D;
       }
-      
-      /* Cinematic Noise - Optimized with PNG pattern instead of SVG filter */
-      .noise-overlay {
-        background-image: url("https://res.cloudinary.com/dydlv7s9n/image/upload/v1615481313/noise_zbe9v2.png");
-        background-repeat: repeat;
-        opacity: 0.05;
-        pointer-events: none;
-        transform: translateZ(0); /* Hardware acceleration */
-        will-change: opacity;
-      }
-
-      /* Hardware Acceleration Classes */
-      .gpu {
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        perspective: 1000px;
-        will-change: transform;
-      }
-
-      .transform-gpu {
-        transform: translate3d(0, 0, 0);
-      }
-
-      /* Animations */
-      @keyframes reveal {
-        from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-        to { opacity: 1; transform: translateY(0); filter: blur(0); }
-      }
-      .animate-reveal {
-        animation: reveal 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-      }
-      
-      @keyframes marquee-scroll {
-        from { transform: translateX(0); }
-        to { transform: translateX(-100%); }
-      }
-      @keyframes marquee-scroll-reverse {
-        from { transform: translateX(-100%); }
-        to { transform: translateX(0); }
-      }
-      .animate-marquee {
-        animation: marquee-scroll 40s linear infinite;
-        will-change: transform;
-        transform: translate3d(0, 0, 0);
-      }
-      .animate-marquee-reverse {
-        animation: marquee-scroll-reverse 40s linear infinite;
-        will-change: transform;
-        transform: translate3d(0, 0, 0);
-      }
-      .animate-marquee:hover, .animate-marquee-reverse:hover {
-        animation-play-state: paused;
-      }
-
-      /* Scrollbar Hide */
+      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
+      .font-serif-i { font-family: 'Instrument Serif', serif; }
+      ::selection { background: #00FA9A; color: #0D0D0D; }
+      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      /* green highlight marker */
+      .mark-green {
+        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
+        padding: 0 0.05em;
+      }
     </style>
-
-</head>
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
