@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AXEM IA — Votre partenaire IA, de A à Z.</title>
     <meta name="description" content="AXEM IA, agence d'IA & organisme de formation certifié Qualiopi. Audit, conseil, automatisation et formation IA pour les entreprises, administrations et particuliers." />
+    <meta name="theme-color" content="#0A0E14" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,17 +14,20 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
-              green: "#00FA9A",
-              "green-deep": "#00B86F",
+              base: "#0A0E14",
+              surface: "#12161F",
+              "surface-2": "#171C28",
+              line: "#1F2632",
+              text: "#E8ECF2",
+              "text-soft": "#8A93A3",
+              mint: "#00FA9A",
+              "mint-deep": "#00C57B",
+              sky: "#0EA5E9",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
-              serif: ["'Instrument Serif'", "serif"],
+              display: ["'Space Grotesk'", "Inter", "sans-serif"],
+              mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
             }
           },
         },
@@ -31,24 +35,52 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       html { scroll-padding-top: 90px; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #0A0E14;
+        color: #E8ECF2;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
-      .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.02em; }
+      .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+      ::selection { background: #00FA9A; color: #0A0E14; }
+      ::-moz-selection { background: #00FA9A; color: #0A0E14; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
-      .mark-green {
-        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
-        padding: 0 0.05em;
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: #0A0E14; }
+      ::-webkit-scrollbar-thumb { background: #1F2632; border-radius: 8px; border: 2px solid #0A0E14; }
+      ::-webkit-scrollbar-thumb:hover { background: #2a3342; }
+      /* mint underline marker for the hero word */
+      .mark-mint {
+        position: relative;
+        color: #00FA9A;
+      }
+      .mark-mint::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; bottom: 0.06em;
+        height: 0.30em;
+        background: linear-gradient(90deg, rgba(0,250,154,0.55), rgba(14,165,233,0.45));
+        border-radius: 4px;
+        z-index: -1;
+        filter: blur(0.5px);
+      }
+      .text-gradient {
+        background: linear-gradient(92deg, #00FA9A 0%, #0EA5E9 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+      /* subtle technical grid for full page */
+      .tech-grid {
+        background-image:
+          linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+        background-size: 56px 56px;
       }
     </style>
   </head>
