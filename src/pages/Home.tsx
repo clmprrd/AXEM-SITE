@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   motion, AnimatePresence, useMotionValue, useSpring, useTransform,
-  useScroll, useInView, useReducedMotion,
+  useScroll, useInView, useReducedMotion, useMotionTemplate, MotionConfig,
+  type Variants,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
 import Grainient from '../components/Grainient';
@@ -98,6 +99,78 @@ const Counter: React.FC<{ value: number; prefix?: string; suffix?: string; class
   }, [inView, value, reduce]);
   const fmt = n >= 1000 ? n.toLocaleString('fr-FR') : String(n);
   return <span ref={ref} className={className}>{prefix}{fmt}{suffix}</span>;
+};
+
+// ---------- INTERACTIONS (Premium Retenu) ----------
+
+// Spotlight : radial-gradient piloté par la souris via vars --mx/--my.
+// Pur cosmétique (aria-hidden, pointer-events-none) → la lisibilité reste
+// totale au repos et sur mobile (pas de hover → gradient invisible).
+const Spotlight: React.FC<{ className?: string; color?: string; size?: number }> = ({
+  className = '', color = 'rgba(0,250,154,0.10)', size = 360,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const move = (e: React.MouseEvent) => {
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  };
+  if (reduce) return null;
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      onMouseMove={move}
+      className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${className}`}
+      style={{
+        background: `radial-gradient(${size}px circle at var(--mx, 50%) var(--my, 50%), ${color}, transparent 70%)`,
+      }}
+    />
+  );
+};
+
+// Variants de cascade (stagger) — reveal une seule fois, transform+opacity only.
+const cascade: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+const cascadeItem: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
+};
+
+// Glow doux qui pulse derrière le CTA (opacity/scale en boucle légère).
+// Coupé en reduced-motion (rien rendu → aucune translation/anim).
+const PulseGlow: React.FC<{ className?: string; color?: string }> = ({
+  className = '', color = 'rgba(15,15,15,0.45)',
+}) => {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
+  return (
+    <motion.span
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 -z-10 rounded-full blur-2xl ${className}`}
+      style={{ background: color }}
+      initial={{ opacity: 0.35, scale: 0.9 }}
+      animate={{ opacity: [0.35, 0.6, 0.35], scale: [0.9, 1.08, 0.9] }}
+      transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
+    />
+  );
+};
+
+// Barre de progression de scroll — scaleX GPU, originX:0, fixed 3px mint.
+const ScrollProgress: React.FC = () => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
+  return (
+    <motion.div
+      aria-hidden
+      className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-green"
+      style={{ scaleX }}
+    />
+  );
 };
 
 // ---------- NAV ----------
@@ -276,14 +349,21 @@ const Trust: React.FC = () => {
         <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-cream-dim">Ils nous font confiance</p>
         <p className="font-display text-lg text-cream/90 md:text-2xl" style={{ fontWeight: 700 }}>Des PME aux grands comptes &amp; administrations.</p>
       </div>
-      <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
+      <motion.div
+        className="group relative overflow-hidden"
+        style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5, ease }}
+      >
         <div className="flex w-max items-center gap-16 px-8 group-hover:[animation-play-state:paused] md:gap-24" style={{ animation: 'marquee 50s linear infinite' }}>
           {[...logos, ...logos].map((l, i) => (
             <img key={l.alt + i} src={l.src} alt={l.alt} loading="lazy" decoding="async"
               className="h-9 w-auto max-w-[210px] shrink-0 object-contain opacity-70 brightness-0 invert transition duration-300 hover:opacity-100 hover:brightness-100 hover:invert-0 md:h-12" />
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
@@ -309,20 +389,34 @@ const Services: React.FC = () => {
           </h2>
         </Reveal>
 
-        <div className="mt-16 border-t border-cream/12">
-          {items.map((s, i) => (
-            <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
-                </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
-              </a>
-            </Reveal>
+        <motion.div
+          className="mt-16 border-t border-cream/12"
+          variants={cascade}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+        >
+          {items.map((s) => (
+            <motion.a
+              key={s.n}
+              href="#methode"
+              variants={cascadeItem}
+              whileHover={{ y: -4 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+              className="group relative block overflow-hidden border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9"
+            >
+              {/* glow de bordure subtil au hover (opacity only) */}
+              <span aria-hidden className="pointer-events-none absolute inset-0 opacity-0 ring-1 ring-inset ring-green/30 transition-opacity duration-300 group-hover:opacity-100" />
+              <Spotlight />
+              <div className="relative grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
+                <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
+                <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
+                <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
+              </div>
+              <p className="relative mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
+            </motion.a>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -350,9 +444,14 @@ const Duo: React.FC = () => {
         <div className="mt-16 grid gap-6 md:grid-cols-2">
           {founders.map((f, i) => (
             <Reveal key={f.name} delay={i * 0.1}>
-              <div className="group flex h-full flex-col overflow-hidden border border-cream/12 bg-ink transition-colors hover:border-green/40">
+              <div className="group relative flex h-full flex-col overflow-hidden border border-cream/12 bg-ink transition-colors hover:border-green/40">
+                <Spotlight size={420} />
                 <div className="relative overflow-hidden">
-                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
+                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.04] group-hover:grayscale-0" />
+                  {/* overlay : révèle le secondaire (rôle + lien LinkedIn) — nom/rôle restent visibles AU REPOS plus bas */}
+                  <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-2 items-end bg-gradient-to-t from-ink/85 via-ink/30 to-transparent p-5 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-green">{f.role}</span>
+                  </div>
                   <a href={f.li} target="_blank" rel="noopener noreferrer" className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center bg-green text-ink shadow-lg transition-transform hover:scale-110" aria-label={`LinkedIn ${f.name}`}>
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34V9.99H5.67v8.35h2.67zM7 8.84a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.5v-4.58c0-2.45-1.31-3.59-3.06-3.59-1.41 0-2.04.78-2.4 1.33v-1.14h-2.66c.04.75 0 8.35 0 8.35h2.66v-4.66c0-.24.02-.48.09-.65.19-.48.63-.97 1.36-.97.96 0 1.35.73 1.35 1.8v4.48h2.66z" /></svg>
                   </a>
@@ -386,7 +485,11 @@ const Duo: React.FC = () => {
 // ---------- PROOF : chiffres géants ----------
 const Proof: React.FC = () => {
   const stats = [{ v: 55000, p: '+', l: 'abonnés LinkedIn' }, { v: 10, p: '', l: 'formations Qualiopi' }, { v: 70, p: '', s: ' %', l: 'de pratique' }, { v: null, l: 'opérationnel', txt: 'J+1' }];
-  const cases = [{ sector: 'BTP · Chiffrage', r: '80 %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' }, { sector: 'Administration · OCR', r: '×4', d: 'plus rapide · fiabilité 100 % par double vérification' }, { sector: 'Industrie · Conformité ADV', r: '317 h', d: 'libérées par mois · anomalies détectées > 98 %' }];
+  const cases = [
+    { sector: 'BTP · Chiffrage', val: 80, pre: '', suf: ' %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' },
+    { sector: 'Administration · OCR', val: 4, pre: '×', suf: '', d: 'plus rapide · fiabilité 100 % par double vérification' },
+    { sector: 'Industrie · Conformité ADV', val: 317, pre: '', suf: ' h', d: 'libérées par mois · anomalies détectées > 98 %' },
+  ];
   return (
     <section className="px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
@@ -409,17 +512,30 @@ const Proof: React.FC = () => {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {cases.map((c, i) => (
-            <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
-              </div>
-            </Reveal>
+        <motion.div
+          className="mt-14 grid gap-6 md:grid-cols-3"
+          variants={cascade}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {cases.map((c) => (
+            <motion.div
+              key={c.sector}
+              variants={cascadeItem}
+              whileHover={{ y: -4 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+              className="group relative flex h-full flex-col gap-4 overflow-hidden border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3"
+            >
+              <Spotlight />
+              <span className="relative text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
+              <span className="relative font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>
+                <Counter value={c.val} prefix={c.pre} suffix={c.suf} />
+              </span>
+              <p className="relative text-base leading-relaxed text-cream-soft">{c.d}</p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -436,19 +552,40 @@ const Method: React.FC = () => {
             En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
           </h2>
         </Reveal>
-        <div className="mt-16 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10">
-                <div className="flex items-center justify-between">
+        <div className="relative mt-16">
+          {/* fine ligne connectrice (desktop) — se dessine via pathLength, une fois */}
+          <svg aria-hidden className="pointer-events-none absolute left-0 right-0 top-[6px] z-10 hidden h-[2px] w-full md:block" preserveAspectRatio="none" viewBox="0 0 100 1">
+            <motion.line
+              x1="2" y1="0.5" x2="98" y2="0.5" stroke="#00FA9A" strokeWidth="1" vectorEffect="non-scaling-stroke" strokeLinecap="round" opacity="0.4"
+              initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, ease }}
+            />
+          </svg>
+          <motion.div
+            className="grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3"
+            variants={cascade}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            {steps.map((s) => (
+              <motion.div
+                key={s.n}
+                variants={cascadeItem}
+                whileHover={{ y: -4 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+                className="group relative flex h-full flex-col gap-4 overflow-hidden bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10"
+              >
+                <Spotlight />
+                <div className="relative flex items-center justify-between">
                   <span className="font-display text-7xl text-cream transition-colors group-hover:text-green tighter md:text-8xl" style={{ fontWeight: 900 }}>{s.n}</span>
                   <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
                 </div>
-                <h3 className="font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
-                <p className="text-base leading-relaxed text-cream-soft">{s.d}</p>
-              </div>
-            </Reveal>
-          ))}
+                <h3 className="relative font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
+                <p className="relative text-base leading-relaxed text-cream-soft">{s.d}</p>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>
@@ -466,10 +603,13 @@ const FinalCTA: React.FC = () => (
       </Reveal>
       <Reveal delay={0.1}><p className="mx-auto mt-8 max-w-xl text-lg font-medium text-ink/70 md:text-xl">Pas un commercial. Directement Clément ou Alexis. 30 minutes pour identifier vos leviers les plus rentables.</p></Reveal>
       <Reveal delay={0.2}>
-        <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
-          className="group mt-12 inline-flex items-center gap-3 bg-ink px-10 py-5 text-base uppercase tracking-[0.04em] text-green" style={{ fontWeight: 900 }}>
-          Réserver un diagnostic gratuit <span className="transition-transform group-hover:translate-x-1">→</span>
-        </Magnetic>
+        <span className="relative mt-12 inline-flex">
+          <PulseGlow />
+          <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
+            className="group relative inline-flex items-center gap-3 bg-ink px-10 py-5 text-base uppercase tracking-[0.04em] text-green" style={{ fontWeight: 900 }}>
+            Réserver un diagnostic gratuit <span className="transition-transform group-hover:translate-x-1">→</span>
+          </Magnetic>
+        </span>
       </Reveal>
     </div>
   </section>
@@ -511,11 +651,14 @@ const Footer: React.FC = () => (
 );
 
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <ScrollProgress />
+      <Nav />
+      <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
