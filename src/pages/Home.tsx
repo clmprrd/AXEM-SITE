@@ -3,6 +3,8 @@ import {
   motion, AnimatePresence, useMotionValue, useSpring, useTransform,
   useScroll, useInView, useReducedMotion,
 } from 'framer-motion';
+// @ts-ignore — composant JS (React Bits / OGL)
+import Grainient from '../components/Grainient';
 
 // =====================================================================
 // AXEM IA — BOLD TYPOGRAPHIQUE
@@ -13,6 +15,31 @@ const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 const ease = [0.16, 1, 0.3, 1] as const;
+
+// =====================================================================
+// BACKGROUND HERO — Grainient (OGL). 3 mix de couleurs virales SaaS.
+// Change ACTIVE_PALETTE pour basculer : 'emerald' | 'cobalt' | 'solar'
+// =====================================================================
+const PALETTES = {
+  // 1 · AXEM Emerald — vert mint de marque → teal → forêt profonde (cohérent #00FA9A)
+  emerald: { color1: '#00FA9A', color2: '#0BA37F', color3: '#04140F' },
+  // 2 · Cobalt AI — cyan → bleu électrique/indigo → navy profond (vibe Linear/Stripe/OpenAI)
+  cobalt:  { color1: '#3CE0FF', color2: '#3B5BFF', color3: '#070B2A' },
+  // 3 · Solar Sunset — or/ambre → corail → prune profonde (vibe Framer/Gumroad, chaud)
+  solar:   { color1: '#FFC24B', color2: '#FF5E5B', color3: '#2B0B3F' },
+} as const;
+const DEFAULT_PALETTE: keyof typeof PALETTES = 'emerald';
+const PALETTE_META: Record<keyof typeof PALETTES, { label: string; dot: string }> = {
+  emerald: { label: 'Emerald', dot: '#00FA9A' },
+  cobalt:  { label: 'Cobalt',  dot: '#3B5BFF' },
+  solar:   { label: 'Solar',   dot: '#FF5E5B' },
+};
+const GRAINIENT = {
+  timeSpeed: 0.16, warpStrength: 1.0, warpFrequency: 4.0, warpSpeed: 1.5,
+  warpAmplitude: 62.0, blendAngle: 18.0, blendSoftness: 0.12, rotationAmount: 360.0,
+  noiseScale: 2.0, grainAmount: 0.1, grainScale: 2.0, grainAnimated: false,
+  contrast: 1.32, gamma: 1.0, saturation: 1.06, zoom: 0.95,
+} as const;
 
 // ---------- helpers ----------
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => (
@@ -132,12 +159,35 @@ const Hero: React.FC = () => {
   const scale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.35]);
   const yWord = useTransform(scrollYProgress, [0, 1], reduce ? ['0%', '0%'] : ['0%', '-22%']);
   const op = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const [pal, setPal] = useState<keyof typeof PALETTES>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('p');
+      if (p && p in PALETTES) return p as keyof typeof PALETTES;
+    }
+    return DEFAULT_PALETTE;
+  });
 
   return (
     <section id="top" ref={ref} className="relative overflow-hidden px-5 pt-32 md:px-8">
-      {/* halo mint discret */}
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-[18%] -z-10 h-[60vh] w-[80vw] -translate-x-1/2 rounded-full opacity-40 blur-[140px]"
-        style={{ background: 'radial-gradient(closest-side, rgba(0,250,154,0.22), transparent)' }} />
+      {/* BACKGROUND — Grainient animé (OGL) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+        <Grainient {...GRAINIENT} {...PALETTES[pal]} className="h-full w-full" />
+      </div>
+      {/* scrim lisibilité + fondu vers le fond #0F0F0F */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
+        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.5) 0%, rgba(15,15,15,0.28) 30%, rgba(15,15,15,0.66) 74%, #0F0F0F 100%)' }} />
+
+      {/* SÉLECTEUR DE PALETTE (démo — à retirer une fois choisie) */}
+      <div className="fixed right-3 top-20 z-50 flex flex-col gap-1.5 rounded-2xl border border-cream/15 bg-ink/70 p-2 backdrop-blur-md md:right-5">
+        <span className="px-1 pb-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-cream-dim">Fond hero</span>
+        {(Object.keys(PALETTES) as (keyof typeof PALETTES)[]).map((k) => (
+          <button key={k} type="button" onClick={() => setPal(k)}
+            className={`flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide transition ${pal === k ? 'bg-cream/15 text-cream' : 'text-cream-soft hover:bg-cream/10'}`}>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: PALETTE_META[k].dot }} />
+            {PALETTE_META[k].label}
+          </button>
+        ))}
+      </div>
 
       <div className="mx-auto max-w-[1400px]">
         {/* top label */}
@@ -211,14 +261,28 @@ const Hero: React.FC = () => {
 
 // ---------- TRUST : marquee CAPS ----------
 const Trust: React.FC = () => {
-  const logos = ['Carrefour', 'Blackfin Capital', 'Avantis', 'KIT France', 'Espace 2', 'Socos', 'Gravotech', 'Mammouth AI', 'Pennylane', 'Dragon LLM', 'myconnecting', 'IAdescript', 'Gomable AI', 'Cegos', 'SENZA', 'ASphere'];
+  // Vrais logos clients/partenaires (extraits + vérifiés). Monochrome blanc, couleur au survol.
+  const logos = [
+    { src: '/logos/carrefour.svg', alt: 'Carrefour' },
+    { src: '/logos/pennylane.svg', alt: 'Pennylane' },
+    { src: '/logos/cegos.png', alt: 'Cegos' },
+    { src: '/logos/blackfin.png', alt: 'BlackFin Capital' },
+    { src: '/logos/gravotech.png', alt: 'Gravotech' },
+    { src: '/logos/dragonllm.svg', alt: 'Dragon LLM' },
+    { src: '/logos/asphere.png', alt: 'ASphere' },
+    { src: '/logos/myconnecting.png', alt: 'myconnecting' },
+    { src: '/logos/mammouth.svg', alt: 'Mammouth AI' },
+    { src: '/logos/avantis.png', alt: 'Avantis' },
+    { src: '/logos/senza.png', alt: 'SENZA' },
+  ];
   return (
-    <section id="references" className="mt-28 border-y border-cream/10 bg-ink-2 py-9 md:mt-36">
-      <p className="mb-6 px-5 text-center text-[11px] font-bold uppercase tracking-[0.28em] text-cream-dim">Ils nous font confiance</p>
+    <section id="references" className="mt-28 border-y border-cream/10 bg-ink-2 py-10 md:mt-36">
+      <p className="mb-8 px-5 text-center text-[11px] font-bold uppercase tracking-[0.28em] text-cream-dim">Ils nous font confiance</p>
       <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)' }}>
-        <div className="flex w-max gap-14 px-6 group-hover:[animation-play-state:paused]" style={{ animation: 'marquee 45s linear infinite' }}>
+        <div className="flex w-max items-center gap-12 px-6 group-hover:[animation-play-state:paused] md:gap-16" style={{ animation: 'marquee 48s linear infinite' }}>
           {[...logos, ...logos].map((l, i) => (
-            <span key={l + i} className="shrink-0 whitespace-nowrap font-display text-2xl uppercase tracking-tight text-cream/35 transition-colors hover:text-green md:text-3xl" style={{ fontWeight: 800 }}>{l}</span>
+            <img key={l.alt + i} src={l.src} alt={l.alt} loading="lazy" decoding="async"
+              className="h-6 w-auto max-w-[170px] shrink-0 object-contain opacity-55 brightness-0 invert transition duration-300 hover:opacity-100 hover:brightness-100 hover:invert-0 md:h-8" />
           ))}
         </div>
       </div>
