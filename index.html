@@ -13,17 +13,18 @@
         theme: {
           extend: {
             colors: {
-              cream: "#FBFAF8",
-              sand: "#F4F1EB",
-              ink: "#0D0D0D",
-              "ink-soft": "#6B6B66",
+              ink: "#0F0F0F",
+              "ink-2": "#161616",
+              "ink-3": "#1E1E1E",
+              cream: "#FAFAF7",
+              "cream-soft": "#A8A8A2",
+              "cream-dim": "#6E6E68",
               green: "#00FA9A",
               "green-deep": "#00B86F",
             },
             fontFamily: {
               sans: ["Inter", "sans-serif"],
-              display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
-              serif: ["'Instrument Serif'", "serif"],
+              display: ["Archivo", "Inter", "sans-serif"],
             }
           },
         },
@@ -31,25 +32,32 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      html { scroll-padding-top: 90px; }
+      html { scroll-padding-top: 80px; background-color: #0F0F0F; }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #FBFAF8;
-        color: #0D0D0D;
+        background-color: #0F0F0F;
+        color: #FAFAF7;
+        overflow-x: hidden;
       }
-      .font-display { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.03em; }
-      .font-serif-i { font-family: 'Instrument Serif', serif; }
-      ::selection { background: #00FA9A; color: #0D0D0D; }
-      ::-moz-selection { background: #00FA9A; color: #0D0D0D; }
+      .font-display { font-family: 'Archivo', 'Inter', sans-serif; }
+      ::selection { background: #00FA9A; color: #0F0F0F; }
+      ::-moz-selection { background: #00FA9A; color: #0F0F0F; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* green highlight marker */
-      .mark-green {
-        background: linear-gradient(180deg, transparent 58%, rgba(0,250,154,0.55) 58%);
-        padding: 0 0.05em;
+      /* huge type kills its own tracking */
+      .tight { letter-spacing: -0.04em; }
+      .tighter { letter-spacing: -0.055em; }
+      .outline-type {
+        color: transparent;
+        -webkit-text-stroke: 1.5px #FAFAF7;
       }
+      .outline-green {
+        color: transparent;
+        -webkit-text-stroke: 1.5px #00FA9A;
+      }
+      @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
     </style>
   </head>
   <body>
