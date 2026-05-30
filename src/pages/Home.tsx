@@ -38,10 +38,10 @@ const PALETTE_META: Record<keyof typeof PALETTES, { label: string; dot: string }
   mint:   { label: 'Mint',   dot: '#00E0A4' },
 };
 const GRAINIENT = {
-  timeSpeed: 0.18, warpStrength: 1.0, warpFrequency: 4.0, warpSpeed: 1.5,
-  warpAmplitude: 62.0, blendAngle: 18.0, blendSoftness: 0.14, rotationAmount: 340.0,
-  noiseScale: 2.0, grainAmount: 0.09, grainScale: 2.0, grainAnimated: false,
-  contrast: 1.26, gamma: 1.0, saturation: 1.14, zoom: 0.95,
+  timeSpeed: 0.18, warpStrength: 1.0, warpFrequency: 5.0, warpSpeed: 2.0,
+  warpAmplitude: 50.0, blendAngle: 0.0, blendSoftness: 0.05, rotationAmount: 500.0,
+  noiseScale: 2.0, grainAmount: 0.12, grainScale: 1.5, grainAnimated: false,
+  contrast: 1.5, gamma: 1.0, saturation: 1.05, zoom: 0.78,
 } as const;
 
 // ---------- helpers ----------
@@ -170,11 +170,15 @@ const Hero: React.FC = () => {
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
         <Grainient {...GRAINIENT} {...PALETTES[pal]} className="h-full w-full" />
       </div>
-      {/* lisibilité : vignette douce centrale + fondu bas vers #0F0F0F (sans tuer la couleur) */}
+      {/* lisibilité MINIMALE — on garde le fond LUMINEUX comme la démo React Bits */}
+      {/* léger spot derrière le texte seulement (le reste reste vif) */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'radial-gradient(135% 105% at 50% 36%, rgba(10,10,12,0) 0%, rgba(10,10,12,0.16) 50%, rgba(15,15,15,0.5) 80%, #0F0F0F 100%)' }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-28"
-        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.55), transparent)' }} />
+        style={{ background: 'radial-gradient(70% 52% at 50% 44%, rgba(6,6,12,0.34) 0%, rgba(6,6,12,0.12) 46%, transparent 72%)' }} />
+      {/* fondu bas vers le fond du site + voile haut discret pour la nav */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[24%]"
+        style={{ background: 'linear-gradient(180deg, transparent, #0F0F0F)' }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24"
+        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.42), transparent)' }} />
 
       {/* SÉLECTEUR DE PALETTE (démo — retiré une fois la couleur choisie) */}
       <div className="fixed right-3 top-24 z-50 flex flex-col gap-1 rounded-2xl border border-white/15 bg-black/45 p-2 backdrop-blur-md md:right-5">
