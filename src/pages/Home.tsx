@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   motion, AnimatePresence, useMotionValue, useSpring, useTransform,
-  useScroll, useInView, useReducedMotion,
+  useScroll, useInView, useReducedMotion, useVelocity, useAnimationFrame,
+  wrap, MotionConfig,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
 import Grainient from '../components/Grainient';
@@ -98,6 +99,242 @@ const Counter: React.FC<{ value: number; prefix?: string; suffix?: string; class
   }, [inView, value, reduce]);
   const fmt = n >= 1000 ? n.toLocaleString('fr-FR') : String(n);
   return <span ref={ref} className={className}>{prefix}{fmt}{suffix}</span>;
+};
+
+// =====================================================================
+// KINETIC & TACTILE — composants d'interaction (transform/opacity/filter only)
+// =====================================================================
+
+// ---------- Tilt 3D au pointeur (perspective sur le parent) ----------
+const Tilt: React.FC<{ children: React.ReactNode; className?: string; max?: number; scale?: number }> = ({ children, className, max = 8, scale = 1.02 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const mx = useMotionValue(0); // -0.5..0.5
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 220, damping: 18, mass: 0.4 });
+  const sy = useSpring(my, { stiffness: 220, damping: 18, mass: 0.4 });
+  const rotateX = useTransform(sy, [-0.5, 0.5], [max, -max]);
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-max, max]);
+  const sc = useSpring(useMotionValue(1), { stiffness: 220, damping: 18 });
+
+  const onMove = (e: React.MouseEvent) => {
+    if (reduce) return;
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width - 0.5);
+    my.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onEnter = () => { if (!reduce) sc.set(scale); };
+  const onLeave = () => { mx.set(0); my.set(0); sc.set(1); };
+
+  if (reduce) return <div className={className}>{children}</div>;
+  return (
+    <div style={{ perspective: 900 }} className={className}>
+      <motion.div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+        style={{ rotateX, rotateY, scale: sc, transformStyle: 'preserve-3d', willChange: 'transform' }}
+        className="h-full w-full"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+};
+
+// ---------- Magnetic générique (span/div) — pour libellés & flèches internes ----------
+const MagneticEl: React.FC<{ children: React.ReactNode; className?: string; strength?: number; clamp?: number }> = ({ children, className, strength = 0.4, clamp = 8 }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0); const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 14, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 220, damping: 14, mass: 0.4 });
+  const clampV = (v: number) => Math.max(-clamp, Math.min(clamp, v));
+  const move = (e: React.MouseEvent) => {
+    if (reduce) return;
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    x.set(clampV((e.clientX - (r.left + r.width / 2)) * strength));
+    y.set(clampV((e.clientY - (r.top + r.height / 2)) * strength));
+  };
+  if (reduce) return <span className={className}>{children}</span>;
+  return (
+    <motion.span ref={ref} onMouseMove={move} onMouseLeave={() => { x.set(0); y.set(0); }}
+      style={{ x: sx, y: sy, display: 'inline-flex', willChange: 'transform' }} className={className}>
+      {children}
+    </motion.span>
+  );
+};
+
+// ---------- VELOCITY-SKEW MARQUEE — bandeau slogan plein largeur ----------
+const VelocityMarquee: React.FC<{ items: string[]; baseVelocity?: number }> = ({ items, baseVelocity = 2.4 }) => {
+  const reduce = useReducedMotion();
+  const baseX = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothV = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  // facteur de vitesse : -5..5 selon la vélocité du scroll
+  const velocityFactor = useTransform(smoothV, [-1500, 1500], [-5, 5], { clamp: false });
+  // inclinaison synchronisée avec la vélocité, clampée [-12,12]
+  const skew = useTransform(smoothV, [-2000, 2000], [-12, 12], { clamp: true });
+  const skewSmooth = useSpring(skew, { damping: 30, stiffness: 200 });
+  const x = useTransform(baseX, (v) => `${wrap(-25, 0, v)}%`);
+
+  const directionFactor = useRef(1);
+  useAnimationFrame((_, delta) => {
+    if (reduce) return;
+    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
+    if (velocityFactor.get() < 0) directionFactor.current = -1;
+    else if (velocityFactor.get() > 0) directionFactor.current = 1;
+    moveBy += directionFactor.current * moveBy * velocityFactor.get();
+    baseX.set(baseX.get() + moveBy);
+  });
+
+  // état repos lisible (reduced-motion) : bandeau statique sans skew ni défilement
+  if (reduce) {
+    return (
+      <div className="border-y border-cream/10 bg-ink py-6 md:py-8" aria-hidden>
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 px-5 text-center">
+          {items.map((t, i) => (
+            <span key={i} className="font-display text-2xl tracking-tight text-cream/90 md:text-4xl" style={{ fontWeight: 900 }}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const run = [...items, ...items, ...items, ...items];
+  return (
+    <div className="relative overflow-hidden border-y border-cream/10 bg-ink py-6 md:py-8" aria-hidden>
+      <motion.div style={{ skewX: skewSmooth, willChange: 'transform' }}>
+        <motion.div className="flex w-max flex-nowrap" style={{ x, willChange: 'transform' }}>
+          {run.map((t, i) => (
+            <span key={i} className="flex items-center whitespace-nowrap font-display text-2xl tracking-tight text-cream/90 md:text-4xl" style={{ fontWeight: 900 }}>
+              <span className="px-6 md:px-9">{t}</span>
+              <span className="text-green">·</span>
+            </span>
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+};
+
+// ---------- FlipCard — chiffre au repos, contexte au hover (flip 3D rotateY) ----------
+const FlipCard: React.FC<{ sector: string; result: string; detail: string }> = ({ sector, result, detail }) => {
+  const reduce = useReducedMotion();
+  const [flipped, setFlipped] = useState(false);
+
+  // Repos = TOUJOURS lisible (chiffre + secteur). Mobile / reduced-motion : pas de flip, le détail s'affiche sous le chiffre.
+  if (reduce) {
+    return (
+      <div className="flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{sector}</span>
+        <span className="font-display text-7xl text-cream tighter md:text-8xl" style={{ fontWeight: 900 }}>{result}</span>
+        <p className="text-base leading-relaxed text-cream-soft">{detail}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{ perspective: 1200 }}
+      className="h-full min-h-[280px]"
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+    >
+      <motion.div
+        className="relative h-full w-full"
+        style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.6, ease }}
+      >
+        {/* FACE — chiffre lisible au repos */}
+        <div
+          className="flex h-full min-h-[280px] flex-col gap-4 border border-cream/12 bg-ink-2 p-8"
+          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{sector}</span>
+          <span className="mt-auto font-display text-7xl text-cream tighter md:text-8xl" style={{ fontWeight: 900 }}>{result}</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-cream-dim">Survolez pour le détail</span>
+        </div>
+        {/* DOS — contexte au hover */}
+        <div
+          className="absolute inset-0 flex h-full flex-col gap-4 border border-green/40 bg-ink-3 p-8"
+          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{sector}</span>
+          <p className="my-auto font-display text-2xl leading-tight text-cream md:text-3xl" style={{ fontWeight: 800 }}>{detail}</p>
+          <span className="font-display text-3xl text-green tighter" style={{ fontWeight: 900 }}>{result}</span>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// ---------- MagneticAvatar — avatar qui suit légèrement le curseur ----------
+const MagneticAvatar: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0); const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 150, damping: 12, mass: 0.5 });
+  const sy = useSpring(y, { stiffness: 150, damping: 12, mass: 0.5 });
+  const clampV = (v: number) => Math.max(-14, Math.min(14, v));
+  const move = (e: React.MouseEvent) => {
+    if (reduce) return;
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    x.set(clampV((e.clientX - (r.left + r.width / 2)) * 0.18));
+    y.set(clampV((e.clientY - (r.top + r.height / 2)) * 0.18));
+  };
+
+  return (
+    <div ref={ref} className="relative overflow-hidden" onMouseMove={move} onMouseLeave={() => { x.set(0); y.set(0); }}>
+      <motion.img
+        src={src} alt={alt} loading="lazy"
+        style={reduce ? undefined : { x: sx, y: sy, willChange: 'transform' }}
+        className="aspect-[5/4] w-full scale-[1.06] object-cover grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.1] group-hover:grayscale-0"
+      />
+    </div>
+  );
+};
+
+// ---------- Spotlight — halo radial discret qui suit la souris (sections sombres) ----------
+const Spotlight: React.FC<{ children: React.ReactNode; className?: string; id?: string; color?: string }> = ({ children, className, id, color = 'rgba(0,250,154,0.10)' }) => {
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const mx = useMotionValue(-9999);
+  const my = useMotionValue(-9999);
+  const sx = useSpring(mx, { stiffness: 120, damping: 22, mass: 0.4 });
+  const sy = useSpring(my, { stiffness: 120, damping: 22, mass: 0.4 });
+  const bg = useTransform(
+    [sx, sy],
+    ([x, y]: number[]) => `radial-gradient(420px circle at ${x}px ${y}px, ${color}, transparent 70%)`
+  );
+  const onMove = (e: React.MouseEvent) => {
+    if (reduce) return;
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set(e.clientX - r.left);
+    my.set(e.clientY - r.top);
+  };
+  return (
+    <section
+      ref={ref as any} id={id}
+      onMouseMove={onMove}
+      onMouseLeave={() => { mx.set(-9999); my.set(-9999); }}
+      className={`relative ${className ?? ''}`}
+    >
+      {!reduce && (
+        <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-0" style={{ background: bg }} />
+      )}
+      <div className="relative z-[1]">{children}</div>
+    </section>
+  );
 };
 
 // ---------- NAV ----------
@@ -312,14 +549,21 @@ const Services: React.FC = () => {
         <div className="mt-16 border-t border-cream/12">
           {items.map((s, i) => (
             <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
-                </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
-              </a>
+              <Tilt max={5} scale={1.012}>
+                <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
+                  <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
+                    <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
+                    <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>
+                      <MagneticEl strength={0.25} clamp={6} className="items-baseline gap-3">
+                        {s.t}
+                        <span aria-hidden className="ml-3 text-green opacity-0 transition-opacity duration-300 group-hover:opacity-100">→</span>
+                      </MagneticEl>
+                    </h3>
+                    <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
+                  </div>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
+                </a>
+              </Tilt>
             </Reveal>
           ))}
         </div>
@@ -335,7 +579,7 @@ const Duo: React.FC = () => {
     { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Institut Polytechnique de Paris', role: 'Tech · Déploiement · Systèmes', desc: "L'ingénieur. Je conçois et déploie l'IA en production. Expérience secteur financier & Private Equity.", n: 15000, li: 'https://www.linkedin.com/in/alexiszeitoun/' },
   ];
   return (
-    <section id="duo" className="border-y border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
+    <Spotlight id="duo" className="border-y border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
         <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Les fondateurs</div></Reveal>
         <Reveal delay={0.08}>
@@ -352,8 +596,8 @@ const Duo: React.FC = () => {
             <Reveal key={f.name} delay={i * 0.1}>
               <div className="group flex h-full flex-col overflow-hidden border border-cream/12 bg-ink transition-colors hover:border-green/40">
                 <div className="relative overflow-hidden">
-                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
-                  <a href={f.li} target="_blank" rel="noopener noreferrer" className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center bg-green text-ink shadow-lg transition-transform hover:scale-110" aria-label={`LinkedIn ${f.name}`}>
+                  <MagneticAvatar src={f.img} alt={f.name} />
+                  <a href={f.li} target="_blank" rel="noopener noreferrer" className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center bg-green text-ink shadow-lg transition-transform hover:scale-110" aria-label={`LinkedIn ${f.name}`}>
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34V9.99H5.67v8.35h2.67zM7 8.84a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.5v-4.58c0-2.45-1.31-3.59-3.06-3.59-1.41 0-2.04.78-2.4 1.33v-1.14h-2.66c.04.75 0 8.35 0 8.35h2.66v-4.66c0-.24.02-.48.09-.65.19-.48.63-.97 1.36-.97.96 0 1.35.73 1.35 1.8v4.48h2.66z" /></svg>
                   </a>
                 </div>
@@ -379,7 +623,7 @@ const Duo: React.FC = () => {
           </p>
         </Reveal>
       </div>
-    </section>
+    </Spotlight>
   );
 };
 
@@ -412,11 +656,7 @@ const Proof: React.FC = () => {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {cases.map((c, i) => (
             <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
-              </div>
+              <FlipCard sector={c.sector} result={c.r} detail={c.d} />
             </Reveal>
           ))}
         </div>
@@ -429,29 +669,53 @@ const Proof: React.FC = () => {
 const Method: React.FC = () => {
   const steps = [{ n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
   return (
-    <section id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
+    <Spotlight id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
             En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
           </h2>
         </Reveal>
-        <div className="mt-16 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10">
+        <div className="relative mt-16">
+          {/* ligne connectrice qui se dessine (desktop) */}
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute left-0 right-0 top-[68px] z-10 hidden h-[2px] origin-left bg-green/50 md:block"
+            initial={{ scaleX: 0, opacity: 0 }}
+            whileInView={{ scaleX: 1, opacity: 1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 1.1, ease, delay: 0.25 }}
+            style={{ willChange: 'transform' }}
+          />
+          <div className="grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.n}
+                initial={{ opacity: 0, y: 36 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ type: 'spring', stiffness: 130, damping: 14, mass: 0.7, delay: i * 0.12 }}
+                style={{ willChange: 'transform' }}
+                className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10"
+              >
                 <div className="flex items-center justify-between">
-                  <span className="font-display text-7xl text-cream transition-colors group-hover:text-green tighter md:text-8xl" style={{ fontWeight: 900 }}>{s.n}</span>
+                  <motion.span
+                    className="relative z-20 font-display text-7xl text-cream transition-colors group-hover:text-green tighter md:text-8xl" style={{ fontWeight: 900 }}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 12, delay: 0.3 + i * 0.12 }}
+                  >{s.n}</motion.span>
                   <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
                 </div>
                 <h3 className="font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
                 <p className="text-base leading-relaxed text-cream-soft">{s.d}</p>
-              </div>
-            </Reveal>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
-    </section>
+    </Spotlight>
   );
 };
 
@@ -466,9 +730,12 @@ const FinalCTA: React.FC = () => (
       </Reveal>
       <Reveal delay={0.1}><p className="mx-auto mt-8 max-w-xl text-lg font-medium text-ink/70 md:text-xl">Pas un commercial. Directement Clément ou Alexis. 30 minutes pour identifier vos leviers les plus rentables.</p></Reveal>
       <Reveal delay={0.2}>
-        <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
-          className="group mt-12 inline-flex items-center gap-3 bg-ink px-10 py-5 text-base uppercase tracking-[0.04em] text-green" style={{ fontWeight: 900 }}>
-          Réserver un diagnostic gratuit <span className="transition-transform group-hover:translate-x-1">→</span>
+        <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.4}
+          whileTap={{ scale: 0.96 }}
+          className="group relative mt-12 inline-flex items-center gap-3 overflow-hidden bg-ink px-10 py-5 text-base uppercase tracking-[0.04em] text-green" style={{ fontWeight: 900 }}>
+          <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-green/25 to-transparent transition-transform duration-[900ms] ease-out group-hover:translate-x-full" />
+          <span className="relative">Réserver un diagnostic gratuit</span>
+          <span className="relative transition-transform group-hover:translate-x-1">→</span>
         </Magnetic>
       </Reveal>
     </div>
@@ -510,12 +777,25 @@ const Footer: React.FC = () => (
   </footer>
 );
 
+const SLOGAN = ['QUE DU LIVRABLE', 'OPÉRATIONNEL J+1', 'QUALIOPI', 'AUDIT · CONSEIL · DÉPLOIEMENT'];
+
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <Nav />
+      <main>
+        <Hero />
+        <Trust />
+        <Services />
+        <VelocityMarquee items={SLOGAN} />
+        <Duo />
+        <Proof />
+        <Method />
+        <FinalCTA />
+      </main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
