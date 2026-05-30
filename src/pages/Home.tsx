@@ -10,7 +10,7 @@ import {
 // HERO BACKGROUND : change BG_VARIANT pour 'aurora' | 'grid' | 'letters'
 // =====================================================================
 
-const BG_VARIANT: 'aurora' | 'grid' | 'letters' = 'aurora';
+const BG_VARIANT: 'aurora' | 'grid' | 'letters' = 'grid';
 
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
