@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
+  motion, AnimatePresence, MotionConfig, useMotionValue, useSpring, useTransform,
   useScroll, useInView, useReducedMotion,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
@@ -98,6 +98,214 @@ const Counter: React.FC<{ value: number; prefix?: string; suffix?: string; class
   }, [inView, value, reduce]);
   const fmt = n >= 1000 ? n.toLocaleString('fr-FR') : String(n);
   return <span ref={ref} className={className}>{prefix}{fmt}{suffix}</span>;
+};
+
+// =====================================================================
+// SCHÉMA VIVANT — couche visuelle schématique (toolkit SVG animé)
+// On anime UNIQUEMENT transform / opacity / pathLength / dashoffset → 60fps.
+// Accent mint, trait fin, langage « blueprint » commun à tout le site.
+// =====================================================================
+const MINT = '#00FA9A';
+
+// --- Fond grille blueprint très subtile (CSS gradients, ~6-8% opacité) ---
+const Blueprint: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <div aria-hidden className={`pointer-events-none absolute inset-0 z-0 ${className}`}
+    style={{
+      backgroundImage:
+        'linear-gradient(rgba(250,250,247,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(250,250,247,0.05) 1px, transparent 1px)',
+      backgroundSize: '46px 46px',
+      maskImage: 'radial-gradient(120% 90% at 50% 30%, #000 30%, transparent 100%)',
+      WebkitMaskImage: 'radial-gradient(120% 90% at 50% 30%, #000 30%, transparent 100%)',
+    }} />
+);
+
+// transition de tracé partagée
+const drawT = { duration: 1.1, ease } as const;
+// viewport partagé pour les reveals SVG (jamais en boucle)
+const VP = { once: true, amount: 0.4 } as const;
+
+// motion.path qui se dessine au scroll-in (pathLength 0→1) + replay au hover (via key parent)
+const Draw: React.FC<any> = ({ d, delay = 0, duration = 1.1, ...rest }) => (
+  <motion.path d={d} initial={{ pathLength: 0, opacity: 0 }}
+    whileInView={{ pathLength: 1, opacity: 1 }} viewport={VP}
+    transition={{ pathLength: { duration, ease, delay }, opacity: { duration: 0.25, delay } }}
+    fill="none" {...rest} />
+);
+
+// =====================================================================
+// B. DIAGRAMMES PAR PRESTATION — un mini-schéma distinct par service
+// Carte sombre + grille blueprint, trait ~1.75px, accent mint.
+// Chaque viz se (re)joue quand sa carte entre dans le viewport ET au hover
+// (on incrémente une `key` au hover → remount → rejoue, sans boucle).
+// =====================================================================
+type DiagProps = { play: number; reduce: boolean };
+
+// 01 — Audit IA : radar/scan (arcs + balayage + jauge)
+const DiagAudit: React.FC<DiagProps> = ({ play, reduce }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    <g stroke={MINT} strokeWidth="1.75" strokeLinecap="round">
+      <Draw d="M40 40 m-26 0 a26 26 0 1 0 52 0 a26 26 0 1 0 -52 0" opacity={0.5} />
+      <Draw d="M40 40 m-17 0 a17 17 0 1 0 34 0 a17 17 0 1 0 -34 0" delay={0.15} opacity={0.7} />
+      <Draw d="M40 40 m-8 0 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0" delay={0.3} />
+    </g>
+    {!reduce && (
+      <motion.line x1="40" y1="40" x2="40" y2="14" stroke={MINT} strokeWidth="1.75" strokeLinecap="round"
+        style={{ transformOrigin: '40px 40px' }}
+        initial={{ rotate: 0, opacity: 0 }} whileInView={{ rotate: 360, opacity: [0, 1, 1] }} viewport={VP}
+        transition={{ duration: 2.4, ease: 'linear', delay: 0.4 }} />
+    )}
+    {[[40, 18], [56, 48], [26, 52]].map(([cx, cy], i) => (
+      <motion.circle key={i} cx={cx} cy={cy} r="2.4" fill={MINT}
+        initial={{ scale: 0, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={VP}
+        transition={{ duration: 0.4, delay: 0.7 + i * 0.25, ease }} />
+    ))}
+    {/* jauge qui se remplit */}
+    <rect x="80" y="58" width="30" height="6" rx="3" fill="none" stroke="rgba(250,250,247,0.22)" strokeWidth="1.5" />
+    <motion.rect x="80" y="58" height="6" rx="3" fill={MINT}
+      initial={{ width: 0 }} whileInView={{ width: 24 }} viewport={VP}
+      transition={{ duration: 1, delay: 0.6, ease }} />
+    <text x="80" y="50" fill="rgba(250,250,247,0.5)" fontSize="7" fontFamily="Archivo" fontWeight="700">SCORE</text>
+  </svg>
+);
+
+// 02 — Conseil stratégique : arbre de décision (la reco plus épaisse)
+const DiagConseil: React.FC<DiagProps> = ({ play }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    <Draw d="M16 40 H40" stroke="rgba(250,250,247,0.55)" strokeWidth="1.75" strokeLinecap="round" />
+    <Draw d="M40 40 C58 40 58 18 80 18" stroke="rgba(250,250,247,0.4)" strokeWidth="1.5" strokeLinecap="round" delay={0.3} />
+    <Draw d="M40 40 C58 40 58 62 80 62" stroke="rgba(250,250,247,0.4)" strokeWidth="1.5" strokeLinecap="round" delay={0.45} />
+    <Draw d="M40 40 C62 40 62 40 80 40" stroke={MINT} strokeWidth="2.6" strokeLinecap="round" delay={0.6} />
+    <motion.circle cx="16" cy="40" r="3.4" fill={MINT}
+      initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={VP} transition={{ duration: 0.4, ease }} />
+    {[[80, 18, 0.6], [80, 62, 0.6], [80, 40, 1]].map(([cx, cy, o], i) => (
+      <motion.circle key={i} cx={cx} cy={cy} r={i === 2 ? 4 : 3} fill={i === 2 ? MINT : 'rgba(250,250,247,0.45)'}
+        initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={VP}
+        transition={{ duration: 0.4, delay: 0.7 + i * 0.18, ease }} style={{ opacity: o as number }} />
+    ))}
+    <motion.text x="88" y="43" fill={MINT} fontSize="7" fontFamily="Archivo" fontWeight="800"
+      initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VP} transition={{ delay: 1, duration: 0.4 }}>RECO</motion.text>
+  </svg>
+);
+
+// 03 — Déploiement & automatisation : WORKFLOW (signature)
+const DiagWorkflow: React.FC<DiagProps> = ({ play, reduce }) => {
+  const path = 'M14 40 C30 40 30 40 44 40 M76 40 C92 40 92 40 106 40';
+  return (
+    <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+      {/* connecteurs bézier */}
+      <Draw d="M30 40 C40 40 38 40 46 40" stroke="rgba(250,250,247,0.5)" strokeWidth="1.75" strokeLinecap="round" delay={0.5} />
+      <Draw d="M74 40 C84 40 82 40 90 40" stroke="rgba(250,250,247,0.5)" strokeWidth="1.75" strokeLinecap="round" delay={0.75} />
+      {/* 3 nœuds (rect arrondis) qui s'allument en séquence */}
+      {[12, 50, 88].map((x, i) => (
+        <motion.rect key={i} x={x} y="30" width="20" height="20" rx="5" fill="none" stroke={MINT} strokeWidth="1.75"
+          initial={{ opacity: 0, scale: 0.7 }} whileInView={{ opacity: 1, scale: 1 }} viewport={VP}
+          transition={{ duration: 0.45, delay: i * 0.28, ease }} />
+      ))}
+      {/* point de données qui circule le long du parcours */}
+      {!reduce && (
+        <motion.circle r="3" fill={MINT}
+          initial={{ opacity: 0 }} whileInView={{ opacity: [0, 1, 1, 1, 0] }} viewport={VP}
+          transition={{ duration: 2.2, delay: 1, ease: 'linear' }}>
+          <animateMotion dur="2.2s" begin="1s" fill="freeze" path="M22 40 H40 H60 H78 H98" />
+        </motion.circle>
+      )}
+      <text x="22" y="62" textAnchor="middle" fill="rgba(250,250,247,0.5)" fontSize="6.5" fontFamily="Archivo" fontWeight="700">IN</text>
+      <text x="60" y="62" textAnchor="middle" fill={MINT} fontSize="6.5" fontFamily="Archivo" fontWeight="800">RUN</text>
+      <text x="98" y="62" textAnchor="middle" fill="rgba(250,250,247,0.5)" fontSize="6.5" fontFamily="Archivo" fontWeight="700">OUT</text>
+    </svg>
+  );
+};
+
+// 04 — Formation Qualiopi : checklist en cascade + barre de progression
+const DiagFormation: React.FC<DiagProps> = ({ play }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    {[16, 34, 52].map((y, i) => (
+      <g key={i}>
+        <motion.rect x="14" y={y - 6} width="13" height="13" rx="3.5" fill="none" stroke={MINT} strokeWidth="1.6"
+          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VP} transition={{ duration: 0.3, delay: i * 0.3 }} />
+        <Draw d={`M17 ${y} l3 3 l5 -7`} stroke={MINT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" delay={0.2 + i * 0.3} duration={0.4} />
+        <motion.line x1="34" y1={y} x2="96" y2={y} stroke="rgba(250,250,247,0.3)" strokeWidth="1.5" strokeLinecap="round"
+          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VP} transition={{ duration: 0.3, delay: 0.2 + i * 0.3 }} />
+      </g>
+    ))}
+    <rect x="14" y="68" width="92" height="5" rx="2.5" fill="none" stroke="rgba(250,250,247,0.22)" strokeWidth="1.4" />
+    <motion.rect x="14" y="68" height="5" rx="2.5" fill={MINT}
+      initial={{ width: 0 }} whileInView={{ width: 92 }} viewport={VP} transition={{ duration: 1.1, delay: 0.3, ease }} />
+  </svg>
+);
+
+// 05 — Coaching : 2 bulles de chat en alternance + courbe qui monte
+const DiagCoaching: React.FC<DiagProps> = ({ play }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    <motion.g initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.5, delay: 0.1, ease }}>
+      <rect x="12" y="14" width="46" height="18" rx="9" fill="none" stroke="rgba(250,250,247,0.5)" strokeWidth="1.75" />
+      <circle cx="22" cy="23" r="1.7" fill="rgba(250,250,247,0.6)" /><circle cx="30" cy="23" r="1.7" fill="rgba(250,250,247,0.6)" /><circle cx="38" cy="23" r="1.7" fill="rgba(250,250,247,0.6)" />
+    </motion.g>
+    <motion.g initial={{ opacity: 0, x: 8 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.5, delay: 0.6, ease }}>
+      <rect x="58" y="36" width="50" height="18" rx="9" fill="none" stroke={MINT} strokeWidth="1.75" />
+      <path d="M70 45 l4 4 l8 -9" fill="none" stroke={MINT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </motion.g>
+    <Draw d="M14 70 C40 70 56 60 106 40" stroke={MINT} strokeWidth="1.75" strokeLinecap="round" delay={0.9} />
+  </svg>
+);
+
+// 06 — Production IA : pipeline brief→prod→livraison + barre de remplissage
+const DiagProduction: React.FC<DiagProps> = ({ play }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    {[['brief', 10], ['prod', 45], ['livr.', 80]].map(([lab, x], i) => (
+      <g key={i}>
+        <motion.rect x={x as number} y="22" width="30" height="22" rx="4" fill="none" stroke={i === 1 ? MINT : 'rgba(250,250,247,0.5)'} strokeWidth="1.75"
+          initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={VP} transition={{ duration: 0.45, delay: i * 0.3, ease }} />
+        <motion.text x={(x as number) + 15} y="36" textAnchor="middle" fill={i === 1 ? MINT : 'rgba(250,250,247,0.6)'} fontSize="6.5" fontFamily="Archivo" fontWeight="700"
+          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VP} transition={{ duration: 0.3, delay: 0.15 + i * 0.3 }}>{lab}</motion.text>
+      </g>
+    ))}
+    {[40, 75].map((x, i) => (
+      <Draw key={i} d={`M${x} 33 H${x + 5}`} stroke="rgba(250,250,247,0.45)" strokeWidth="1.75" strokeLinecap="round" delay={0.2 + i * 0.3} duration={0.3} />
+    ))}
+    <rect x="10" y="58" width="100" height="6" rx="3" fill="none" stroke="rgba(250,250,247,0.22)" strokeWidth="1.4" />
+    <motion.rect x="10" y="58" height="6" rx="3" fill={MINT}
+      initial={{ width: 0 }} whileInView={{ width: 100 }} viewport={VP} transition={{ duration: 1.2, delay: 0.4, ease }} />
+  </svg>
+);
+
+// 07 — Suivi : mini-dashboard (sparkline + point statut qui pulse)
+const DiagSuivi: React.FC<DiagProps> = ({ play, reduce }) => (
+  <svg viewBox="0 0 120 80" className="h-full w-full" key={play}>
+    <Draw d="M10 12 V64 H110" stroke="rgba(250,250,247,0.25)" strokeWidth="1.4" strokeLinecap="round" />
+    <Draw d="M14 54 L30 48 L44 52 L60 36 L76 40 L92 24 L106 18" stroke={MINT} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" delay={0.3} duration={1.3} />
+    <motion.circle cx="106" cy="18" r="3" fill={MINT}
+      initial={{ scale: 0 }} whileInView={reduce ? { scale: 1 } : { scale: [0, 1.5, 1] }} viewport={VP}
+      transition={{ duration: 0.6, delay: 1.4, ease }} />
+    {!reduce && (
+      <motion.circle cx="106" cy="18" r="3" fill="none" stroke={MINT} strokeWidth="1.5"
+        initial={{ scale: 1, opacity: 0 }} whileInView={{ scale: [1, 2.6], opacity: [0.7, 0] }} viewport={VP}
+        transition={{ duration: 1.4, delay: 1.6, repeat: 2, ease: 'easeOut' }} />
+    )}
+    <circle cx="14" cy="10" r="1.6" fill="rgba(250,250,247,0.4)" /><text x="20" y="13" fill="rgba(250,250,247,0.45)" fontSize="6" fontFamily="Archivo" fontWeight="700">LIVE</text>
+  </svg>
+);
+
+const DIAGRAMS: Record<string, React.FC<DiagProps>> = {
+  '01': DiagAudit, '02': DiagConseil, '03': DiagWorkflow, '04': DiagFormation,
+  '05': DiagCoaching, '06': DiagProduction, '07': DiagSuivi,
+};
+
+// conteneur carte sombre + blueprint, gère le replay au hover
+const ServiceDiagram: React.FC<{ n: string }> = ({ n }) => {
+  const Comp = DIAGRAMS[n];
+  const reduce = !!useReducedMotion();
+  const [play, setPlay] = useState(0);
+  return (
+    <div
+      onMouseEnter={() => !reduce && setPlay((p) => p + 1)}
+      className="relative aspect-[3/2] w-full overflow-hidden rounded-lg border border-cream/12 bg-ink-3"
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: 'linear-gradient(rgba(250,250,247,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(250,250,247,0.05) 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
+      <div className="absolute inset-0 p-3">{Comp ? <Comp play={play} reduce={reduce} /> : null}</div>
+    </div>
+  );
 };
 
 // ---------- NAV ----------
@@ -300,8 +508,9 @@ const Services: React.FC = () => {
     { n: '07', t: 'Suivi', d: "Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. Long terme.", price: '80 € / mois' },
   ];
   return (
-    <section id="prestations" className="px-5 py-28 md:px-8 md:py-36">
-      <div className="mx-auto max-w-[1400px]">
+    <section id="prestations" className="relative px-5 py-28 md:px-8 md:py-36">
+      <Blueprint />
+      <div className="relative z-10 mx-auto max-w-[1400px]">
         <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Ce qu'on fait</div></Reveal>
         <Reveal delay={0.08}>
           <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
@@ -312,13 +521,19 @@ const Services: React.FC = () => {
         <div className="mt-16 border-t border-cream/12">
           {items.map((s, i) => (
             <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
+              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2/60 md:py-9">
+                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_220px_auto] md:items-center md:gap-x-8">
+                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:self-start md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
+                  <div className="md:self-start">
+                    <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:text-base">{s.d}</p>
+                  </div>
+                  {/* mini-schéma SVG distinct par prestation */}
+                  <div className="col-span-2 mt-1 max-w-[280px] md:col-span-1 md:mt-0 md:max-w-none md:self-center">
+                    <ServiceDiagram n={s.n} />
+                  </div>
+                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap md:text-right">{s.price}</span>
                 </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
               </a>
             </Reveal>
           ))}
@@ -383,6 +598,83 @@ const Duo: React.FC = () => {
   );
 };
 
+// =====================================================================
+// C. CAS CLIENTS — data-viz par cas (gris = avant/manuel, mint = après/IA)
+// Lisible en < 2 s. Anime scaleY / width / dashoffset + count-up.
+// =====================================================================
+const GREY = 'rgba(250,250,247,0.28)';
+
+// Cas 1 — BTP : 2 barres avant→après + 95k€ count-up + sparkline cumulée
+const VizChiffrage: React.FC = () => (
+  <div className="flex items-end gap-5">
+    <svg viewBox="0 0 110 80" className="h-24 w-32 shrink-0">
+      <line x1="8" y1="70" x2="104" y2="70" stroke="rgba(250,250,247,0.18)" strokeWidth="1.4" />
+      {/* barre avant (grise, pleine) */}
+      <motion.rect x="16" width="22" rx="2" fill={GREY} style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
+        y="14" height="56" initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={VP} transition={{ duration: 0.8, ease }} />
+      {/* barre après (mint, -80%) */}
+      <motion.rect x="50" width="22" rx="2" fill={MINT} style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
+        y="58" height="12" initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={VP} transition={{ duration: 0.8, delay: 0.25, ease }} />
+      {/* sparkline cumulée des économies */}
+      <Draw d="M14 64 L34 60 L54 50 L74 34 L100 14" stroke={MINT} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" delay={0.5} duration={1.1} opacity={0.65} />
+      <text x="16" y="78" fill="rgba(250,250,247,0.45)" fontSize="6.5" fontFamily="Archivo" fontWeight="700">AVANT</text>
+      <text x="50" y="78" fill={MINT} fontSize="6.5" fontFamily="Archivo" fontWeight="800">IA</text>
+    </svg>
+    <div>
+      <div className="font-display text-3xl text-cream tight" style={{ fontWeight: 900 }}><Counter value={95} suffix=" k€" /></div>
+      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-soft">neutralisés / an</div>
+    </div>
+  </div>
+);
+
+// Cas 2 — OCR : anneau qui se remplit à 100% + 2 mini-anneaux avant/après
+const Ring: React.FC<{ pct: number; size: number; sw: number; color: string; delay?: number; label?: string }> = ({ pct, size, sw, color, delay = 0, label }) => {
+  const r = (size - sw) / 2; const c = 2 * Math.PI * r; const cx = size / 2;
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} style={{ width: size, height: size }}>
+      <circle cx={cx} cy={cx} r={r} fill="none" stroke="rgba(250,250,247,0.16)" strokeWidth={sw} />
+      <motion.circle cx={cx} cy={cx} r={r} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round"
+        strokeDasharray={c} transform={`rotate(-90 ${cx} ${cx})`}
+        initial={{ strokeDashoffset: c }} whileInView={{ strokeDashoffset: c * (1 - pct) }} viewport={VP}
+        transition={{ duration: 1.2, delay, ease }} />
+      {label && <text x={cx} y={cx + 3} textAnchor="middle" fill={color} fontSize={size * 0.22} fontFamily="Archivo" fontWeight="800">{label}</text>}
+    </svg>
+  );
+};
+const VizOCR: React.FC = () => (
+  <div className="flex items-center gap-5">
+    <Ring pct={1} size={88} sw={8} color={MINT} delay={0.2} label="100%" />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2"><Ring pct={0.25} size={30} sw={4} color={GREY} /><span className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-soft">avant · 25%</span></div>
+      <div className="flex items-center gap-2"><Ring pct={1} size={30} sw={4} color={MINT} delay={0.3} /><span className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-soft">après · 100%</span></div>
+    </div>
+  </div>
+);
+
+// Cas 3 — ADV : 317h count-up + barres mensuelles (scaleY, stagger) + jauge >98%
+const MONTHS = [40, 52, 36, 60, 48, 70, 58, 66];
+const VizADV: React.FC = () => (
+  <div className="flex items-end gap-5">
+    <svg viewBox="0 0 120 80" className="h-24 w-36 shrink-0">
+      <line x1="6" y1="64" x2="116" y2="64" stroke="rgba(250,250,247,0.18)" strokeWidth="1.4" />
+      {MONTHS.map((h, i) => (
+        <motion.rect key={i} x={10 + i * 13} width="8" rx="1.5" fill={MINT} y={64 - h} height={h}
+          style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
+          initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={VP} transition={{ duration: 0.6, delay: i * 0.07, ease }} />
+      ))}
+      <text x="10" y="76" fill="rgba(250,250,247,0.45)" fontSize="6.5" fontFamily="Archivo" fontWeight="700">H LIBÉRÉES / MOIS</text>
+    </svg>
+    <div>
+      <div className="font-display text-3xl text-cream tight" style={{ fontWeight: 900 }}><Counter value={317} suffix=" h" /></div>
+      <div className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-green/30 bg-green/10 px-2 py-0.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-green" /><span className="text-[10px] font-bold uppercase tracking-[0.08em] text-green">anomalies &gt; 98%</span>
+      </div>
+    </div>
+  </div>
+);
+
+const CASE_VIZ: Record<string, React.FC> = { '0': VizChiffrage, '1': VizOCR, '2': VizADV };
+
 // ---------- PROOF : chiffres géants ----------
 const Proof: React.FC = () => {
   const stats = [{ v: 55000, p: '+', l: 'abonnés LinkedIn' }, { v: 10, p: '', l: 'formations Qualiopi' }, { v: 70, p: '', s: ' %', l: 'de pratique' }, { v: null, l: 'opérationnel', txt: 'J+1' }];
@@ -410,33 +702,74 @@ const Proof: React.FC = () => {
         </Reveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {cases.map((c, i) => (
-            <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
-              </div>
-            </Reveal>
-          ))}
+          {cases.map((c, i) => {
+            const Viz = CASE_VIZ[String(i)];
+            return (
+              <Reveal key={c.sector} delay={i * 0.1}>
+                <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
+                  <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
+                  <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
+                  {/* data-viz du cas */}
+                  <div className="mt-auto border-t border-cream/12 pt-6">{Viz ? <Viz /> : null}</div>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
 
-// ---------- METHOD ----------
+// ---------- METHOD : « le parcours qui se trace » ----------
+// Une ligne SVG qui se DESSINE au scroll (pathLength lié à scrollYProgress),
+// reliant les 3 étapes ; chaque nœud s'allume à son seuil. Sobre, lisible.
+const MethodNode: React.FC<{ progress: any; threshold: number; reduce: boolean; cx: number; cy: number }> = ({ progress, threshold, reduce, cx, cy }) => {
+  const lit = useTransform(progress, [threshold - 0.04, threshold + 0.02], [0, 1]);
+  const scale = useTransform(lit, [0, 1], [0.7, 1]);
+  return (
+    <g>
+      <motion.circle cx={cx} cy={cy} r="13" fill="#161616" stroke={MINT} strokeWidth="2"
+        style={reduce ? { opacity: 1 } : { opacity: lit, scale, transformOrigin: `${cx}px ${cy}px` }} />
+      <motion.circle cx={cx} cy={cy} r="4.5" fill={MINT}
+        style={reduce ? { opacity: 1 } : { opacity: lit }} />
+    </g>
+  );
+};
 const Method: React.FC = () => {
   const steps = [{ n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
+  const reduce = !!useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.8', 'end 0.4'] });
+  const rawLen = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const pathLength = useSpring(rawLen, { stiffness: 90, damping: 28, mass: 0.4 });
+  // chemin desktop : diagonale 3 nœuds ; nœuds à x=50/300/550 (sur viewBox 600x140)
+  const NODES = [[50, 70], [300, 70], [550, 70]] as const;
+
   return (
-    <section id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
-      <div className="mx-auto max-w-[1400px]">
+    <section id="methode" className="relative border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
+      <Blueprint />
+      <div ref={ref} className="relative z-10 mx-auto max-w-[1400px]">
         <Reveal>
           <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
             En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
           </h2>
         </Reveal>
-        <div className="mt-16 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
+
+        {/* TRAIT QUI SE TRACE — horizontal sur desktop, reliant les 3 nœuds */}
+        <div className="relative mt-16 hidden md:block">
+          <svg viewBox="0 0 600 140" preserveAspectRatio="none" className="h-20 w-full" aria-hidden>
+            <line x1="50" y1="70" x2="550" y2="70" stroke="rgba(250,250,247,0.14)" strokeWidth="2" strokeLinecap="round" />
+            <motion.line x1="50" y1="70" x2="550" y2="70" stroke={MINT} strokeWidth="2.5" strokeLinecap="round"
+              style={{ pathLength: reduce ? 1 : pathLength }} />
+            {NODES.map(([cx, cy], i) => (
+              <MethodNode key={i} progress={scrollYProgress} threshold={i / 2} reduce={reduce} cx={cx} cy={cy} />
+            ))}
+          </svg>
+        </div>
+
+        <div className="mt-8 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:mt-2 md:grid-cols-3">
           {steps.map((s, i) => (
             <Reveal key={s.n} delay={i * 0.1}>
               <div className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10">
@@ -511,11 +844,13 @@ const Footer: React.FC = () => (
 );
 
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <Nav />
+      <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
