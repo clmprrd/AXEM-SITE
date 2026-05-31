@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
-  useScroll, useInView, useReducedMotion,
+  motion, useMotionValue, useSpring,
+  useInView, useReducedMotion, MotionConfig,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
 import Grainient from '../components/Grainient';
 
 // =====================================================================
-// AXEM IA — BOLD TYPOGRAPHIQUE
-// Typo géante comme architecture · aplats massifs mint + noir · dark #0F0F0F
+// AXEM IA — BENTO SYSTÈME
+// Grilles bento, cartes cliquables qui s'ouvrent · aplats mint + noir · dark #0F0F0F
 // =====================================================================
 
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
+const CALENDLY_INLINE = 'https://calendly.com/clem-pred/30min?hide_gdpr_banner=1';
+// TODO: URL Notion à fournir
+const NOTION_URL = 'NOTION_URL';
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -50,24 +53,6 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
     transition={{ duration: 0.8, delay, ease }} className={className}>{children}</motion.div>
 );
 
-// Mots qui montent (mask reveal) mot par mot
-const RiseWords: React.FC<{ text: string; className?: string; delay?: number; stagger?: number }> = ({ text, className = '', delay = 0, stagger = 0.05 }) => {
-  const words = text.split(' ');
-  return (
-    <span className={className} aria-label={text}>
-      {words.map((w, i) => (
-        <span key={i} className="inline-block overflow-hidden align-bottom" aria-hidden>
-          <motion.span className="inline-block"
-            initial={{ y: '110%' }} whileInView={{ y: 0 }} viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.85, delay: delay + i * stagger, ease }}>
-            {w}{i < words.length - 1 ? ' ' : ''}
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-};
-
 const Magnetic: React.FC<any> = ({ children, strength = 0.35, className, ...props }) => {
   const ref = useRef<HTMLAnchorElement>(null);
   const x = useMotionValue(0); const y = useMotionValue(0);
@@ -100,6 +85,22 @@ const Counter: React.FC<{ value: number; prefix?: string; suffix?: string; class
   return <span ref={ref} className={className}>{prefix}{fmt}{suffix}</span>;
 };
 
+// Icône +/× animée pour les cartes qui s'ouvrent
+const PlusToggle: React.FC<{ open: boolean; className?: string }> = ({ open, className = '' }) => (
+  <span className={`relative inline-flex h-6 w-6 shrink-0 items-center justify-center ${className}`} aria-hidden>
+    <span className="absolute h-[2px] w-3.5 rounded-full bg-current" />
+    <motion.span className="absolute h-[2px] w-3.5 rounded-full bg-current" animate={{ rotate: open ? 0 : 90 }} transition={{ duration: 0.3, ease }} />
+  </span>
+);
+
+// Conteneur d'accordéon (grid-rows 0fr→1fr, opacity uniquement)
+const Collapse: React.FC<{ open: boolean; children: React.ReactNode }> = ({ open, children }) => (
+  <motion.div initial={false} animate={{ gridTemplateRows: open ? '1fr' : '0fr', opacity: open ? 1 : 0 }}
+    transition={{ duration: 0.4, ease }} style={{ display: 'grid' }}>
+    <div className="overflow-hidden">{children}</div>
+  </motion.div>
+);
+
 // ---------- NAV ----------
 const Nav: React.FC = () => {
   const [s, setS] = useState(false);
@@ -110,9 +111,9 @@ const Nav: React.FC = () => {
         <a href="#top" className="font-display text-2xl tracking-tighter text-cream" style={{ fontWeight: 900 }}>
           AXEM<span className="text-green">.</span>
         </a>
-        <div className="hidden items-center gap-9 md:flex">
-          {[['Prestations', '#prestations'], ['Le duo', '#duo'], ['Références', '#references'], ['Méthode', '#methode']].map(([l, h]) => (
-            <a key={l} href={h} className="group relative text-[13px] font-semibold uppercase tracking-[0.12em] text-cream-soft transition-colors hover:text-cream">
+        <div className="hidden items-center gap-7 lg:flex">
+          {[['Prestations', '#prestations'], ['Catalogue', '#catalogue'], ['Cas clients', '#cas-clients'], ['Le duo', '#duo'], ['Méthode', '#methode']].map(([l, h]) => (
+            <a key={l} href={h} className="group relative text-[13px] font-semibold uppercase tracking-[0.1em] text-cream-soft transition-colors hover:text-cream">
               {l}<span className="absolute -bottom-1.5 left-0 h-[2px] w-0 bg-green transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
@@ -123,34 +124,6 @@ const Nav: React.FC = () => {
         </Magnetic>
       </div>
     </nav>
-  );
-};
-
-// ---------- FUSION : Alexis × Clément → AXEM ----------
-const Fusion: React.FC = () => {
-  const [phase, setPhase] = useState<0 | 1 | 2>(0);
-  useEffect(() => { const a = setTimeout(() => setPhase(1), 1100); const b = setTimeout(() => setPhase(2), 2000); return () => { clearTimeout(a); clearTimeout(b); }; }, []);
-  return (
-    <div className="flex h-7 items-center justify-center" aria-label="Alexis et Clément égalent AXEM">
-      <AnimatePresence mode="wait">
-        {phase < 2 ? (
-          <motion.div key="n" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(6px)' }} transition={{ duration: 0.4 }}
-            className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.4em] text-cream-soft">
-            <motion.span animate={phase === 1 ? { opacity: 0.3 } : {}} transition={{ duration: 0.6 }}>Alexis</motion.span>
-            <motion.span animate={{ rotate: phase === 1 ? 90 : 0, scale: phase === 1 ? 1.5 : 1 }} transition={{ duration: 0.5 }} className="text-green">×</motion.span>
-            <motion.span animate={phase === 1 ? { opacity: 0.3 } : {}} transition={{ duration: 0.6 }}>Clément</motion.span>
-          </motion.div>
-        ) : (
-          <motion.div key="a" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease }} className="flex items-center gap-0.5">
-            {'AXEM'.split('').map((l, i) => (
-              <motion.span key={l + i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-                className="font-display text-base tracking-tight text-cream" style={{ fontWeight: 900 }}>{l}</motion.span>
-            ))}
-            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="ml-1 font-display text-base text-green" style={{ fontWeight: 900 }}>IA</motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 };
 
@@ -254,79 +227,516 @@ const Hero: React.FC = () => {
   );
 };
 
-// ---------- TRUST : marquee CAPS ----------
-const Trust: React.FC = () => {
-  // Vrais logos clients/partenaires (extraits + vérifiés). Monochrome blanc, couleur au survol.
-  const logos = [
-    { src: '/logos/carrefour.svg', alt: 'Carrefour' },
-    { src: '/logos/pennylane.svg', alt: 'Pennylane' },
-    { src: '/logos/cegos.png', alt: 'Cegos' },
-    { src: '/logos/blackfin.png', alt: 'BlackFin Capital' },
-    { src: '/logos/gravotech.png', alt: 'Gravotech' },
-    { src: '/logos/dragonllm.svg', alt: 'Dragon LLM' },
-    { src: '/logos/asphere.png', alt: 'ASphere' },
-    { src: '/logos/myconnecting.png', alt: 'myconnecting' },
-    { src: '/logos/mammouth.svg', alt: 'Mammouth AI' },
-    { src: '/logos/avantis.png', alt: 'Avantis' },
-    { src: '/logos/senza.png', alt: 'SENZA' },
-  ];
-  return (
-    <section id="references" className="relative border-y border-white/10 bg-ink-2 py-14 md:py-16">
-      <div className="mb-10 flex flex-col items-center gap-2 px-5 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-cream-dim">Ils nous font confiance</p>
-        <p className="font-display text-lg text-cream/90 md:text-2xl" style={{ fontWeight: 700 }}>Des PME aux grands comptes &amp; administrations.</p>
-      </div>
-      <div className="group relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
-        <div className="flex w-max items-center gap-16 px-8 group-hover:[animation-play-state:paused] md:gap-24" style={{ animation: 'marquee 50s linear infinite' }}>
-          {[...logos, ...logos].map((l, i) => (
-            <img key={l.alt + i} src={l.src} alt={l.alt} loading="lazy" decoding="async"
-              className="h-9 w-auto max-w-[210px] shrink-0 object-contain opacity-70 brightness-0 invert transition duration-300 hover:opacity-100 hover:brightness-100 hover:invert-0 md:h-12" />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+// ---------- TRUST : 2 groupes · logos couleur sur cartes blanches (plaquette) ----------
+type LogoItem = { src?: string; alt: string; fallback?: string };
+const LogoCard: React.FC<{ item: LogoItem }> = ({ item }) => (
+  <div className="group flex h-[78px] items-center justify-center rounded-2xl bg-white px-4 shadow-[0_2px_14px_-6px_rgba(0,0,0,0.5)] ring-1 ring-black/5 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(0,250,154,0.4)] md:h-[92px] md:px-6">
+    {item.src ? (
+      <img src={item.src} alt={item.alt} loading="lazy" decoding="async"
+        className="max-h-[44px] w-auto max-w-full object-contain md:max-h-[52px]" />
+    ) : (
+      <span className="text-center font-display text-base font-extrabold tracking-tight text-[#0F0F0F] md:text-xl">{item.fallback || item.alt}</span>
+    )}
+  </div>
+);
 
-// ---------- SERVICES : liste typographique massive ----------
-const Services: React.FC = () => {
-  const items = [
-    { n: '01', t: 'Audit IA', d: "On regarde avant de déployer. Diagnostic, cartographie de vos process, scoring de maturité IA.", price: '1 à 4 semaines' },
-    { n: '02', t: 'Conseil stratégique', d: "On décide quoi faire, dans quel ordre, avec quels budgets. Roadmap priorisée, choix des outils.", price: 'Sur devis' },
-    { n: '03', t: 'Déploiement & automatisation', d: "Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main ou suivi.", price: 'À partir de 1 200 €' },
-    { n: '04', t: 'Formation Qualiopi', d: "Vos équipes opérationnelles dès J+1. 10 formations, 3 niveaux, 70 % de pratique. Finançable OPCO.", price: '200 € – 1 250 € / pers.' },
-    { n: '05', t: 'Coaching individuel', d: "Pour vos profils clés : managers, dirigeants, référents IA. On ancre les compétences dans la durée.", price: '200 € / session' },
-    { n: '06', t: 'Production IA', d: "Vidéos avatar, voix clonée, visuels, sites no-code, présentations. Produits 10× plus vite.", price: 'Sur devis' },
-    { n: '07', t: 'Suivi', d: "Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. Long terme.", price: '80 € / mois' },
+const Trust: React.FC = () => {
+  const clients: LogoItem[] = [
+    { src: '/logos/carrefour.svg', alt: 'Carrefour' },
+    { src: '/logos/blackfin.png', alt: 'BlackFin Capital Partners' },
+    { src: '/logos/avantis.png', alt: 'Avantis' },
+    { src: '/logos/kit.png', alt: 'KIT France' },
+    { src: '/logos/espace2.png', alt: 'Espace 2' },
+    { src: '/logos/socos.png', alt: 'Socos Services' },
+  ];
+  const partenaires: LogoItem[] = [
+    { src: '/logos/myconnecting.png', alt: 'myconnecting' },
+    { alt: 'synapse ia', fallback: 'synapse ia' },
+    { src: '/logos/asphere.png', alt: 'ASphere' },
+    { alt: 'AI sisters', fallback: 'AI sisters' },
+    { src: '/logos/senza.png', alt: 'SENZA Formations' },
+    { src: '/logos/cegos.png', alt: 'Cegos' },
   ];
   return (
-    <section id="prestations" className="px-5 py-28 md:px-8 md:py-36">
+    <section id="references" className="relative border-y border-white/10 bg-ink-2 px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Ce qu'on fait</div></Reveal>
-        <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
-            Sept prestations.<br /><span className="outline-type">Un partenaire.</span>
+        <Reveal>
+          <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Références</div>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 110px)' }}>
+            Ils nous font<br /><span className="text-green">confiance.</span>
           </h2>
         </Reveal>
+        <Reveal delay={0.12}>
+          <p className="mt-6 max-w-2xl text-base text-cream-soft md:text-lg">Des grands comptes aux PME, en passant par les administrations et les organismes de formation leaders du marché.</p>
+        </Reveal>
 
-        <div className="mt-16 border-t border-cream/12">
-          {items.map((s, i) => (
-            <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
-                </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
-              </a>
-            </Reveal>
+        {/* GROUPE 1 — CLIENTS */}
+        <Reveal delay={0.05}>
+          <div className="mt-16 flex items-center gap-3">
+            <span className="font-display text-sm font-extrabold uppercase tracking-[0.14em] text-cream">Clients</span>
+            <span className="h-px flex-1 bg-cream/12" />
+          </div>
+        </Reveal>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
+          {clients.map((l, i) => (
+            <Reveal key={l.alt} delay={(i % 6) * 0.05}><LogoCard item={l} /></Reveal>
+          ))}
+        </div>
+
+        {/* GROUPE 2 — ORGANISMES PARTENAIRES */}
+        <Reveal delay={0.05}>
+          <div className="mt-14 flex items-center gap-3">
+            <span className="font-display text-sm font-extrabold uppercase tracking-[0.14em] text-cream">Organismes de formation partenaires</span>
+            <span className="h-px flex-1 bg-cream/12" />
+          </div>
+        </Reveal>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
+          {partenaires.map((l, i) => (
+            <Reveal key={l.alt} delay={(i % 6) * 0.05}><LogoCard item={l} /></Reveal>
           ))}
         </div>
       </div>
     </section>
   );
 };
+
+// ---------- SERVICES : 7 prestations · cartes bento cliquables → détail ----------
+type ServiceDetail = { heading: string; points: string[] };
+type Service = { n: string; t: string; d: string; price: string; span?: string; details: ServiceDetail[]; punch?: string };
+
+const SERVICES: Service[] = [
+  {
+    n: '01', t: 'Audit IA', price: '1 semaine · sur devis', span: 'lg:col-span-2',
+    d: "On regarde avant de déployer. Diagnostic, cartographie de vos process, scoring de maturité IA, roadmap priorisée.",
+    details: [{
+      heading: 'Process en 4 étapes',
+      points: [
+        '01 Analyse — cartographie des process + points de friction',
+        '02 Opportunités — cas d’usage scorés par impact et faisabilité',
+        '03 Roadmap — plan d’adoption séquencé sur 3 à 12 mois',
+        '04 Livrable — document de synthèse + recommandations concrètes',
+      ],
+    }],
+  },
+  {
+    n: '02', t: 'Conseil stratégique', price: 'Sur devis',
+    d: "On décide quoi faire, dans quel ordre, avec quels budgets. Roadmap priorisée, choix des outils, architecture, pilotage.",
+    details: [{
+      heading: 'Ce que ça couvre',
+      points: [
+        'Accompagnement décisionnel — cadrage, arbitrages, priorisation par ROI',
+        'Choix des outils — architecture, sélection fournisseurs, stack adaptée',
+        'Pilotage du déploiement — coordination équipes, jalons, conduite du changement',
+        'Missions sur mesure — ponctuelles ou continues',
+      ],
+    }],
+  },
+  {
+    n: '03', t: 'Déploiement & automatisation', price: 'À partir de 1 200 €', span: 'lg:col-span-2',
+    d: "Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main ou suivi.",
+    punch: 'Automatisation : libérez vos équipes des tâches répétitives.',
+    details: [
+      { heading: 'Option A — Délivrable clé en main · 1 200 € – 2 000 €', points: [
+        'Automatisation construite, testée et déployée',
+        'Outils n8n / Make / Claude Code',
+        'Documentation + passation',
+      ] },
+      { heading: 'Option B — Abonnement suivi · 900 € + 80 €/mois', points: [
+        'Maintenance + évolutions incluses',
+        'Nouvelles automatisations au fil du temps',
+        'Un référent Axem dédié',
+      ] },
+    ],
+  },
+  {
+    n: '04', t: 'Formation', price: '200 € – 1 250 € / pers.',
+    d: "Upskilling de vos équipes sur les cas d’usage identifiés. 70 % de pratique, certifié Qualiopi, finançable OPCO.",
+    details: [{ heading: 'Notre catalogue s’active ici', points: [
+      '10 formations, 3 niveaux, ciblées sur vos besoins réels',
+      '70 % de pratique minimum — opérationnel dès J+1',
+      'Certifié Qualiopi · finançable OPCO (jusqu’à 100 %)',
+      'Voir le catalogue complet plus bas ↓',
+    ] }],
+  },
+  {
+    n: '05', t: 'Coaching individuel', price: '200 € / session (1h)',
+    d: "Pour vos profils clés : managers, dirigeants, référents IA internes. On ancre les compétences dans la durée.",
+    details: [{ heading: 'Format', points: [
+      '1 session / semaine (1h)',
+      'Réalisé directement par Clément ou Alexis',
+      'Ancrage des compétences dans la durée',
+    ] }],
+  },
+  {
+    n: '06', t: 'Production IA', price: 'Sur devis (au livrable)',
+    d: "Vidéos avatar, voix clonée, visuels, sites no-code, présentations. Produits 10× plus vite, à coût maîtrisé.",
+    details: [{ heading: 'Ce qu’on produit', points: [
+      'Vidéos (avatar IA) · vidéos réseaux sociaux',
+      'Images & visuels · voix clonée',
+      'Sites web no-code · slides & présentations',
+    ] }],
+  },
+  {
+    n: '07', t: 'Suivi', price: '80 € / mois', span: 'lg:col-span-2',
+    d: "Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. La relation devient long terme.",
+    punch: 'Durée moyenne d’un partenariat : 12 mois +',
+    details: [{ heading: 'Ce qui change la trajectoire, c’est l’après', points: [
+      'Maintenance — automatisations à jour, MAJ d’API',
+      'Évolutions & améliorations continues',
+      'Nouvelles opportunités — à mesure que les équipes mûrissent',
+      'Production IA continue',
+    ] }],
+  },
+];
+
+const ServiceCard: React.FC<{ s: Service; index: number }> = ({ s, index }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Reveal delay={(index % 3) * 0.05} className={s.span}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open}
+        className="group flex h-full w-full flex-col border border-cream/12 bg-ink-2 p-7 text-left transition-colors hover:border-green/40 hover:bg-ink-3 md:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <span className="font-display text-2xl text-green md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
+          <PlusToggle open={open} className="text-cream-soft group-hover:text-green" />
+        </div>
+        <h3 className="mt-4 font-display leading-[0.98] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(24px, 3vw, 38px)' }}>{s.t}</h3>
+        <p className="mt-3 text-sm leading-relaxed text-cream-soft md:text-base">{s.d}</p>
+        <span className="mt-4 inline-flex w-fit rounded-full border border-green/30 bg-green/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-green">{s.price}</span>
+
+        <Collapse open={open}>
+          <div className="mt-6 space-y-5 border-t border-cream/12 pt-6">
+            {s.details.map((d) => (
+              <div key={d.heading}>
+                <p className="mb-2 font-display text-sm font-extrabold uppercase tracking-[0.08em] text-cream">{d.heading}</p>
+                <ul className="space-y-1.5">
+                  {d.points.map((p) => (
+                    <li key={p} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft">
+                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-green" />{p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {s.punch && <p className="font-display text-base font-bold italic text-green">« {s.punch} »</p>}
+          </div>
+        </Collapse>
+      </button>
+    </Reveal>
+  );
+};
+
+const Services: React.FC = () => (
+  <section id="prestations" className="px-5 py-28 md:px-8 md:py-36">
+    <div className="mx-auto max-w-[1400px]">
+      <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Ce qu'on fait</div></Reveal>
+      <Reveal delay={0.08}>
+        <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
+          Sept prestations.<br /><span className="outline-type">Un partenaire.</span>
+        </h2>
+      </Reveal>
+      <Reveal delay={0.14}><p className="mt-7 max-w-2xl text-base text-cream-soft md:text-lg">Un parcours complet, pas une intervention isolée. <span className="text-cream">Cliquez sur une carte</span> pour le détail.</p></Reveal>
+
+      <div className="mt-14 grid gap-3 md:gap-4 lg:grid-cols-3">
+        {SERVICES.map((s, i) => <ServiceCard key={s.n} s={s} index={i} />)}
+      </div>
+    </div>
+  </section>
+);
+
+// ---------- CATALOGUE FORMATIONS : bento par niveau · cartes cliquables → détail ----------
+type Formation = {
+  code: string; t: string; level: string; duree: string; prix: string;
+  tagline: string;
+  programme: { title?: string; points: string[] }[];
+  outils: string[];
+  livrables: string[];
+};
+
+const FORMATIONS: Formation[] = [
+  {
+    code: 'F01', t: 'IA Essentielle', level: 'SOCLE', duree: '1 J', prix: '300 €',
+    tagline: 'De zéro à opérationnel en 1 journée.',
+    programme: [
+      { title: 'Matin · Comprendre l’IA', points: ['Comment fonctionne un LLM (sans jargon)', 'RGPD : ce qu’on peut envoyer ou pas à une IA', 'Identifier ses cas d’usage métier'] },
+      { title: 'Après-midi · Pratiquer', points: ['Prompt Engineering — structure RACF (Rôle/Action/Contexte/Format)', '15 exercices sur cas réels par métier', 'Plan d’action J+1 : 3 actions à déployer demain matin'] },
+    ],
+    outils: ['Claude Sonnet 4.6', 'GPT-5.2', 'Gemini 3 Flash', 'Perplexity'],
+    livrables: ['Guide 50 Prompts par Métier', 'Charte d’usage IA', 'Fiche 3 Quick Wins J+1'],
+  },
+  {
+    code: 'F02', t: 'Prompt Engineering Pro', level: 'SOCLE', duree: '½ J', prix: '200 €',
+    tagline: 'Multiplier par 5 la qualité de ses outputs IA.',
+    programme: [
+      { points: ['Techniques avancées : Few-shot, Chain-of-Thought, Tree-of-Thought, Meta-prompting', '20 exercices chronométrés sur cas réels', 'Construire sa bibliothèque de prompts d’équipe (template Notion configuré en live)', 'Atelier final : 5 prompts signature'] },
+    ],
+    outils: ['Claude Opus 4.6', 'GPT-5.2', 'Gemini 3.1 Pro'],
+    livrables: ['Template Bibliothèque Prompts Notion', 'Fiche mémo Techniques Avancées'],
+  },
+  {
+    code: 'F03', t: 'Maîtriser Claude', level: 'SOCLE', duree: '1 J', prix: '450 €',
+    tagline: 'Devenir expert de l’IA qui pèse 70 % du Fortune 100.',
+    programme: [
+      { title: 'Matin · bases solides', points: ['Claude vs ChatGPT vs Gemini', 'Modèles Sonnet 4.6 et Opus 4.6', 'Projects, Artifacts, Computer Use'] },
+      { title: 'Après-midi · niveau expert', points: ['Claude Skills', 'MCP (Model Context Protocol)', 'Cowork & Sub-agents', 'Atelier : 3 Skills'] },
+    ],
+    outils: ['Claude Opus 4.6', 'Sonnet 4.6', 'Skills', 'MCP', 'Cowork'],
+    livrables: ['Pack 10 Skills Axem', 'Guide Claude Power User', 'Charte d’usage Claude'],
+  },
+  {
+    code: 'F04', t: 'IA pour tous les métiers', level: 'MÉTIERS', duree: '1 J', prix: '400 €',
+    tagline: '1 journée, 8 modules au choix (vous en choisissez 2-3).',
+    programme: [
+      { title: '8 modules combinables (contenus 2026)', points: [
+        '01 Direction & Stratégie — Roadmap IA, ROI, scénarios, AI Act',
+        '02 Marketing & Commercial — 10× contenu, prospection ultra-personnalisée, +25 % leads',
+        '03 RH & Recrutement — fiche poste 10 min, screening 100 CV, onboarding 30/60/90',
+        '04 Finance & Compta — reporting, analyse Excel/CSV, automatisation factures',
+        '05 Juridique & Compliance — analyse contrats, recherche juris, clauses risquées',
+        '06 Service Client — chatbots, triage tickets, FAQ auto, escalade',
+        '07 Réseaux Sociaux & Brand — 4 semaines en 1 jour, hooks LinkedIn, repurposing 8 formats',
+        '08 Créatif & Design — visuels, moodboards, design system, copywriting marque',
+      ] },
+    ],
+    outils: ['Contenus 2026', 'Modules combinables'],
+    livrables: ['Supports & prompts sectoriels des modules choisis'],
+  },
+  {
+    code: 'F05', t: 'No-Code & Workflows', level: 'AUTOMATISATION', duree: '2 J', prix: '800 €',
+    tagline: 'Des workflows qui tournent seuls, 7j/7 — sans coder.',
+    programme: [
+      { title: 'J1', points: ['Make et n8n — 3 automatisations live', 'Exemples : Formulaire→CRM · Email→Slack+tâche · RSS→LinkedIn', 'Objectif : 1 workflow déployé avant 18h'] },
+      { title: 'J2', points: ['Intégrer Claude/GPT/Gemini dans Make et n8n', 'Conditions complexes, erreurs, boucles', 'Projet final déployé en prod'] },
+    ],
+    outils: ['Make', 'n8n', 'Claude Sonnet 4.6', 'GPT-5.2', 'Gemini 3 Flash'],
+    livrables: ['10 templates Make & n8n prêts à cloner', 'Guide Connecter 50 outils'],
+  },
+  {
+    code: 'F06', t: 'Agent IA sur-mesure', level: 'AUTOMATISATION', duree: '2 J', prix: '1 250 €',
+    tagline: 'Un travailleur autonome qui agit seul, 24h/24. (Prérequis : F05 ou pratique API)',
+    programme: [
+      { title: 'J1 · Architecture', points: ['LLM + Mémoire + Outils + Planification (démo live)', 'Frameworks : n8n Agents, CrewAI, LangGraph', 'RAG (Pinecone, Chroma), MCP'] },
+      { title: 'J2 · Déploiement', points: ['3 patterns business : Agent Support 24/7 · Agent SDR · Agent Admin', 'Claude Skills', 'Validation humaine, monitoring, RGPD', 'Projet final'] },
+    ],
+    outils: ['Claude Opus 4.6', 'GPT-5.2', 'n8n Agents', 'CrewAI', 'LangGraph', 'Pinecone', 'MCP'],
+    livrables: ['Template Agent IA n8n/LangGraph', 'Guide 6 Architectures d’Agents', 'Checklist sécurité'],
+  },
+  {
+    code: 'F07', t: 'Vibe Coding & Claude Code', level: 'AUTOMATISATION', duree: '1 J', prix: '450 €',
+    tagline: 'Construire des outils sans coder, avec l’IA comme binôme.',
+    programme: [
+      { title: 'Matin', points: ['Lovable / Bolt.new / v0 — app web en 1h', 'Méthode du vibe coding structuré', 'Atelier micro-outil métier'] },
+      { title: 'Après-midi', points: ['Cursor IDE', 'Claude Code (CLI)', 'Workflows générer / tester / déployer', 'Sécurité, audit, gouvernance'] },
+    ],
+    outils: ['Cursor', 'Claude Code', 'Lovable', 'Bolt.new', 'v0', 'GitHub Copilot'],
+    livrables: ['Pack Prompts Vibe Coding', 'Guide Cursor & Claude Code', '3 mini-apps livrées'],
+  },
+  {
+    code: 'F08', t: 'Gouvernance & AI Act', level: 'TRANSVERSAL', duree: '½ J', prix: '250 €',
+    tagline: 'Cadrer ses usages IA en conformité. (Public : Direction, DPO, DSI, RH, Juristes)',
+    programme: [
+      { points: ['AI Act 2026 : ce qui est interdit / obligatoire', 'RGPD & IA — serveurs US (OpenAI, Anthropic)', 'Construire sa charte IA + traçabilité', '5 cas pratiques live', 'Matrice de risques AI Act'] },
+    ],
+    outils: ['AI Act 2026', 'CNIL', 'Frameworks RGPD'],
+    livrables: ['Template Charte IA', 'Matrice de risques AI Act', 'Plan de mise en conformité 90 jours'],
+  },
+  {
+    code: 'F09', t: 'Veille IA', level: 'TRANSVERSAL', duree: '2 h', prix: '80 € · 320 €/an',
+    tagline: 'Rester à jour sur un champ qui bouge tous les mois. (Abonnement annuel 320 €/pers, 4 sessions/an)',
+    programme: [
+      { points: ['10 avancées IA majeures (démos live)', 'Méthode de veille perso 20 min/semaine', 'Horizon 12-24 mois', 'Modulable selon métier'] },
+    ],
+    outils: ['Perplexity', 'Claude', 'Veille IA Axem', 'Newsletters'],
+    livrables: ['Template Notion Veille IA', 'Liste 30 sources curées', 'Replays'],
+  },
+  {
+    code: 'F10', t: 'Création IA — Visuel · Vidéo · Voix', level: 'PRODUCTION', duree: '1 J', prix: '400 €',
+    tagline: 'Produire 10× plus vite, à coût maîtrisé.',
+    programme: [
+      { title: 'Matin · images', points: ['Midjourney V7, DALL-E 4, Adobe Firefly 3, Nano Banana Pro', 'Logos : Looka, Brandmark, Ideogram 2', 'Infographies : Napkin AI, Gamma, NotebookLM', 'Sites en 1h : Lovable, Bolt.new, Emergent'] },
+      { title: 'Après-midi · vidéo & voix', points: ['Synthesia — 140 avatars, 120 langues', 'ElevenLabs — voix clonée en 3 min', 'Vidéo : Kling 2.5, Sora 2, Veo 3.1', 'Repurposing : CapCut AI, Opus Clip → 1 contenu = 8 formats'] },
+    ],
+    outils: ['Midjourney V7', 'Synthesia', 'ElevenLabs', 'Kling 2.5', 'Sora 2', 'Veo 3.1'],
+    livrables: ['Guide 30 Outils Créatifs IA 2026', 'Pack 50 Prompts Midjourney', 'Templates Gamma'],
+  },
+];
+
+const LEVELS: { id: string; label: string }[] = [
+  { id: 'SOCLE', label: 'Socle' },
+  { id: 'MÉTIERS', label: 'Métiers' },
+  { id: 'AUTOMATISATION', label: 'Automatisation' },
+  { id: 'TRANSVERSAL', label: 'Transversal' },
+  { id: 'PRODUCTION', label: 'Production' },
+];
+
+const FormationCard: React.FC<{ f: Formation }> = ({ f }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open}
+      className={`group flex w-full flex-col border border-cream/12 bg-ink p-6 text-left transition-colors hover:border-green/40 hover:bg-ink-3 md:p-7 ${open ? 'border-green/40 bg-ink-3 lg:col-span-2' : ''}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="font-display text-sm font-extrabold text-green">{f.code}</span>
+          <span className="rounded-full border border-cream/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-cream-soft">{f.level}</span>
+        </div>
+        <PlusToggle open={open} className="text-cream-soft group-hover:text-green" />
+      </div>
+      <h3 className="mt-3 font-display leading-[1.02] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(20px, 2.4vw, 30px)' }}>{f.t}</h3>
+      <p className="mt-2 text-sm leading-snug text-cream-soft">{f.tagline}</p>
+      <div className="mt-4 flex items-center gap-2">
+        <span className="rounded-full bg-cream/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-cream">{f.duree}</span>
+        <span className="rounded-full bg-green/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-green">{f.prix}</span>
+      </div>
+
+      <Collapse open={open}>
+        <div className="mt-6 grid gap-6 border-t border-cream/12 pt-6 md:grid-cols-2">
+          <div className="space-y-4 md:col-span-2">
+            <p className="font-display text-xs font-extrabold uppercase tracking-[0.12em] text-green">Programme</p>
+            {f.programme.map((p, i) => (
+              <div key={i}>
+                {p.title && <p className="mb-1.5 text-sm font-bold text-cream">{p.title}</p>}
+                <ul className="space-y-1.5">
+                  {p.points.map((pt) => (
+                    <li key={pt} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft"><span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-green" />{pt}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div>
+            <p className="mb-2 font-display text-xs font-extrabold uppercase tracking-[0.12em] text-green">Outils</p>
+            <div className="flex flex-wrap gap-1.5">
+              {f.outils.map((o) => <span key={o} className="rounded-md bg-cream/8 px-2.5 py-1 text-[12px] text-cream-soft">{o}</span>)}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 font-display text-xs font-extrabold uppercase tracking-[0.12em] text-green">Livrables</p>
+            <ul className="space-y-1.5">
+              {f.livrables.map((l) => (
+                <li key={l} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft">
+                  <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>{l}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Collapse>
+    </button>
+  );
+};
+
+const Catalogue: React.FC = () => (
+  <section id="catalogue" className="border-y border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
+    <div className="mx-auto max-w-[1400px]">
+      <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Catalogue 2025-2026</div></Reveal>
+      <Reveal delay={0.08}>
+        <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.4vw, 122px)' }}>
+          10 formations.<br /><span className="text-green">3 niveaux.</span>
+        </h2>
+      </Reveal>
+      <Reveal delay={0.14}>
+        <p className="mt-7 max-w-2xl text-base text-cream-soft md:text-lg">
+          Construites de A à Z selon vos besoins, vos contraintes et vos cas d’usage. <span className="text-cream">70 % de pratique, certifiées Qualiopi.</span> Tarifs HT/participant. Inter ou intra. <span className="text-cream">Cliquez une formation</span> pour le programme complet.
+        </p>
+      </Reveal>
+
+      {/* Bandeau Qualiopi */}
+      <Reveal delay={0.05}>
+        <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-green/30 bg-green/[0.06] px-6 py-4">
+          <span className="inline-flex items-center gap-2 text-sm font-bold text-cream">
+            <svg className="h-4 w-4 text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Certifié Qualiopi
+          </span>
+          <span className="text-sm text-cream-soft">Finançable OPCO — prise en charge jusqu’à 100 %</span>
+          <span className="text-sm text-cream-soft">70 % de pratique minimum · opérationnel dès J+1</span>
+        </div>
+      </Reveal>
+
+      {/* Formations groupées par niveau */}
+      <div className="mt-14 space-y-12">
+        {LEVELS.map((lvl) => {
+          const items = FORMATIONS.filter((f) => f.level === lvl.id);
+          if (!items.length) return null;
+          return (
+            <div key={lvl.id}>
+              <Reveal>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="font-display text-sm font-extrabold uppercase tracking-[0.16em] text-cream">{lvl.label}</span>
+                  <span className="text-xs text-cream-dim">{items.length} formation{items.length > 1 ? 's' : ''}</span>
+                  <span className="h-px flex-1 bg-cream/12" />
+                </div>
+              </Reveal>
+              <div className="grid items-start gap-3 md:gap-4 lg:grid-cols-3">
+                {items.map((f, i) => (
+                  <Reveal key={f.code} delay={(i % 3) * 0.05}><FormationCard f={f} /></Reveal>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bootcamps + vidéos */}
+      <div className="mt-14 grid gap-3 md:gap-4 lg:grid-cols-3">
+        <Reveal>
+          <div className="flex h-full flex-col border border-cream/12 bg-ink p-7">
+            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">B01 · Bootcamp immersif</span>
+            <h4 className="mt-2 font-display text-2xl text-cream tight" style={{ fontWeight: 800 }}>IA &amp; Social Media</h4>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-cream-soft">3 jours · sur devis · le MVP</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream-soft">10 % théorie / 90 % pratique sur vos données. 20-30 posts créés, calendrier automatisé (Zapier/Make), playbook + 1 automatisation live.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <div className="flex h-full flex-col border border-cream/12 bg-ink p-7">
+            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">B02 · Bootcamp immersif</span>
+            <h4 className="mt-2 font-display text-2xl text-cream tight" style={{ fontWeight: 800 }}>Performance &amp; Scale</h4>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-cream-soft">+2 jours d’extension · sur devis</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream-soft">Après B01. Optimisation data (A/B testing, funnels), scale vidéos courtes, autonomie 24/7 (agents IA + chatbots), système complet branché.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div className="flex h-full flex-col border border-cream/12 bg-ink p-7">
+            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">Masterclass 24/7</span>
+            <h4 className="mt-2 font-display text-2xl text-cream tight" style={{ fontWeight: 800 }}>Formations vidéos</h4>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-cream-soft">40-45 vidéos HD · sur devis</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream-soft">Apprendre à son rythme. Format screencast pas-à-pas, cas d’usage métiers, config workflows live, templates & prompts sectoriels téléchargeables, MAJ 2026. Idéal onboarding nouvelle recrue.</p>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Financement OPCO via portage IZY for pro */}
+      <Reveal delay={0.05}>
+        <div className="mt-16 rounded-3xl border border-cream/12 bg-ink p-7 md:p-12">
+          <div className="flex flex-col gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-green">Financement</span>
+            <h3 className="font-display leading-[0.95] text-cream tight" style={{ fontWeight: 900, fontSize: 'clamp(28px, 4vw, 56px)' }}>
+              Finançable OPCO via portage <span className="text-green">IZY for pro</span>.
+            </h3>
+            <p className="mt-2 max-w-2xl text-base text-cream-soft">Prise en charge possible jusqu’à 100 %, un interlocuteur unique côté Axem.</p>
+          </div>
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-cream/12 bg-cream/12 md:grid-cols-3">
+            {[
+              { n: '01', t: 'Diagnostic gratuit', d: '30 min pour identifier les 3 formations les plus rentables pour vos équipes.', meta: '30 MIN' },
+              { n: '02', t: 'Devis & dossier OPCO', d: 'Proposition sous 48h. Prise en charge OPCO via portage IZY for pro, démarches simplifiées.', meta: '48 H' },
+              { n: '03', t: 'Formation', d: 'Équipes opérationnelles dès J+1. Livrables concrets, suivi post-formation.', meta: 'J+1' },
+            ].map((s) => (
+              <div key={s.n} className="flex flex-col gap-3 bg-ink p-7">
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-5xl text-cream tighter" style={{ fontWeight: 900 }}>{s.n}</span>
+                  <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+                </div>
+                <h4 className="font-display text-xl text-cream tight" style={{ fontWeight: 800 }}>{s.t}</h4>
+                <p className="text-sm leading-relaxed text-cream-soft">{s.d}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-sm text-cream-soft">Une question sur le financement ? <a href="mailto:contact@axem-ia.fr" className="font-semibold text-green underline-offset-4 hover:underline">contact@axem-ia.fr</a></p>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
 
 // ---------- DUO ----------
 const Duo: React.FC = () => {
@@ -344,7 +754,7 @@ const Duo: React.FC = () => {
           </h2>
         </Reveal>
         <Reveal delay={0.16}><p className="mt-7 max-w-2xl text-lg text-cream-soft md:text-xl">
-          <span className="font-bold text-cream">A</span>lexis <span className="text-green">×</span> Cl<span className="font-bold text-cream">ém</span>ent. Le stratège et l'ingénieur. Pas de relais qui se perd entre équipes : vous parlez à ceux qui livrent.
+          <span className="font-bold text-cream">A</span>lexis <span className="text-green">×</span> Cl<span className="font-bold text-cream">ém</span>ent. Le stratège et l'ingénieur. Deux experts, un seul interlocuteur : vous parlez à ceux qui livrent.
         </p></Reveal>
 
         <div className="mt-16 grid gap-6 md:grid-cols-2">
@@ -375,7 +785,7 @@ const Duo: React.FC = () => {
         </div>
         <Reveal delay={0.2}>
           <p className="mt-14 text-center font-display text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 110px)' }}>
-            Ensemble, <span className="text-green">AXEM</span>.
+            Ensemble, <span className="text-green">+55 000</span> abonnés.
           </p>
         </Reveal>
       </div>
@@ -383,51 +793,132 @@ const Duo: React.FC = () => {
   );
 };
 
-// ---------- PROOF : chiffres géants ----------
-const Proof: React.FC = () => {
-  const stats = [{ v: 55000, p: '+', l: 'abonnés LinkedIn' }, { v: 10, p: '', l: 'formations Qualiopi' }, { v: 70, p: '', s: ' %', l: 'de pratique' }, { v: null, l: 'opérationnel', txt: 'J+1' }];
-  const cases = [{ sector: 'BTP · Chiffrage', r: '80 %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' }, { sector: 'Administration · OCR', r: '×4', d: 'plus rapide · fiabilité 100 % par double vérification' }, { sector: 'Industrie · Conformité ADV', r: '317 h', d: 'libérées par mois · anomalies détectées > 98 %' }];
+// ---------- CAS CLIENTS : data-viz bento cliquable + cas formation + Notion ----------
+type CaseStat = { value: number | null; prefix?: string; suffix?: string; txt?: string; caption: string };
+type ClientCase = { sector: string; title: string; context: string; stats: CaseStat[]; results: string[]; span?: string };
+
+const CLIENT_CASES: ClientCase[] = [
+  {
+    sector: 'BTP · Rénovation & Structure', title: 'Chiffrage automatisé par IA', span: 'lg:col-span-2',
+    context: 'PME de 40 collaborateurs, 30 débours par jour et par collaborateur.',
+    stats: [{ value: 80, suffix: ' %', caption: 'temps de saisie économisé' }, { value: 95, suffix: ' k€', caption: 'charge annuelle neutralisée' }],
+    results: ['Note de débours : 80 % de temps de saisie économisé', 'DPGF Excel et CSV générés automatiquement', 'Intégration ERP KALITICS', '95 k€/an neutralisés sur l’avant-vente'],
+  },
+  {
+    sector: 'Administration judiciaire', title: 'Audit automatisé par OCR + IA',
+    context: 'Liasses fiscales et documents juridiques — mission de 4 mois.',
+    stats: [{ value: 4, prefix: '×', caption: 'plus rapide (3 h gagnées/dossier)' }, { value: 100, suffix: ' %', caption: 'de fiabilité (double vérif. OCR/IA)' }],
+    results: ['Vitesse de traitement ×4 (3 h gagnées/dossier)', '100 % de fiabilité par double vérification OCR/IA', '+5 h/semaine/collab réaffectées à l’analyse'],
+  },
+  {
+    sector: 'Adhésifs · Aéronautique & Ferroviaire', title: 'Conformité ADV automatisée',
+    context: 'Comparaison BC vs AR, 1 900 paires de documents par mois.',
+    stats: [{ value: 317, suffix: ' h', caption: 'libérées par mois' }, { value: 98, prefix: '> ', suffix: ' %', caption: 'd’anomalies détectées' }],
+    results: ['Temps par dossier : 15 min → 5 min (317 h/mois libérées)', 'Détection des anomalies > 98 %', 'Hébergement Europe RGPD, intégration ERP Proginov'],
+  },
+  {
+    sector: 'Éditeur logiciel · Médico-social', title: 'Industrialisation IA dans les équipes Dev', span: 'lg:col-span-2',
+    context: 'Éditeur ~550 salariés, Claude déployé sans méthode.',
+    stats: [{ value: 20, caption: 'ambassadeurs formés' }, { value: 80, caption: 'développeurs concernés' }],
+    results: ['20 ambassadeurs formés sur 80 développeurs', 'Framework d’usage co-construit avec le CISO', 'Agents PO, revue de code et support feature en prod'],
+  },
+];
+
+const FORMATION_CASES = [
+  { name: 'ESPACE 2', sector: 'Promotion immobilière', d: 'Formation IA équipes Direction & RH — 2 journées d’upskilling, charte d’usage IA, roadmap 90 jours déployée.' },
+  { name: 'AVANTIS', sector: 'Conseil & expertise', d: 'Kit Journée IA par métier — document interactif HTML, 6 prompts sectoriels validés, adoption +60 %.' },
+  { name: 'GRAVOTECH', sector: 'Industrie / Manufacturing', d: 'Acculturation IA équipes opérationnelles — formation 1 journée sur outils 2025, 3 quick wins déployés en 30 jours.' },
+  { name: 'CARREFOUR', sector: 'Grande distribution', d: 'Animation de formations IA — formation Gemini, 1 journée au niveau groupe.' },
+];
+
+const ClientCaseCard: React.FC<{ c: ClientCase }> = ({ c }) => {
+  const [open, setOpen] = useState(false);
   return (
-    <section className="px-5 py-28 md:px-8 md:py-36">
-      <div className="mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-12 border-b border-cream/12 pb-20 md:grid-cols-4">
-          {stats.map((s, i) => (
-            <Reveal key={s.l} delay={i * 0.08}>
-              <div className="group cursor-default">
-                <div className="font-display leading-[0.85] text-cream transition-colors group-hover:text-green tighter" style={{ fontWeight: 900, fontSize: 'clamp(48px, 7vw, 110px)' }}>
-                  {s.v !== null ? <Counter value={s.v} prefix={s.p} suffix={(s as any).s || ''} /> : (s as any).txt}
-                </div>
-                <div className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-cream-soft">{s.l}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={0.05}>
-          <h2 className="mt-20 font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 118px)' }}>
-            Des résultats.<br /><span className="outline-green">Pas des slides.</span>
-          </h2>
-        </Reveal>
-
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {cases.map((c, i) => (
-            <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+    <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open}
+      className="group flex h-full w-full flex-col border border-cream/12 bg-ink-2 p-7 text-left transition-colors hover:border-green/40 hover:bg-ink-3 md:p-8">
+      <div className="flex items-start justify-between gap-3">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
+        <PlusToggle open={open} className="text-cream-soft group-hover:text-green" />
       </div>
-    </section>
+      <h3 className="mt-3 font-display leading-[1.02] text-cream tight" style={{ fontWeight: 800, fontSize: 'clamp(22px, 2.6vw, 34px)' }}>{c.title}</h3>
+      <div className="mt-6 flex flex-wrap gap-x-10 gap-y-5">
+        {c.stats.map((s) => (
+          <div key={s.caption}>
+            <div className="font-display leading-[0.85] text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 5vw, 76px)' }}>
+              {s.value !== null ? <Counter value={s.value} prefix={s.prefix} suffix={s.suffix} /> : s.txt}
+            </div>
+            <div className="mt-1.5 text-xs font-semibold text-cream-soft">{s.caption}</div>
+          </div>
+        ))}
+      </div>
+      <Collapse open={open}>
+        <div className="mt-6 border-t border-cream/12 pt-6">
+          <p className="text-sm italic text-cream-soft">{c.context}</p>
+          <ul className="mt-4 space-y-2">
+            {c.results.map((r) => (
+              <li key={r} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft">
+                <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>{r}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Collapse>
+    </button>
   );
 };
 
+const Proof: React.FC = () => (
+  <section id="cas-clients" className="px-5 py-28 md:px-8 md:py-36">
+    <div className="mx-auto max-w-[1400px]">
+      <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Cas clients</div></Reveal>
+      <Reveal delay={0.05}>
+        <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 118px)' }}>
+          Des résultats.<br /><span className="outline-green">Pas des slides.</span>
+        </h2>
+      </Reveal>
+      <Reveal delay={0.12}><p className="mt-7 max-w-2xl text-base text-cream-soft md:text-lg">5 missions, 5 secteurs, des résultats mesurés. <span className="text-cream">Cliquez une carte</span> pour le détail.</p></Reveal>
+
+      <div className="mt-14 grid items-start gap-3 md:gap-4 lg:grid-cols-3">
+        {CLIENT_CASES.map((c) => (
+          <Reveal key={c.title} className={c.span}><ClientCaseCard c={c} /></Reveal>
+        ))}
+      </div>
+
+      {/* Cas clients formation */}
+      <Reveal delay={0.05}>
+        <div className="mt-20 mb-6 flex items-center gap-3">
+          <span className="font-display text-sm font-extrabold uppercase tracking-[0.16em] text-cream">Cas clients formation</span>
+          <span className="h-px flex-1 bg-cream/12" />
+        </div>
+      </Reveal>
+      <div className="grid gap-3 md:gap-4 lg:grid-cols-4">
+        {FORMATION_CASES.map((f, i) => (
+          <Reveal key={f.name} delay={(i % 4) * 0.05}>
+            <div className="group flex h-full flex-col border border-cream/12 bg-ink-2 p-6 transition-colors hover:border-green/40 hover:bg-ink-3">
+              <h4 className="font-display text-xl text-cream tight transition-colors group-hover:text-green" style={{ fontWeight: 800 }}>{f.name}</h4>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.1em] text-green">{f.sector}</p>
+              <p className="mt-3 text-sm leading-relaxed text-cream-soft opacity-80 transition-opacity group-hover:opacity-100">{f.d}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={0.1}>
+        {/* TODO: URL Notion à fournir — voir constante NOTION_URL */}
+        <a href={NOTION_URL} target="_blank" rel="noopener noreferrer"
+          className="group mt-12 inline-flex items-center gap-3 border border-green/40 bg-green/[0.06] px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-green transition-colors hover:bg-green hover:text-ink">
+          Voir tous les cas clients en détail
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+        <p className="mt-3 text-sm text-cream-dim">Méthodologies, livrables, retours d’expérience et résultats détaillés.</p>
+      </Reveal>
+    </div>
+  </section>
+);
+
 // ---------- METHOD ----------
 const Method: React.FC = () => {
-  const steps = [{ n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
+  const steps = [{ n: '01', t: 'Diagnostic gratuit', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
   return (
     <section id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
@@ -455,25 +946,51 @@ const Method: React.FC = () => {
   );
 };
 
-// ---------- FINAL CTA : aplat mint massif ----------
-const FinalCTA: React.FC = () => (
-  <section className="px-5 py-28 md:px-8 md:py-36">
-    <div className="mx-auto max-w-[1400px] bg-green px-6 py-24 text-center md:px-16 md:py-32">
-      <Reveal>
-        <h2 className="mx-auto font-display leading-[0.86] text-ink tighter" style={{ fontWeight: 900, fontSize: 'clamp(46px, 9vw, 170px)' }}>
-          Parlons<br />de votre projet.
-        </h2>
-      </Reveal>
-      <Reveal delay={0.1}><p className="mx-auto mt-8 max-w-xl text-lg font-medium text-ink/70 md:text-xl">Pas un commercial. Directement Clément ou Alexis. 30 minutes pour identifier vos leviers les plus rentables.</p></Reveal>
-      <Reveal delay={0.2}>
-        <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.35}
-          className="group mt-12 inline-flex items-center gap-3 bg-ink px-10 py-5 text-base uppercase tracking-[0.04em] text-green" style={{ fontWeight: 900 }}>
-          Réserver un diagnostic gratuit <span className="transition-transform group-hover:translate-x-1">→</span>
-        </Magnetic>
-      </Reveal>
-    </div>
-  </section>
-);
+// ---------- FINAL CTA : accroche + widget Calendly inline ----------
+const FinalCTA: React.FC = () => {
+  useEffect(() => {
+    const SRC = 'https://assets.calendly.com/assets/external/widget.js';
+    if (document.querySelector(`script[src="${SRC}"]`)) return;
+    const s = document.createElement('script');
+    s.src = SRC; s.async = true;
+    document.body.appendChild(s);
+  }, []);
+  return (
+    <section id="rdv" className="px-5 py-28 md:px-8 md:py-36">
+      <div className="mx-auto max-w-[1400px]">
+        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Rendez-vous</div></Reveal>
+        <Reveal delay={0.06}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.4vw, 124px)' }}>
+            Démarrons par un<br /><span className="text-green">diagnostic gratuit.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <p className="mt-7 max-w-2xl text-lg text-cream-soft md:text-xl">
+            30 minutes pour identifier vos 3 leviers IA prioritaires. Pas un commercial — directement Clément ou Alexis.
+          </p>
+        </Reveal>
+        <Reveal delay={0.16}>
+          <a href="mailto:contact@axem-ia.fr" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-green underline-offset-4 hover:underline">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            contact@axem-ia.fr
+          </a>
+        </Reveal>
+
+        <Reveal delay={0.18}>
+          <div className="mt-10 overflow-hidden rounded-3xl border border-cream/12 bg-white">
+            <div className="calendly-inline-widget" data-url={CALENDLY_INLINE} style={{ minWidth: 320, height: 700 }} />
+          </div>
+        </Reveal>
+        <Reveal delay={0.22}>
+          <p className="mt-5 text-center text-sm text-cream-dim">
+            Le créneau ne s’affiche pas ?{' '}
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="font-semibold text-green underline-offset-4 hover:underline">Ouvrir le calendrier dans un nouvel onglet →</a>
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
 
 // ---------- FOOTER ----------
 const Footer: React.FC = () => (
@@ -488,7 +1005,7 @@ const Footer: React.FC = () => (
         </div>
         <div>
           <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
-          <ul className="space-y-2 text-sm text-cream-soft">{[['Prestations', '#prestations'], ['Le duo', '#duo'], ['Références', '#references'], ['Méthode', '#methode']].map(([l, h]) => (<li key={l}><a href={h} className="transition-colors hover:text-cream">{l}</a></li>))}</ul>
+          <ul className="space-y-2 text-sm text-cream-soft">{[['Prestations', '#prestations'], ['Catalogue', '#catalogue'], ['Cas clients', '#cas-clients'], ['Le duo', '#duo'], ['Méthode', '#methode'], ['Références', '#references']].map(([l, h]) => (<li key={l}><a href={h} className="transition-colors hover:text-cream">{l}</a></li>))}</ul>
         </div>
         <div>
           <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
@@ -511,11 +1028,13 @@ const Footer: React.FC = () => (
 );
 
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <Nav />
+      <main><Hero /><Trust /><Services /><Catalogue /><Proof /><Duo /><Method /><FinalCTA /></main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
