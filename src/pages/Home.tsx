@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
-  useScroll, useInView, useReducedMotion,
+  motion, AnimatePresence, MotionConfig, useMotionValue, useSpring, useTransform,
+  useScroll, useInView, useReducedMotion, type MotionValue,
 } from 'framer-motion';
 // @ts-ignore — composant JS (React Bits / OGL)
 import Grainient from '../components/Grainient';
@@ -66,6 +66,57 @@ const RiseWords: React.FC<{ text: string; className?: string; delay?: number; st
       ))}
     </span>
   );
+};
+
+// Titre split-text « masque » : chaque mot monte depuis un masque (clip), stagger, once.
+// Lignes séparées par « | ». Sémantique conservée via aria-label.
+const MaskTitle: React.FC<{
+  lines: { text: string; className?: string }[];
+  className?: string;
+  delay?: number;
+  stagger?: number;
+}> = ({ lines, className = '', delay = 0, stagger = 0.07 }) => {
+  let idx = 0;
+  const full = lines.map((l) => l.text).join(' ');
+  return (
+    <span className={className} aria-label={full}>
+      {lines.map((line, li) => (
+        <span key={li} className="block" aria-hidden>
+          {line.text.split(' ').map((w, wi) => {
+            const d = delay + idx * stagger;
+            idx += 1;
+            return (
+              <span key={wi} className="inline-block overflow-hidden align-bottom pb-[0.06em]">
+                <motion.span
+                  className={`inline-block ${line.className ?? ''}`}
+                  initial={{ y: '108%' }}
+                  whileInView={{ y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.8, delay: d, ease }}
+                >
+                  {w}
+                </motion.span>
+                {wi < line.text.split(' ').length - 1 ? ' ' : ''}
+              </span>
+            );
+          })}
+        </span>
+      ))}
+    </span>
+  );
+};
+
+// petit hook responsive (md+) — évite sticky/hover lourds sur mobile
+const useIsDesktop = () => {
+  const [d, setD] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const on = () => setD(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return d;
 };
 
 const Magnetic: React.FC<any> = ({ children, strength = 0.35, className, ...props }) => {
@@ -288,40 +339,194 @@ const Trust: React.FC = () => {
   );
 };
 
-// ---------- SERVICES : liste typographique massive ----------
+// ---------- SERVICES : liste typo interactive + panneau latéral / accordéon ----------
+type Service = {
+  n: string; t: string; d: string; price: string;
+  result: string; // phrase de résultat
+  kw: string;      // mot-clé animé dans le panneau
+  gauge?: number;  // mini-jauge optionnelle (0–100)
+};
+
+// Mini-jauge animée (transform scaleX, opacity) — purement décorative
+const Gauge: React.FC<{ value: number; active: boolean }> = ({ value, active }) => (
+  <div aria-hidden className="mt-5 h-[3px] w-full overflow-hidden bg-cream/12">
+    <motion.div
+      className="h-full origin-left bg-green"
+      initial={{ scaleX: 0 }}
+      animate={{ scaleX: active ? value / 100 : 0 }}
+      transition={{ duration: 0.5, ease }}
+    />
+  </div>
+);
+
+// Panneau de détail (desktop : latéral sticky ; mobile : accordéon)
+const ServicePanel: React.FC<{ s: Service }> = ({ s }) => (
+  <div>
+    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-green">{s.kw}</div>
+    <div className="mt-4 font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(34px, 4.4vw, 64px)' }}>
+      {s.price}
+    </div>
+    <p className="mt-5 max-w-sm text-base leading-relaxed text-cream-soft">{s.d}</p>
+    <div className="mt-6 flex items-start gap-2.5 border-t border-cream/12 pt-5">
+      <svg aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <p className="text-[15px] font-semibold leading-snug text-cream">{s.result}</p>
+    </div>
+    {typeof s.gauge === 'number' && <Gauge value={s.gauge} active />}
+  </div>
+);
+
+// Une ligne de la liste typo
+const ServiceRow: React.FC<{
+  s: Service;
+  i: number;
+  active: boolean;
+  dim: boolean;
+  desktop: boolean;
+  open: boolean;
+  onHover: () => void;
+  onToggle: () => void;
+}> = ({ s, i, active, dim, desktop, open, onHover, onToggle }) => {
+  return (
+    <Reveal delay={(i % 3) * 0.05}>
+      <div
+        onMouseEnter={desktop ? onHover : undefined}
+        className="border-b border-cream/12"
+      >
+        {/* ligne cliquable — href réel sur desktop (CTA), toggle sur mobile */}
+        {desktop ? (
+          <a
+            href="#methode"
+            className="group block py-6 outline-none md:py-7"
+            aria-label={`${s.t} — ${s.price}`}
+          >
+            <div className="grid grid-cols-[64px_1fr_auto] items-baseline gap-x-6">
+              <span
+                className="font-display text-xl transition-colors md:text-2xl"
+                style={{ fontWeight: 900, color: active ? '#00FA9A' : dim ? '#6E6E68' : '#A8A8A2' }}
+              >
+                {s.n}
+              </span>
+              <motion.h3
+                className="font-display leading-[0.95] tight"
+                style={{ fontWeight: 800, fontSize: 'clamp(28px, 4vw, 60px)' }}
+                animate={{
+                  color: active ? '#FAFAF7' : dim ? '#3a3a36' : '#FAFAF7',
+                  x: active ? 10 : 0,
+                  opacity: dim ? 0.5 : 1,
+                }}
+                transition={{ duration: 0.28, ease }}
+              >
+                {s.t}
+              </motion.h3>
+              {/* prix TOUJOURS visible au repos */}
+              <span className="self-center whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:text-[12px]">
+                {s.price}
+              </span>
+            </div>
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            className="block w-full py-5 text-left"
+          >
+            <div className="grid grid-cols-[40px_1fr] items-baseline gap-x-4">
+              <span className="font-display text-lg text-green" style={{ fontWeight: 900 }}>{s.n}</span>
+              <div className="min-w-0">
+                <h3 className="font-display leading-[0.98] text-cream tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 8vw, 40px)' }}>{s.t}</h3>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft">{s.price}</span>
+                  <motion.span aria-hidden animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.25 }} className="text-2xl leading-none text-green">+</motion.span>
+                </div>
+              </div>
+            </div>
+            {/* accordéon mobile */}
+            <AnimatePresence initial={false}>
+              {open && (
+                <motion.div
+                  key="acc"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease }}
+                  className="overflow-hidden"
+                >
+                  <div className="pl-[56px] pt-5">
+                    <ServicePanel s={s} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+        )}
+      </div>
+    </Reveal>
+  );
+};
+
 const Services: React.FC = () => {
-  const items = [
-    { n: '01', t: 'Audit IA', d: "On regarde avant de déployer. Diagnostic, cartographie de vos process, scoring de maturité IA.", price: '1 à 4 semaines' },
-    { n: '02', t: 'Conseil stratégique', d: "On décide quoi faire, dans quel ordre, avec quels budgets. Roadmap priorisée, choix des outils.", price: 'Sur devis' },
-    { n: '03', t: 'Déploiement & automatisation', d: "Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main ou suivi.", price: 'À partir de 1 200 €' },
-    { n: '04', t: 'Formation Qualiopi', d: "Vos équipes opérationnelles dès J+1. 10 formations, 3 niveaux, 70 % de pratique. Finançable OPCO.", price: '200 € – 1 250 € / pers.' },
-    { n: '05', t: 'Coaching individuel', d: "Pour vos profils clés : managers, dirigeants, référents IA. On ancre les compétences dans la durée.", price: '200 € / session' },
-    { n: '06', t: 'Production IA', d: "Vidéos avatar, voix clonée, visuels, sites no-code, présentations. Produits 10× plus vite.", price: 'Sur devis' },
-    { n: '07', t: 'Suivi', d: "Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. Long terme.", price: '80 € / mois' },
+  const items: Service[] = [
+    { n: '01', t: 'Audit IA', d: "On regarde avant de déployer. Diagnostic, cartographie de vos process, scoring de maturité IA.", price: '1 à 4 semaines', result: 'On sait quoi automatiser — et ce qu\'il ne faut surtout pas.', kw: 'Cartographie', gauge: 65 },
+    { n: '02', t: 'Conseil stratégique', d: "On décide quoi faire, dans quel ordre, avec quels budgets. Roadmap priorisée, choix des outils.", price: 'Sur devis', result: 'Une roadmap priorisée, pas une liste de bonnes intentions.', kw: 'Roadmap', gauge: 80 },
+    { n: '03', t: 'Déploiement & automatisation', d: "Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main ou suivi.", price: 'À partir de 1 200 €', result: 'Des workflows qui tournent seuls, 7j/7, sans vous.', kw: 'n8n · Make · Claude', gauge: 95 },
+    { n: '04', t: 'Formation Qualiopi', d: "Vos équipes opérationnelles dès J+1. 10 formations, 3 niveaux, 70 % de pratique. Finançable OPCO.", price: '200 € – 1 250 € / pers.', result: 'Vos équipes opérationnelles dès la sortie de salle.', kw: '70 % de pratique', gauge: 70 },
+    { n: '05', t: 'Coaching individuel', d: "Pour vos profils clés : managers, dirigeants, référents IA. On ancre les compétences dans la durée.", price: '200 € / session', result: 'Vos référents IA montent en autonomie, séance après séance.', kw: 'Sur-mesure', gauge: 60 },
+    { n: '06', t: 'Production IA', d: "Vidéos avatar, voix clonée, visuels, sites no-code, présentations. Produits 10× plus vite.", price: 'Sur devis', result: 'Du contenu produit 10× plus vite, à votre marque.', kw: '10× plus vite', gauge: 90 },
+    { n: '07', t: 'Suivi', d: "Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. Long terme.", price: '80 € / mois', result: 'On reste. Maintenance, évolutions, nouvelles automatisations.', kw: 'Long terme', gauge: 50 },
   ];
+  const desktop = useIsDesktop();
+  const [active, setActive] = useState(0);
+  const [openMobile, setOpenMobile] = useState<number | null>(null);
+
   return (
     <section id="prestations" className="px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
         <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Ce qu'on fait</div></Reveal>
-        <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
-            Sept prestations.<br /><span className="outline-type">Un partenaire.</span>
-          </h2>
-        </Reveal>
+        <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
+          <MaskTitle lines={[{ text: 'Sept prestations.' }, { text: 'Un partenaire.', className: 'outline-type' }]} />
+        </h2>
 
-        <div className="mt-16 border-t border-cream/12">
-          {items.map((s, i) => (
-            <Reveal key={s.n} delay={(i % 3) * 0.05}>
-              <a href="#methode" className="group block border-b border-cream/12 py-7 transition-colors hover:bg-ink-2 md:py-9">
-                <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 md:grid-cols-[110px_1fr_auto] md:gap-x-8">
-                  <span className="font-display text-xl text-green transition-transform duration-300 group-hover:translate-x-1 md:text-3xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <h3 className="font-display leading-[0.95] text-cream transition-colors group-hover:text-green tight" style={{ fontWeight: 800, fontSize: 'clamp(26px, 4.2vw, 58px)' }}>{s.t}</h3>
-                  <span className="col-span-2 text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft md:col-span-1 md:self-center md:whitespace-nowrap">{s.price}</span>
-                </div>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-cream-soft md:ml-[142px] md:text-base">{s.d}</p>
-              </a>
-            </Reveal>
-          ))}
+        {/* desktop : liste + panneau latéral sticky ; mobile : accordéon */}
+        <div className="mt-16 grid gap-x-14 md:grid-cols-[1fr_minmax(320px,400px)]">
+          {/* colonne liste */}
+          <div
+            className="border-t border-cream/12"
+            onMouseLeave={desktop ? () => setActive(0) : undefined}
+          >
+            {items.map((s, i) => (
+              <ServiceRow
+                key={s.n}
+                s={s}
+                i={i}
+                desktop={desktop}
+                active={desktop && active === i}
+                dim={desktop && active !== i}
+                open={openMobile === i}
+                onHover={() => setActive(i)}
+                onToggle={() => setOpenMobile((o) => (o === i ? null : i))}
+              />
+            ))}
+          </div>
+
+          {/* colonne panneau (desktop only) */}
+          <div className="hidden md:block">
+            <div className="sticky top-28 border border-cream/12 bg-ink-2 p-8">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cream-dim">Prestation {items[active].n}</div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.28, ease }}
+                  className="mt-3"
+                >
+                  <ServicePanel s={items[active]} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -383,10 +588,159 @@ const Duo: React.FC = () => {
   );
 };
 
-// ---------- PROOF : chiffres géants ----------
+// ---------- MANIFESTE : respiration full-typo (noir quasi pur) ----------
+// Punchline réutilisée du hero (« Et on reste. ») — sens conservé.
+const Manifesto: React.FC<{ id?: string; line: { text: string; className?: string }[]; kicker?: string }> = ({ id, line, kicker }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  // léger parallax/scale du bloc (transform only) — désactivé en reduced-motion
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], reduce ? [1, 1, 1] : [0.94, 1, 1.04]);
+  const opacity = useTransform(scrollYProgress, [0, 0.18, 0.82, 1], [0.15, 1, 1, 0.15]);
+  return (
+    <section ref={ref} id={id} className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-[#080808] px-5 py-32 md:py-44">
+      <motion.div style={{ scale, opacity }} className="mx-auto max-w-[1400px] text-center">
+        {kicker && <div className="mb-7 text-[11px] font-bold uppercase tracking-[0.3em] text-green">{kicker}</div>}
+        <h2 className="font-display leading-[0.86] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(56px, 13vw, 220px)' }}>
+          <MaskTitle lines={line} stagger={0.09} />
+        </h2>
+      </motion.div>
+    </section>
+  );
+};
+
+// ---------- PROOF : scrollytelling avant → après ----------
+type CaseStudy = {
+  sector: string;
+  before: { label: string; value: string; note: string };
+  after: { label: string; value: string; note: string };
+  punch: string; // gros chiffre « qui atterrit »
+};
+
+// Un cas client : se construit au scroll (AVANT gris → bascule → APRÈS qui atterrit)
+const CaseBlock: React.FC<{ c: CaseStudy; i: number }> = ({ c, i }) => {
+  const [view, setView] = useState<'before' | 'after'>('before');
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-120px' });
+  const reduce = useReducedMotion();
+
+  // au scroll : on bascule automatiquement sur APRÈS quand le bloc entre en vue
+  useEffect(() => {
+    if (!inView) return;
+    if (reduce) { setView('after'); return; }
+    const t = setTimeout(() => setView('after'), 650);
+    return () => clearTimeout(t);
+  }, [inView, reduce]);
+
+  const isAfter = view === 'after';
+  const data = isAfter ? c.after : c.before;
+
+  return (
+    <Reveal delay={i * 0.05}>
+      <div ref={ref} className="border-t border-cream/12 py-12 md:py-16">
+        <div className="grid items-start gap-8 md:grid-cols-[minmax(0,300px)_1fr]">
+          {/* secteur + toggle Avant/Après */}
+          <div>
+            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.16em] text-green">
+              <span className="font-display text-lg text-cream-dim" style={{ fontWeight: 900 }}>0{i + 1}</span>
+              {c.sector}
+            </div>
+            <div role="group" aria-label="Avant ou après IA" className="mt-5 inline-flex items-center gap-1 border border-cream/15 p-1">
+              {(['before', 'after'] as const).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setView(k)}
+                  aria-pressed={view === k}
+                  className={`relative px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors ${view === k ? (k === 'after' ? 'text-ink' : 'text-cream') : 'text-cream-dim hover:text-cream-soft'}`}
+                >
+                  {view === k && (
+                    <motion.span
+                      layoutId={`seg-${i}`}
+                      className={`absolute inset-0 -z-0 ${k === 'after' ? 'bg-green' : 'bg-cream/12'}`}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{k === 'before' ? 'Manuel' : 'Avec IA'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* comparatif : 2 colonnes (gris manuel / mint avec IA), la colonne active s'illumine */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* AVANT */}
+            <motion.div
+              animate={{ opacity: isAfter ? 0.4 : 1 }}
+              transition={{ duration: 0.3, ease }}
+              className="border border-cream/12 bg-ink-2 p-6 md:p-7"
+            >
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-cream-dim">{c.before.label}</div>
+              <div className="mt-3 font-display leading-[0.85] text-cream-soft tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 76px)' }}>{c.before.value}</div>
+              <p className="mt-3 text-sm leading-relaxed text-cream-dim">{c.before.note}</p>
+            </motion.div>
+
+            {/* APRÈS — le résultat qui atterrit (count-up via AnimatePresence) */}
+            <motion.div
+              animate={{
+                opacity: isAfter ? 1 : 0.5,
+                borderColor: isAfter ? 'rgba(0,250,154,0.5)' : 'rgba(250,250,247,0.12)',
+              }}
+              transition={{ duration: 0.3, ease }}
+              className="border bg-ink-2 p-6 md:p-7"
+            >
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-green">{c.after.label}</div>
+              <div className="mt-3 overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={isAfter ? 'on' : 'off'}
+                    initial={{ y: isAfter ? '60%' : 0, opacity: isAfter ? 0 : 1 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.45, ease }}
+                    className="font-display leading-[0.85] text-green tighter"
+                    style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 76px)' }}
+                  >
+                    {c.after.value}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-cream-soft">{c.after.note}</p>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* la punchline résultat, gros, lisible sans anim */}
+        <div className="mt-8 flex items-baseline gap-4 md:ml-[332px]">
+          <span aria-hidden className="font-display text-green" style={{ fontWeight: 900, fontSize: 'clamp(28px, 3vw, 40px)' }}>→</span>
+          <p className="font-display leading-[0.95] text-cream tight" style={{ fontWeight: 800, fontSize: 'clamp(20px, 2.4vw, 34px)' }}>{c.punch}</p>
+        </div>
+      </div>
+    </Reveal>
+  );
+};
+
 const Proof: React.FC = () => {
   const stats = [{ v: 55000, p: '+', l: 'abonnés LinkedIn' }, { v: 10, p: '', l: 'formations Qualiopi' }, { v: 70, p: '', s: ' %', l: 'de pratique' }, { v: null, l: 'opérationnel', txt: 'J+1' }];
-  const cases = [{ sector: 'BTP · Chiffrage', r: '80 %', d: 'de temps de saisie économisé · 95 k€/an neutralisés' }, { sector: 'Administration · OCR', r: '×4', d: 'plus rapide · fiabilité 100 % par double vérification' }, { sector: 'Industrie · Conformité ADV', r: '317 h', d: 'libérées par mois · anomalies détectées > 98 %' }];
+  const cases: CaseStudy[] = [
+    {
+      sector: 'BTP · Chiffrage',
+      before: { label: 'Saisie manuelle', value: '100 %', note: 'Chiffrage ressaisi à la main, lent et coûteux.' },
+      after: { label: 'Temps économisé', value: '80 %', note: 'de temps de saisie économisé sur chaque devis.' },
+      punch: '95 k€/an neutralisés.',
+    },
+    {
+      sector: 'Administration · OCR',
+      before: { label: 'Traitement manuel', value: '×1', note: 'Lecture et contrôle des documents un par un.' },
+      after: { label: 'Vitesse', value: '×4', note: 'plus rapide, fiabilité 100 % par double vérification.' },
+      punch: 'Zéro erreur de saisie.',
+    },
+    {
+      sector: 'Industrie · Conformité ADV',
+      before: { label: 'Contrôle manuel', value: '0 h', note: 'Vérifications de conformité chronophages.' },
+      after: { label: 'Temps libéré', value: '317 h', note: 'libérées par mois, anomalies détectées > 98 %.' },
+      punch: 'Plus de 98 % d\'anomalies détectées.',
+    },
+  ];
   return (
     <section className="px-5 py-28 md:px-8 md:py-36">
       <div className="mx-auto max-w-[1400px]">
@@ -403,21 +757,16 @@ const Proof: React.FC = () => {
           ))}
         </div>
 
-        <Reveal delay={0.05}>
-          <h2 className="mt-20 font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 118px)' }}>
-            Des résultats.<br /><span className="outline-green">Pas des slides.</span>
+        <div className="mt-20">
+          <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Avant · Après</div></Reveal>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 118px)' }}>
+            <MaskTitle lines={[{ text: 'Des résultats.' }, { text: 'Pas des slides.', className: 'outline-green' }]} />
           </h2>
-        </Reveal>
+        </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-14">
           {cases.map((c, i) => (
-            <Reveal key={c.sector} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 border border-cream/12 bg-ink-2 p-8 transition-colors hover:border-green/40 hover:bg-ink-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green">{c.sector}</span>
-                <span className="font-display text-7xl text-cream transition-transform duration-300 group-hover:-translate-y-0.5 tighter md:text-8xl" style={{ fontWeight: 900 }}>{c.r}</span>
-                <p className="text-base leading-relaxed text-cream-soft">{c.d}</p>
-              </div>
-            </Reveal>
+            <CaseBlock key={c.sector} c={c} i={i} />
           ))}
         </div>
       </div>
@@ -425,32 +774,127 @@ const Proof: React.FC = () => {
   );
 };
 
-// ---------- METHOD ----------
-const Method: React.FC = () => {
-  const steps = [{ n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' }, { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' }, { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' }];
+// ---------- METHOD : chapitres sticky plein écran ----------
+type Chapter = { n: string; t: string; d: string; meta: string };
+
+// Un chapitre sticky (desktop) : 100vh, chiffre géant en ancre, cross-fade via progress
+const MethodChapter: React.FC<{
+  s: Chapter;
+  i: number;
+  total: number;
+  progress: MotionValue<number>;
+}> = ({ s, i, total, progress }) => {
+  const reduce = useReducedMotion();
+  // fenêtre de ce chapitre dans la progression globale [0..1]
+  const seg = 1 / total;
+  const start = i * seg;
+  const end = (i + 1) * seg;
+  const mid = start + seg / 2;
+  // transitions cinématiques : apparition / sortie (transform + opacity uniquement)
+  const opacity = useTransform(
+    progress,
+    [start - 0.02, start + seg * 0.18, end - seg * 0.18, end + 0.02],
+    i === 0 ? [1, 1, 1, 0] : i === total - 1 ? [0, 1, 1, 1] : [0, 1, 1, 0]
+  );
+  const y = useTransform(progress, [start, mid, end], reduce ? [0, 0, 0] : [60, 0, -60]);
+  // le chiffre géant glisse légèrement à contre-sens → parallax
+  const numY = useTransform(progress, [start, end], reduce ? [0, 0] : [80, -80]);
+  const numOpacity = useTransform(progress, [start - 0.02, mid, end + 0.02], [0.12, 1, 0.12]);
+
   return (
-    <section id="methode" className="border-t border-cream/10 bg-ink-2 px-5 py-28 md:px-8 md:py-36">
-      <div className="mx-auto max-w-[1400px]">
-        <Reveal>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
-            En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
-          </h2>
-        </Reveal>
-        <div className="mt-16 grid gap-px overflow-hidden border border-cream/12 bg-cream/12 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.1}>
-              <div className="group flex h-full flex-col gap-4 bg-ink-2 p-8 transition-colors hover:bg-ink-3 md:p-10">
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-7xl text-cream transition-colors group-hover:text-green tighter md:text-8xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                  <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+    <div className="relative sticky top-0 flex h-screen items-center overflow-hidden">
+      <div className="mx-auto w-full max-w-[1400px] px-5 md:px-8">
+        {/* CHIFFRE GÉANT — ancre visuelle */}
+        <motion.div
+          aria-hidden
+          style={{ y: numY, opacity: numOpacity }}
+          className="pointer-events-none absolute inset-x-0 top-1/2 -z-0 -translate-y-1/2 text-center font-display leading-none text-cream/[0.06] tighter"
+        >
+          <span style={{ fontWeight: 900, fontSize: 'clamp(180px, 42vw, 540px)' }}>{s.n}</span>
+        </motion.div>
+
+        {/* CONTENU du chapitre */}
+        <motion.div style={{ opacity, y }} className="relative z-10 mx-auto max-w-3xl text-center">
+          <div className="inline-flex items-center gap-3">
+            <span className="font-display text-2xl text-green" style={{ fontWeight: 900 }}>{s.n}</span>
+            <span className="h-px w-12 bg-cream/20" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-cream-soft">Étape {i + 1} / {total}</span>
+          </div>
+          <h3 className="mt-6 font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(56px, 11vw, 150px)' }}>{s.t}</h3>
+          <div className="mt-6 inline-block bg-green px-6 py-2 font-display text-2xl text-ink tight md:text-4xl" style={{ fontWeight: 900 }}>{s.meta}</div>
+          <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-cream-soft md:text-xl">{s.d}</p>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+const Method: React.FC = () => {
+  const steps: Chapter[] = [
+    { n: '01', t: 'Diagnostic', d: '30 min pour identifier vos 3 leviers IA les plus rentables.', meta: '30 MIN' },
+    { n: '02', t: 'Proposition', d: 'Sous 48h. Parcours sur-mesure, dates, financement OPCO.', meta: '48 H' },
+    { n: '03', t: 'Exécution', d: 'Opérationnel dès J+1. Livrables concrets, suivi inclus.', meta: 'J+1' },
+  ];
+  const desktop = useIsDesktop();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ['start start', 'end end'] });
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
+  // index de chapitre courant pour la barre de progression
+  const [cur, setCur] = useState(0);
+  useEffect(() => {
+    const unsub = progress.on('change', (v) => {
+      setCur(Math.min(steps.length - 1, Math.floor(v * steps.length + 0.0001)));
+    });
+    return () => unsub();
+  }, [progress, steps.length]);
+
+  return (
+    <section id="methode" className="border-t border-cream/10 bg-ink-2">
+      {/* En-tête de section */}
+      <div className="mx-auto max-w-[1400px] px-5 pb-4 pt-28 md:px-8 md:pt-36">
+        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />La méthode</div></Reveal>
+        <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 8vw, 132px)' }}>
+          <MaskTitle lines={[{ text: 'En 3 étapes.' }, { text: 'Pas une de plus.', className: 'text-green' }]} />
+        </h2>
+      </div>
+
+      {desktop ? (
+        // DESKTOP : chapitres sticky plein écran (hauteur = N × 100vh)
+        <div ref={wrapRef} className="relative" style={{ height: `${steps.length * 100}vh` }}>
+          {/* barre de progression chapitres (fixed dans la fenêtre) */}
+          <div className="pointer-events-none sticky top-0 z-20 flex h-0 justify-center">
+            <div className="mt-6 flex items-center gap-2">
+              {steps.map((s, i) => (
+                <div key={s.n} className="h-1 w-10 overflow-hidden bg-cream/15">
+                  <motion.div className="h-full origin-left bg-green" animate={{ scaleX: i <= cur ? 1 : 0 }} transition={{ duration: 0.3, ease }} />
                 </div>
-                <h3 className="font-display text-3xl text-cream tight md:text-4xl" style={{ fontWeight: 800 }}>{s.t}</h3>
-                <p className="text-base leading-relaxed text-cream-soft">{s.d}</p>
+              ))}
+            </div>
+          </div>
+          {steps.map((s, i) => (
+            <MethodChapter key={s.n} s={s} i={i} total={steps.length} progress={progress} />
+          ))}
+        </div>
+      ) : (
+        // MOBILE : fallback empilé simple (pas de sticky lourd)
+        <div className="mx-auto max-w-[1400px] space-y-5 px-5 pb-28 pt-10">
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.06}>
+              <div className="relative overflow-hidden border border-cream/12 bg-ink p-7">
+                <span aria-hidden className="pointer-events-none absolute -right-4 -top-8 font-display leading-none text-cream/[0.06]" style={{ fontWeight: 900, fontSize: '160px' }}>{s.n}</span>
+                <div className="relative">
+                  <div className="flex items-center gap-3">
+                    <span className="font-display text-xl text-green" style={{ fontWeight: 900 }}>{s.n}</span>
+                    <span className="bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+                  </div>
+                  <h3 className="mt-4 font-display text-4xl text-cream tight" style={{ fontWeight: 900 }}>{s.t}</h3>
+                  <p className="mt-3 text-base leading-relaxed text-cream-soft">{s.d}</p>
+                </div>
               </div>
             </Reveal>
           ))}
         </div>
-      </div>
+      )}
     </section>
   );
 };
@@ -511,11 +955,25 @@ const Footer: React.FC = () => (
 );
 
 const Home: React.FC = () => (
-  <div className="min-h-screen bg-ink">
-    <Nav />
-    <main><Hero /><Trust /><Services /><Duo /><Proof /><Method /><FinalCTA /></main>
-    <Footer />
-  </div>
+  <MotionConfig reducedMotion="user">
+    <div className="min-h-screen bg-ink">
+      <Nav />
+      <main>
+        <Hero />
+        <Trust />
+        <Services />
+        {/* respiration full-typo entre deux sections denses */}
+        <Manifesto kicker="Notre promesse" line={[{ text: 'Que du' }, { text: 'livrable.', className: 'text-green' }]} />
+        <Duo />
+        <Proof />
+        {/* seconde respiration — punchline du hero réutilisée */}
+        <Manifesto line={[{ text: 'Et on' }, { text: 'reste.', className: 'text-green' }]} />
+        <Method />
+        <FinalCTA />
+      </main>
+      <Footer />
+    </div>
+  </MotionConfig>
 );
 
 export default Home;
