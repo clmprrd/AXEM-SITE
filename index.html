@@ -58,6 +58,12 @@
         -webkit-text-stroke: 1.5px #00FA9A;
       }
       @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+      /* respect users who prefer reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+      }
+      /* Calendly inline widget — keep it from overflowing on mobile */
+      .calendly-inline-widget { max-width: 100%; }
     </style>
   </head>
   <body>
