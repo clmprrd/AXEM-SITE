@@ -7,11 +7,12 @@ import {
 import Grainient from '../components/Grainient';
 
 // =====================================================================
-// AXEM IA — PAGE PRODUCTION-READY · HERO « GRAINIENT VIF »
-// Dark #0F0F0F · mint #00FA9A · Archivo · vouvoiement, punchy.
+// AXEM IA — PAGE PRODUCTION-READY · VIBE « DARK LUXE / CINÉMATIQUE »
+// Noir profond #0B0B0C · ivoire #EDE9E0 · accent champagne-or #D9B36A · Fraunces serif.
+// Contenu & structure 100% inchangés. Seule la DA change.
 // Structure : Hero → Trust → Problème → Duo → Méthode →
 //   BLOC 1 Formation → BLOC 2 Conseil → Cas clients → Pourquoi → CTA → Footer
-// Effets dosés (transform/opacity/SVG only · whileInView once · reducedMotion).
+// Effets lents/élégants (blur-in, fade, hover or · transform/opacity/filter only · reducedMotion).
 // =====================================================================
 
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
@@ -21,33 +22,40 @@ const EMAIL = 'contact@axem-ia.fr';
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 const ease = [0.16, 1, 0.3, 1] as const;
+const GOLD = '#D9B36A';
 
 // =====================================================================
-// HERO BACKGROUND — Grainient « vif » : palette mint présente + lumineuse.
-// color1 = mint clair (présent), color2 = émeraude saturée, color3 = teal profond
-// (base saturée, pas quasi-noire → gradient lumineux, pas vaseux).
+// HERO BACKGROUND — Grainient recoloré « dark luxe » : volute d'or sur noir.
+// color1 = or champagne (halo, présent mais doux), color2 = bronze sombre,
+// color3 = noir profond. Saturation basse, lent → fumée d'or cinématique, jamais clinquant.
 // =====================================================================
-const HERO_PALETTE = { color1: '#7CFFD0', color2: '#00D88E', color3: '#1B5E66' } as const;
+const HERO_PALETTE = { color1: '#C9A55E', color2: '#3A2E1C', color3: '#0B0B0C' } as const;
 const GRAINIENT = {
-  timeSpeed: 0.16, warpStrength: 1.0, warpFrequency: 5.0, warpSpeed: 1.8,
-  warpAmplitude: 52.0, blendAngle: 0.0, blendSoftness: 0.06, rotationAmount: 480.0,
-  noiseScale: 2.0, grainAmount: 0.1, grainScale: 1.5, grainAnimated: false,
-  contrast: 1.42, gamma: 0.96, saturation: 1.18, zoom: 0.8,
+  timeSpeed: 0.075, warpStrength: 1.0, warpFrequency: 4.0, warpSpeed: 1.0,
+  warpAmplitude: 64.0, blendAngle: 18.0, blendSoftness: 0.12, rotationAmount: 360.0,
+  noiseScale: 1.6, grainAmount: 0.14, grainScale: 1.6, grainAnimated: false,
+  contrast: 1.18, gamma: 1.06, saturation: 0.82, zoom: 0.72,
 } as const;
 
 // ---------------------------------------------------------------------
 // HELPERS
 // ---------------------------------------------------------------------
-const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, delay, ease }}
-    className={className}>{children}</motion.div>
-);
+// Reveal cinématique — fade + léger blur-in + montée douce (lent, posé)
+const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 22, filter: 'blur(8px)' }}
+      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-70px' }} transition={{ duration: 1.0, delay, ease }}
+      className={className}>{children}</motion.div>
+  );
+};
 
 // Titre créatif — mask reveal mot-à-mot (le titre « se compose »)
 const RiseWords: React.FC<{ text: string; className?: string; delay?: number; stagger?: number; greenLast?: boolean }> =
   ({ text, className = '', delay = 0, stagger = 0.07, greenLast = false }) => {
+    const reduce = useReducedMotion();
     const words = text.split(' ');
     return (
       <span className={className} aria-label={text}>
@@ -55,8 +63,8 @@ const RiseWords: React.FC<{ text: string; className?: string; delay?: number; st
           <span key={i} className="inline-block overflow-hidden align-bottom" aria-hidden>
             <motion.span
               className={`inline-block ${greenLast && i === words.length - 1 ? 'text-green' : ''}`}
-              initial={{ y: '115%' }} whileInView={{ y: 0 }} viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.85, delay: delay + i * stagger, ease }}>
+              initial={reduce ? { y: 0 } : { y: '115%' }} animate={{ y: 0 }}
+              transition={{ duration: 1.05, delay: delay + i * stagger, ease }}>
               {w}{i < words.length - 1 ? ' ' : ''}
             </motion.span>
           </span>
@@ -121,7 +129,7 @@ const SpotlightCard: React.FC<{ children: React.ReactNode; className?: string }>
   };
   const bg = useTransform(
     [mx, my],
-    ([x, y]: number[]) => `radial-gradient(220px circle at ${x}px ${y}px, rgba(0,250,154,0.14), transparent 72%)`
+    ([x, y]: number[]) => `radial-gradient(240px circle at ${x}px ${y}px, rgba(217,179,106,0.13), transparent 72%)`
   );
   return (
     <div
@@ -143,7 +151,7 @@ const ScrollProgress: React.FC = () => {
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
   return (
     <motion.div aria-hidden style={{ scaleX }}
-      className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-green" />
+      className="fixed inset-x-0 top-0 z-[60] h-px origin-left bg-green" />
   );
 };
 
@@ -177,21 +185,21 @@ const Nav: React.FC = () => {
     return () => window.removeEventListener('scroll', h);
   }, []);
   return (
-    <nav className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${s ? 'border-b border-cream/10 bg-ink/85 py-3 backdrop-blur-xl' : 'py-5'}`}>
+    <nav className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${s ? 'border-b border-cream/10 bg-ink/80 py-3 backdrop-blur-xl' : 'py-5'}`}>
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 md:px-8">
-        <a href="#top" className="font-display text-2xl tracking-tighter text-cream" style={{ fontWeight: 900 }}>
-          AXEM<span className="text-green">.</span>
+        <a href="#top" className="font-display text-3xl tracking-tight text-cream" style={{ fontWeight: 600 }}>
+          AXEM<span className="text-green serif-italic">.</span>
         </a>
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-9 md:flex">
           {NAV_LINKS.map(([l, h]) => (
-            <a key={l} href={h} className="group relative text-[13px] font-semibold uppercase tracking-[0.12em] text-cream-soft transition-colors hover:text-cream">
-              {l}<span className="absolute -bottom-1.5 left-0 h-[2px] w-0 bg-green transition-all duration-300 group-hover:w-full" />
+            <a key={l} href={h} className="group relative text-[11px] font-medium label-caps text-cream-soft transition-colors hover:text-cream">
+              {l}<span className="absolute -bottom-1.5 left-0 h-px w-0 bg-green transition-all duration-500 group-hover:w-full" />
             </a>
           ))}
         </div>
         <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
-          className="group inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2.5 text-[13px] uppercase tracking-[0.06em] text-ink" style={{ fontWeight: 800 }}>
-          Rendez-vous <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          className="group inline-flex items-center gap-1.5 rounded-full border border-green/60 bg-transparent px-5 py-2.5 text-[11px] label-caps text-green transition-colors duration-500 hover:bg-green hover:text-ink" style={{ fontWeight: 600 }}>
+          Rendez-vous <span className="transition-transform duration-500 group-hover:translate-x-0.5">→</span>
         </Magnetic>
       </div>
     </nav>
@@ -205,55 +213,60 @@ const Hero: React.FC = () => {
   const reduce = useReducedMotion();
   return (
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-32 md:px-8">
-      {/* BACKGROUND — Grainient vif (mint présent) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0F0F0F]">
+      {/* BACKGROUND — Grainient recoloré « volute d'or sur noir » */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0B0B0C]">
         <Grainient {...GRAINIENT} {...HERO_PALETTE} className="h-full w-full" />
       </div>
-      {/* SCRIM derrière le texte (lisibilité) — le fond reste vif autour */}
+      {/* SCRIM cinématique derrière le texte (lisibilité) — noir chaud profond */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(62% 50% at 50% 44%, rgba(7,9,9,0.62) 0%, rgba(7,9,9,0.34) 42%, transparent 72%)' }} />
+        style={{ background: 'radial-gradient(60% 52% at 50% 46%, rgba(11,11,12,0.74) 0%, rgba(11,11,12,0.46) 44%, transparent 74%)' }} />
+      {/* halo or très subtil au centre */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: 'radial-gradient(40% 32% at 50% 40%, rgba(217,179,106,0.10), transparent 70%)' }} />
       {/* fondu bas vers le site + voile haut pour la nav */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[26%]"
-        style={{ background: 'linear-gradient(180deg, transparent, #0F0F0F)' }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[30%]"
+        style={{ background: 'linear-gradient(180deg, transparent, #0B0B0C)' }} />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-28"
-        style={{ background: 'linear-gradient(180deg, rgba(15,15,15,0.5), transparent)' }} />
+        style={{ background: 'linear-gradient(180deg, rgba(11,11,12,0.6), transparent)' }} />
 
       {/* CONTENU */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
-        {/* eyebrow retravaillé */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/25 px-4 py-1.5 backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+        {/* eyebrow — label caps raffiné, filet or */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0, ease }}>
+          <div className="inline-flex items-center gap-3 rounded-full border border-green/30 bg-black/30 px-5 py-2 backdrop-blur-md">
+            <span className="relative flex h-1.5 w-1.5">
+              {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60" />}
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green" />
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white md:text-[11px]">
-              Agence d'IA <span className="text-green">×</span> organisme de formation Qualiopi
+            <span className="text-[10px] font-medium label-caps text-cream/90 md:text-[11px]">
+              Agence d'IA <span className="text-green">·</span> Organisme de formation Qualiopi
             </span>
           </div>
         </motion.div>
 
-        {/* TITRE créatif : se compose mot à mot */}
-        <h1 className="mt-7 font-display leading-[0.92] tracking-tight text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.45)]"
-          style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.6vw, 90px)' }}>
-          <RiseWords text="Votre partenaire IA," stagger={0.08} />
+        {/* TITRE serif géant : se compose mot à mot (mask reveal lent), accent or italique */}
+        <h1 className="mt-9 font-display leading-[0.96] tracking-tight text-cream [text-shadow:0_2px_40px_rgba(0,0,0,0.5)]"
+          style={{ fontWeight: 500, fontSize: 'clamp(42px, 7.6vw, 96px)' }}>
+          <RiseWords text="Votre partenaire IA," stagger={0.1} />
           <br />
           <span className="relative inline-block">
-            <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
+            <span className="serif-italic text-green">
+              <RiseWords text="de A à Z." delay={0.34} stagger={0.1} />
+            </span>
             <motion.span aria-hidden
-              className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-green"
+              className="absolute -bottom-2 left-0 block h-px hairline-gold"
               initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
-              transition={{ duration: 0.7, delay: 0.85, ease }} />
+              transition={{ duration: 1.1, delay: 1.0, ease }} />
           </span>
         </h1>
 
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease }}
-          className="mt-7 max-w-2xl font-display text-xl font-bold leading-snug text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.4)] md:text-2xl">
-          On vous forme, on vous conseille, on déploie. <span className="text-green">Et on reste.</span>
+        <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0, delay: 0.8, ease }}
+          className="mt-9 max-w-2xl text-xl font-light leading-snug text-cream [text-shadow:0_2px_20px_rgba(0,0,0,0.45)] md:text-2xl">
+          On vous forme, on vous conseille, on déploie. <span className="serif-italic text-green">Et on reste.</span>
         </motion.p>
 
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82, ease }}
-          className="mt-5 max-w-2xl text-[15px] leading-relaxed text-white/90 [text-shadow:0_1px_14px_rgba(0,0,0,0.45)] md:text-base">
+        <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0, delay: 0.94, ease }}
+          className="mt-6 max-w-2xl text-[15px] font-light leading-relaxed text-cream-soft [text-shadow:0_1px_14px_rgba(0,0,0,0.5)] md:text-base">
           Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Nous accompagnons entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour déployer des solutions IA concrètes.
         </motion.p>
 
@@ -261,26 +274,26 @@ const Hero: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.94, ease }}
           className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
           <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
-            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-green px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-ink shadow-[0_12px_44px_-12px_rgba(0,250,154,0.7)]" style={{ fontWeight: 900 }}>
-            <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/55 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
+            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-green px-8 py-4 text-[12px] label-caps text-ink shadow-[0_16px_50px_-14px_rgba(217,179,106,0.65)]" style={{ fontWeight: 600 }}>
+            <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+            <svg className="relative h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
             <span className="relative">Prendre rendez-vous</span>
-            <span className="relative transition-transform group-hover:translate-x-1">→</span>
+            <span className="relative transition-transform duration-500 group-hover:translate-x-1">→</span>
           </Magnetic>
-          <a href="#formation" className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/5 px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-white backdrop-blur-sm transition hover:bg-white/15">
+          <a href="#formation" className="inline-flex items-center gap-2 rounded-full border border-cream/25 bg-cream/[0.03] px-7 py-4 text-[12px] label-caps text-cream backdrop-blur-sm transition-colors duration-500 hover:border-cream/45 hover:bg-cream/[0.07]">
             Voir le catalogue <span aria-hidden>↓</span>
           </a>
         </motion.div>
 
         {/* badge preuve sociale duo (+55 000) avec les 2 avatars */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.06, ease }}
-          className="mt-10 inline-flex items-center gap-3 rounded-full border border-white/20 bg-black/35 py-2 pl-2 pr-5 backdrop-blur-md">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0, delay: 1.1, ease }}
+          className="mt-10 inline-flex items-center gap-3 rounded-full border border-cream/15 bg-black/35 py-2 pl-2 pr-5 backdrop-blur-md">
           <div className="flex -space-x-2.5">
-            <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-white/80" loading="lazy" />
-            <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-white/80" loading="lazy" />
+            <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover grayscale ring-2 ring-green/50" loading="lazy" />
+            <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover grayscale ring-2 ring-green/50" loading="lazy" />
           </div>
-          <span className="text-sm font-semibold text-white">
-            <span className="text-green">+55 000</span> abonnés LinkedIn nous suivent
+          <span className="text-sm font-light text-cream">
+            <span className="font-medium text-green">+55 000</span> abonnés LinkedIn nous suivent
           </span>
         </motion.div>
       </div>
@@ -313,10 +326,10 @@ const Trust: React.FC = () => {
     <section id="references" className="relative border-y border-cream/10 bg-ink-2 px-5 py-20 md:px-8 md:py-24">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="mb-12 flex flex-col items-center gap-2 text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-green">Ils nous font confiance</p>
-            <p className="font-display text-2xl text-cream md:text-4xl" style={{ fontWeight: 800 }}>
-              Des PME aux grands comptes <span className="text-cream-soft">&amp;</span> administrations.
+          <div className="mb-12 flex flex-col items-center gap-3 text-center">
+            <p className="text-[11px] font-medium label-caps text-green">Ils nous font confiance</p>
+            <p className="font-display text-3xl text-cream md:text-4xl" style={{ fontWeight: 400 }}>
+              Des PME aux grands comptes <span className="serif-italic text-cream-soft">&amp;</span> administrations.
             </p>
           </div>
         </Reveal>
@@ -375,9 +388,9 @@ const Problem: React.FC = () => {
   return (
     <section className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Pourquoi la plupart échouent</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-3 text-[11px] font-medium label-caps text-green"><span className="h-px w-7 bg-green/70" />Pourquoi la plupart échouent</div></Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.92] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(36px, 6.2vw, 96px)' }}>
+          <h2 className="font-display leading-[0.92] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(36px, 6.2vw, 96px)' }}>
             3 pièges qui font<br /><span className="outline-type">échouer l'IA.</span>
           </h2>
         </Reveal>
@@ -385,16 +398,16 @@ const Problem: React.FC = () => {
           {traps.map((p, i) => (
             <Reveal key={p.n} delay={i * 0.1}>
               <div className="flex h-full flex-col gap-3 rounded-2xl border border-cream/12 bg-ink-2 p-7 md:p-8">
-                <span className="font-display text-5xl text-cream/20 md:text-6xl" style={{ fontWeight: 900 }}>{p.n}</span>
-                <h3 className="font-display text-xl text-cream md:text-2xl" style={{ fontWeight: 800 }}>{p.t}</h3>
+                <span className="font-display text-5xl text-cream/25 md:text-6xl" style={{ fontWeight: 500 }}>{p.n}</span>
+                <h3 className="font-display text-xl text-cream md:text-2xl" style={{ fontWeight: 500 }}>{p.t}</h3>
                 <p className="text-sm leading-relaxed text-cream-soft md:text-[15px]">{p.d}</p>
               </div>
             </Reveal>
           ))}
         </div>
         <Reveal delay={0.1}>
-          <p className="mt-12 max-w-2xl font-display text-2xl leading-snug text-cream md:text-3xl" style={{ fontWeight: 700 }}>
-            La réponse d'AXEM : un parcours complet, <span className="text-green">pas une intervention isolée.</span>
+          <p className="mt-12 max-w-2xl font-display text-2xl leading-snug text-cream md:text-3xl" style={{ fontWeight: 400 }}>
+            La réponse d'AXEM : un parcours complet, <span className="serif-italic text-green">pas une intervention isolée.</span>
           </p>
         </Reveal>
       </div>
@@ -413,9 +426,9 @@ const Duo: React.FC = () => {
   return (
     <section id="duo" className="border-y border-cream/10 bg-ink-2 px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Les fondateurs</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-3 text-[11px] font-medium label-caps text-green"><span className="h-px w-7 bg-green/70" />Les fondateurs</div></Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 120px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7vw, 120px)' }}>
             Deux experts,<br /><span className="text-green">un seul interlocuteur.</span>
           </h2>
         </Reveal>
@@ -428,9 +441,9 @@ const Duo: React.FC = () => {
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {founders.map((f, i) => (
             <Reveal key={f.name} delay={i * 0.1}>
-              <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-cream/12 bg-ink transition-colors hover:border-green/40">
+              <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-cream/12 bg-ink transition-colors duration-500 hover:border-green/45">
                 <div className="relative overflow-hidden">
-                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
+                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale contrast-[1.08] brightness-95 transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
                   {/* hover-reveal : voile + LinkedIn qui apparaît */}
                   <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <a href={f.li} target="_blank" rel="noopener noreferrer"
@@ -441,13 +454,13 @@ const Duo: React.FC = () => {
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-7 md:p-9">
                   <div>
-                    <h3 className="font-display text-3xl text-cream tighter md:text-4xl" style={{ fontWeight: 900 }}>{f.name}</h3>
+                    <h3 className="font-display text-3xl text-cream tighter md:text-4xl" style={{ fontWeight: 500 }}>{f.name}</h3>
                     <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-green">{f.school}</p>
                     <p className="text-sm text-cream-soft">{f.role}</p>
                   </div>
                   <p className="text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
                   <div className="mt-auto flex items-baseline gap-2 border-t border-cream/12 pt-5">
-                    <span className="font-display text-5xl text-cream" style={{ fontWeight: 900 }}><Counter value={f.n} prefix="+" /></span>
+                    <span className="font-display text-5xl text-cream" style={{ fontWeight: 500 }}><Counter value={f.n} prefix="+" /></span>
                     <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-cream-soft">abonnés LinkedIn</span>
                   </div>
                 </div>
@@ -473,7 +486,7 @@ const Method: React.FC = () => {
     <section id="methode" className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.4vw, 120px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7.4vw, 120px)' }}>
             En 3 étapes.<br /><span className="text-green">Pas une de plus.</span>
           </h2>
         </Reveal>
@@ -481,19 +494,19 @@ const Method: React.FC = () => {
         {/* trait qui se dessine (desktop) */}
         <div className="relative mt-16">
           <svg aria-hidden className="absolute left-0 top-9 hidden h-2 w-full md:block" viewBox="0 0 100 2" preserveAspectRatio="none">
-            <motion.line x1="2" y1="1" x2="98" y2="1" stroke="#00FA9A" strokeWidth="0.4" strokeLinecap="round"
+            <motion.line x1="2" y1="1" x2="98" y2="1" stroke="#D9B36A" strokeWidth="0.3" strokeLinecap="round"
               initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 1.1, ease }} />
+              transition={{ duration: 1.6, ease }} />
           </svg>
           <div className="grid gap-5 md:grid-cols-3">
             {steps.map((s, i) => (
               <Reveal key={s.n} delay={i * 0.12}>
                 <div className="group flex h-full flex-col gap-4 rounded-2xl border border-cream/12 bg-ink-2 p-7 transition-colors hover:bg-ink-3 md:p-9">
                   <div className="flex items-center justify-between">
-                    <span className="font-display text-6xl text-cream transition-colors group-hover:text-green tighter md:text-7xl" style={{ fontWeight: 900 }}>{s.n}</span>
-                    <span className="rounded-full bg-green px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-ink" style={{ fontWeight: 900 }}>{s.meta}</span>
+                    <span className="font-display text-6xl text-cream transition-colors group-hover:text-green tighter md:text-7xl" style={{ fontWeight: 500 }}>{s.n}</span>
+                    <span className="rounded-full bg-green px-3 py-1 text-[10px] label-caps text-ink" style={{ fontWeight: 600 }}>{s.meta}</span>
                   </div>
-                  <h3 className="font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 800 }}>{s.t}</h3>
+                  <h3 className="font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 500 }}>{s.t}</h3>
                   <p className="text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
                 </div>
               </Reveal>
@@ -556,7 +569,8 @@ const FORMATIONS: Formation[] = [
     programme: ['Matin · Images (Midjourney V7, DALL-E 4, Firefly 3, Nano Banana Pro), logos, infographies, sites 1h', 'Après-midi · Vidéo & voix (Synthesia, ElevenLabs, Kling/Sora/Veo), repurposing 1 contenu = 8 formats'],
     outils: 'Midjourney · Synthesia · ElevenLabs · Kling · Sora · Veo · CapCut', livrables: 'Guide 30 Outils Créatifs IA 2026 · Pack 50 Prompts Midjourney · Templates Gamma' },
 ];
-const LEVEL_DOT: Record<string, string> = { Socle: '#00FA9A', Métiers: '#7DE3FF', Automatisation: '#FFD27A', Transversal: '#C9A8FF', Production: '#FF8FB0' };
+// Pastilles niveau — palette métallique chaude (dark luxe) plutôt que couleurs vives.
+const LEVEL_DOT: Record<string, string> = { Socle: '#D9B36A', Métiers: '#C9B79A', Automatisation: '#B98E4A', Transversal: '#A8A192', Production: '#8C8073' };
 
 const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, onClose }) => {
   useEffect(() => {
@@ -581,7 +595,7 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
               </span>
               <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-soft">{f.duree}</span>
             </div>
-            <h3 className="font-display text-2xl text-cream tighter md:text-3xl" style={{ fontWeight: 900 }}>{f.t}</h3>
+            <h3 className="font-display text-2xl text-cream tighter md:text-3xl" style={{ fontWeight: 500 }}>{f.t}</h3>
             <p className="mt-1 text-sm italic text-green">« {f.tag} »</p>
           </div>
           <button onClick={onClose} aria-label="Fermer" className="shrink-0 rounded-full border border-cream/15 p-2 text-cream-soft transition hover:bg-cream/10 hover:text-cream">
@@ -613,11 +627,11 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
         </div>
         <div className="flex flex-col items-center justify-between gap-3 border-t border-cream/10 p-6 sm:flex-row md:px-8">
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-3xl text-cream" style={{ fontWeight: 900 }}>{f.prix}</span>
+            <span className="font-display text-3xl text-cream" style={{ fontWeight: 500 }}>{f.prix}</span>
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft">HT / participant</span>
           </div>
           <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-green px-6 py-3 text-sm uppercase tracking-[0.04em] text-ink sm:w-auto" style={{ fontWeight: 900 }}>
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-green px-6 py-3 text-[12px] label-caps text-ink sm:w-auto" style={{ fontWeight: 600 }}>
             Réserver cette formation →
           </Magnetic>
         </div>
@@ -634,12 +648,12 @@ const FormationBlock: React.FC = () => {
     <section id="formation" className="border-y border-cream/10 bg-ink-2 px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green">
-            <span className="rounded bg-green px-2 py-0.5 text-ink" style={{ fontWeight: 900 }}>Bloc 1</span> Organisme de formation Qualiopi
+          <div className="mb-4 flex items-center gap-2 text-[11px] font-medium label-caps text-green">
+            <span className="rounded bg-green px-2 py-0.5 text-ink" style={{ fontWeight: 600 }}>Bloc 1</span> Organisme de formation Qualiopi
           </div>
         </Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 116px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7vw, 116px)' }}>
             10 formations.<br /><span className="text-green">70 % de pratique.</span>
           </h2>
         </Reveal>
@@ -671,12 +685,12 @@ const FormationBlock: React.FC = () => {
                 <SpotlightCard className="h-full rounded-2xl border border-cream/12 bg-ink transition-colors hover:border-green/40">
                   <button type="button" onClick={() => setOpen(f)} className="flex h-full w-full flex-col items-start gap-3 p-6 text-left">
                     <div className="flex w-full items-center justify-between">
-                      <span className="font-display text-sm text-cream-soft" style={{ fontWeight: 800 }}>{f.code}</span>
+                      <span className="font-display text-sm text-cream-soft" style={{ fontWeight: 600 }}>{f.code}</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-cream/12 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-cream-soft">
                         <span className="h-1.5 w-1.5 rounded-full" style={{ background: LEVEL_DOT[f.niveau] }} />{f.niveau}
                       </span>
                     </div>
-                    <h3 className="font-display text-xl leading-tight text-cream transition-colors group-hover:text-green md:text-2xl" style={{ fontWeight: 800 }}>{f.t}</h3>
+                    <h3 className="font-display text-xl leading-tight text-cream transition-colors group-hover:text-green md:text-2xl" style={{ fontWeight: 500 }}>{f.t}</h3>
                     <p className="text-sm leading-relaxed text-cream-soft">{f.tag}</p>
                     <div className="mt-auto flex w-full items-center justify-between pt-3">
                       <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-cream-soft">{f.duree} · {f.prix}</span>
@@ -698,7 +712,7 @@ const FormationBlock: React.FC = () => {
           ].map((c, i) => (
             <Reveal key={c.t} delay={i * 0.08}>
               <div className="flex h-full flex-col gap-2 rounded-2xl border border-cream/12 bg-ink p-6">
-                <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 800 }}>{c.t}</h3>
+                <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 500 }}>{c.t}</h3>
                 <p className="text-sm leading-relaxed text-cream-soft">{c.d}</p>
                 <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green">{c.price}</span>
               </div>
@@ -715,7 +729,7 @@ const FormationBlock: React.FC = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-green">Financement</p>
-                <h3 className="mt-1 font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 800 }}>Formations finançables OPCO.</h3>
+                <h3 className="mt-1 font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 500 }}>Formations finançables OPCO.</h3>
                 <p className="mt-2 text-sm leading-relaxed text-cream-soft md:text-[15px]">
                   Organisme certifié Qualiopi : prise en charge possible jusqu'à 100 %, interlocuteur unique côté AXEM, démarches simplifiées.
                 </p>
@@ -726,7 +740,7 @@ const FormationBlock: React.FC = () => {
                     { n: '03', t: 'Formation', d: 'Équipes opérationnelles dès J+1, livrables concrets, suivi post-formation.' },
                   ].map((s) => (
                     <div key={s.n} className="rounded-xl border border-cream/10 bg-ink-2 p-4">
-                      <span className="font-display text-lg text-green" style={{ fontWeight: 900 }}>{s.n}</span>
+                      <span className="font-display text-lg text-green" style={{ fontWeight: 600 }}>{s.n}</span>
                       <p className="mt-1 text-sm font-bold text-cream">{s.t}</p>
                       <p className="mt-1 text-[13px] leading-relaxed text-cream-soft">{s.d}</p>
                     </div>
@@ -758,12 +772,12 @@ const ConseilBlock: React.FC = () => {
     <section id="conseil" className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green">
-            <span className="rounded bg-green px-2 py-0.5 text-ink" style={{ fontWeight: 900 }}>Bloc 2</span> Agence · Conseil & déploiement
+          <div className="mb-4 flex items-center gap-2 text-[11px] font-medium label-caps text-green">
+            <span className="rounded bg-green px-2 py-0.5 text-ink" style={{ fontWeight: 600 }}>Bloc 2</span> Agence · Conseil & déploiement
           </div>
         </Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 116px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7vw, 116px)' }}>
             De l'audit<br /><span className="outline-green">à l'autonomie.</span>
           </h2>
         </Reveal>
@@ -779,9 +793,9 @@ const ConseilBlock: React.FC = () => {
               <SpotlightCard className="h-full rounded-2xl border border-cream/12 bg-ink-2 transition-colors hover:border-green/40">
                 <div className="flex h-full flex-col gap-3 p-7">
                   <div className="flex items-center justify-between">
-                    <span className="font-display text-4xl text-cream/20 md:text-5xl" style={{ fontWeight: 900 }}>{s.n}</span>
+                    <span className="font-display text-4xl text-cream/25 md:text-5xl" style={{ fontWeight: 500 }}>{s.n}</span>
                   </div>
-                  <h3 className="font-display text-xl text-cream transition-colors group-hover:text-green md:text-2xl" style={{ fontWeight: 800 }}>{s.t}</h3>
+                  <h3 className="font-display text-xl text-cream transition-colors group-hover:text-green md:text-2xl" style={{ fontWeight: 500 }}>{s.t}</h3>
                   <p className="text-sm leading-relaxed text-cream-soft">{s.d}</p>
                   <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green">{s.price}</span>
                 </div>
@@ -811,9 +825,9 @@ const Cases: React.FC = () => {
   return (
     <section id="resultats" className="border-y border-cream/10 bg-ink-2 px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Cas clients</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-3 text-[11px] font-medium label-caps text-green"><span className="h-px w-7 bg-green/70" />Cas clients</div></Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 120px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7vw, 120px)' }}>
             Des résultats.<br /><span className="outline-green">Pas des slides.</span>
           </h2>
         </Reveal>
@@ -825,7 +839,7 @@ const Cases: React.FC = () => {
           {stats.map((s, i) => (
             <Reveal key={s.l} delay={i * 0.08}>
               <div className="group cursor-default">
-                <div className="font-display leading-[0.85] text-cream transition-colors group-hover:text-green tighter" style={{ fontWeight: 900, fontSize: 'clamp(44px, 6vw, 96px)' }}>
+                <div className="font-display leading-[0.85] text-cream transition-colors group-hover:text-green tighter" style={{ fontWeight: 500, fontSize: 'clamp(44px, 6vw, 96px)' }}>
                   <Counter value={s.v} prefix={(s as any).p || ''} suffix={s.s || ''} />
                 </div>
                 <div className="mt-3 text-[13px] font-semibold leading-snug text-cream-soft">{s.l}</div>
@@ -837,7 +851,7 @@ const Cases: React.FC = () => {
           {stats2.map((s, i) => (
             <Reveal key={s.l} delay={i * 0.08}>
               <div className="group cursor-default">
-                <div className="font-display leading-[0.85] text-cream transition-colors group-hover:text-green tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 5vw, 80px)' }}>
+                <div className="font-display leading-[0.85] text-cream transition-colors group-hover:text-green tighter" style={{ fontWeight: 500, fontSize: 'clamp(40px, 5vw, 80px)' }}>
                   <Counter value={s.v} prefix={(s as any).p || ''} suffix={s.s || ''} />
                 </div>
                 <div className="mt-3 text-[13px] font-semibold leading-snug text-cream-soft">{s.l}</div>
@@ -848,9 +862,9 @@ const Cases: React.FC = () => {
 
         <Reveal delay={0.1}>
           <a href={NOTION_CASES} target="_blank" rel="noopener noreferrer"
-            className="group mt-14 inline-flex items-center gap-2.5 rounded-full border border-green/40 bg-green/10 px-6 py-3.5 text-sm font-bold uppercase tracking-[0.06em] text-green transition hover:bg-green hover:text-ink">
+            className="group mt-14 inline-flex items-center gap-2.5 rounded-full border border-green/50 bg-transparent px-7 py-3.5 text-[12px] font-medium label-caps text-green transition-colors duration-500 hover:bg-green hover:text-ink">
             Voir tous les cas clients en détail
-            <span className="transition-transform group-hover:translate-x-1">→</span>
+            <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
           </a>
         </Reveal>
       </div>
@@ -872,9 +886,9 @@ const Why: React.FC = () => {
   return (
     <section className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Pourquoi AXEM</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-3 text-[11px] font-medium label-caps text-green"><span className="h-px w-7 bg-green/70" />Pourquoi AXEM</div></Reveal>
         <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 116px)' }}>
+          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 7vw, 116px)' }}>
             5 raisons<br /><span className="text-green">de nous choisir.</span>
           </h2>
         </Reveal>
@@ -882,8 +896,8 @@ const Why: React.FC = () => {
           {reasons.map((r, i) => (
             <Reveal key={r.n} delay={Math.min(i, 5) * 0.06}>
               <div className="flex h-full flex-col gap-2.5 rounded-2xl border border-cream/12 bg-ink-2 p-7">
-                <span className="font-display text-3xl text-green" style={{ fontWeight: 900 }}>{r.n}</span>
-                <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 800 }}>{r.t}</h3>
+                <span className="font-display text-3xl text-green" style={{ fontWeight: 600 }}>{r.n}</span>
+                <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 500 }}>{r.t}</h3>
                 <p className="text-sm leading-relaxed text-cream-soft md:text-[15px]">{r.d}</p>
               </div>
             </Reveal>
@@ -916,9 +930,9 @@ const FinalCTA: React.FC = () => {
       <div className="mx-auto max-w-[1400px]">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr]">
           <div>
-            <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Rendez-vous</div></Reveal>
+            <Reveal><div className="mb-5 flex items-center gap-3 text-[11px] font-medium label-caps text-green"><span className="h-px w-7 bg-green/70" />Rendez-vous</div></Reveal>
             <Reveal delay={0.08}>
-              <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 96px)' }}>
+              <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(40px, 6vw, 96px)' }}>
                 Démarrons par un<br /><span className="text-green">diagnostic gratuit.</span>
               </h2>
             </Reveal>
@@ -951,8 +965,8 @@ const FinalCTA: React.FC = () => {
 const Footer: React.FC = () => (
   <footer className="bg-ink px-5 py-16 md:px-8">
     <div className="mx-auto max-w-[1400px]">
-      <div className="font-display leading-[0.85] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(64px, 16vw, 260px)' }}>
-        AXEM<span className="text-green">.</span>
+      <div className="font-display leading-[0.85] text-cream tighter" style={{ fontWeight: 400, fontSize: 'clamp(64px, 16vw, 260px)' }}>
+        AXEM<span className="serif-italic text-green">.</span>
       </div>
       <div className="mt-12 grid gap-10 border-t border-cream/12 pt-12 md:grid-cols-4">
         <div className="md:col-span-2">
