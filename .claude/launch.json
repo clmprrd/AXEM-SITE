@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "logos", "runtimeExecutable": "python3", "runtimeArgs": ["-m","http.server","8778","--directory","public/logos"], "port": 8778 }
+    { "name": "logos", "runtimeExecutable": "python3", "runtimeArgs": ["-m","http.server","8778","--directory","public/logos"], "port": 8778 },
+    { "name": "vibe-editorial", "runtimeExecutable": "npm", "runtimeArgs": ["run","dev","--","--port","3007"], "port": 3007 }
   ]
 }
