@@ -9,58 +9,99 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+      // ============================================================
+      // VIBE « BRUTALIST SWISS » — contraste maximal, brut, énergique.
+      // Noir #000 / blanc cassé #F2F0EA · un seul accent acide #C6FF00.
+      // Archivo 900 caps géant · JetBrains Mono pour labels/prix.
+      // Aliases conservés (ink/cream/green) → contenu/structure inchangés,
+      // seules les VALEURS changent (re-skin pur).
+      // ============================================================
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              ink: "#0F0F0F",
-              "ink-2": "#161616",
-              "ink-3": "#1E1E1E",
-              cream: "#FAFAF7",
-              "cream-soft": "#A8A8A2",
-              "cream-dim": "#6E6E68",
-              green: "#00FA9A",
-              "green-deep": "#00B86F",
+              // base brutalist
+              ink: "#000000",          // noir absolu
+              "ink-2": "#0A0A0A",      // aplat quasi-noir
+              "ink-3": "#141414",
+              cream: "#F2F0EA",        // blanc cassé (texte clair)
+              "cream-soft": "#9C9A92", // gris brut
+              "cream-dim": "#6A6862",
+              green: "#C6FF00",        // accent acide UNIQUE (vert citron)
+              "green-deep": "#A8DB00",
             },
             fontFamily: {
-              sans: ["Inter", "sans-serif"],
-              display: ["Archivo", "Inter", "sans-serif"],
-            }
+              sans: ["Archivo", "Inter", "sans-serif"],
+              display: ["Archivo", "sans-serif"],
+              mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
+            },
+            borderRadius: {
+              // brutalist = zéro arrondi : on neutralise toute l'échelle
+              none: "0", sm: "0", DEFAULT: "0", md: "0", lg: "0",
+              xl: "0", "2xl": "0", "3xl": "0", full: "9999px",
+            },
+            boxShadow: {
+              // pas d'ombres douces : seules des ombres dures "hard" subsistent
+              none: "none",
+              hard: "6px 6px 0 0 #000000",
+              "hard-acid": "6px 6px 0 0 #C6FF00",
+            },
           },
         },
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      html { scroll-padding-top: 80px; background-color: #0F0F0F; }
+      html { scroll-padding-top: 72px; background-color: #000000; }
       body {
-        font-family: 'Inter', sans-serif;
-        background-color: #0F0F0F;
-        color: #FAFAF7;
+        font-family: 'Archivo', 'Inter', sans-serif;
+        background-color: #000000;
+        color: #F2F0EA;
         overflow-x: hidden;
       }
-      .font-display { font-family: 'Archivo', 'Inter', sans-serif; }
-      ::selection { background: #00FA9A; color: #0F0F0F; }
-      ::-moz-selection { background: #00FA9A; color: #0F0F0F; }
+      .font-display { font-family: 'Archivo', sans-serif; }
+      .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+      /* sélection = invert acide */
+      ::selection { background: #C6FF00; color: #000000; }
+      ::-moz-selection { background: #C6FF00; color: #000000; }
+
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* huge type kills its own tracking */
-      .tight { letter-spacing: -0.04em; }
-      .tighter { letter-spacing: -0.055em; }
+
+      /* huge type kills its own tracking — brutalist serre encore plus */
+      .tight { letter-spacing: -0.045em; }
+      .tighter { letter-spacing: -0.06em; }
+
+      /* contour : version brutalist swiss (stroke épais, blanc cassé / acide) */
       .outline-type {
         color: transparent;
-        -webkit-text-stroke: 1.5px #FAFAF7;
+        -webkit-text-stroke: 2px #F2F0EA;
       }
       .outline-green {
         color: transparent;
-        -webkit-text-stroke: 1.5px #00FA9A;
+        -webkit-text-stroke: 2px #C6FF00;
       }
+
+      /* GRILLE 12 colonnes — overlay subtil de fond (suisse/brut) */
+      .swiss-grid-bg {
+        background-image:
+          linear-gradient(90deg, rgba(242,240,234,0.05) 1px, transparent 1px);
+        background-size: calc(100% / 12) 100%;
+      }
+
+      /* hover INVERT brutal (réutilisé sur cartes / CTA) */
+      .invert-hover { transition: background-color .18s linear, color .18s linear, border-color .18s linear; }
+
       @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+      .marquee-track { animation: marquee 26s linear infinite; will-change: transform; }
+
       /* respect users who prefer reduced motion */
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+        .marquee-track { animation: none !important; }
       }
       /* Calendly inline widget — keep it from overflowing on mobile */
       .calendly-inline-widget { max-width: 100%; }
