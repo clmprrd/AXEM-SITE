@@ -3,14 +3,29 @@ import {
   motion, AnimatePresence, useMotionValue, useSpring, useTransform,
   useScroll, useInView, useReducedMotion, MotionConfig,
 } from 'framer-motion';
+import Grainient from '../components/Grainient';
 
 // =====================================================================
-// AXEM IA — PAGE PRODUCTION-READY · VIBE « SOFT AURORA / GLASS »
-// Clair pastel aurora · violet #A855F7 + cyan #38BDF8 · Inter · glassmorphism.
+// AXEM IA — PAGE PRODUCTION-READY · DA « BLEU NUIT / NAVY GLASS »
+// Sombre navy · bleu électrique #5B8CFF + cyan #38BDF8 · Inter · glass + quadrillage.
 // Structure (inchangée) : Hero → Trust → Problème → Duo → Méthode →
 //   BLOC 1 Formation → BLOC 2 Conseil → Cas clients → Pourquoi → CTA → Footer
 // Effets doux (transform/opacity only · whileInView once · reducedMotion).
+// Hero = Grainient navy + quadrillage + sélecteur 5 variantes (live state).
 // =====================================================================
+
+// 5 variantes de gradient navy pour le Grainient du hero (togglables en live)
+const NAVY = {
+  nuit:    { color1: '#2A4BD0', color2: '#0EA5E9', color3: '#05091A' },
+  indigo:  { color1: '#6366F1', color2: '#3B82F6', color3: '#0A0F2C' },
+  cyan:    { color1: '#38BDF8', color2: '#2563EB', color3: '#06101F' },
+  violet:  { color1: '#818CF8', color2: '#4F46E5', color3: '#0B0B1A' },
+  azur:    { color1: '#5B8CFF', color2: '#1E40AF', color3: '#070C1A' },
+} as const;
+type NavyKey = keyof typeof NAVY;
+const NAVY_LABELS: Record<NavyKey, string> = {
+  nuit: 'Nuit', indigo: 'Indigo', cyan: 'Cyan', violet: 'Violet', azur: 'Azur',
+};
 
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CALENDLY_EMBED = 'https://calendly.com/clem-pred/30min?hide_gdpr_banner=1';
@@ -26,15 +41,15 @@ const ease = [0.16, 1, 0.3, 1] as const;
 // =====================================================================
 const AuroraBlobs: React.FC<{ className?: string }> = ({ className = '' }) => (
   <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
-    {/* blob 1 — indigo/violet */}
-    <div className="aurora-blob drift-1 absolute -left-[12%] -top-[14%] h-[62vh] w-[62vh] rounded-full opacity-70 blur-3xl"
-      style={{ background: 'radial-gradient(circle at 50% 50%, #C9B8FF 0%, rgba(201,184,255,0) 70%)' }} />
-    {/* blob 2 — rose/pêche */}
-    <div className="aurora-blob drift-2 absolute -right-[10%] top-[6%] h-[58vh] w-[58vh] rounded-full opacity-70 blur-3xl"
-      style={{ background: 'radial-gradient(circle at 50% 50%, #FFC9E2 0%, rgba(255,201,226,0) 70%)' }} />
-    {/* blob 3 — cyan/mint */}
-    <div className="aurora-blob drift-3 absolute bottom-[-18%] left-[28%] h-[56vh] w-[56vh] rounded-full opacity-60 blur-3xl"
-      style={{ background: 'radial-gradient(circle at 50% 50%, #A6E9FF 0%, rgba(166,233,255,0) 70%)' }} />
+    {/* blob 1 — bleu électrique */}
+    <div className="aurora-blob drift-1 absolute -left-[12%] -top-[14%] h-[62vh] w-[62vh] rounded-full opacity-50 blur-3xl"
+      style={{ background: 'radial-gradient(circle at 50% 50%, #2A4BD0 0%, rgba(42,75,208,0) 70%)' }} />
+    {/* blob 2 — indigo */}
+    <div className="aurora-blob drift-2 absolute -right-[10%] top-[6%] h-[58vh] w-[58vh] rounded-full opacity-45 blur-3xl"
+      style={{ background: 'radial-gradient(circle at 50% 50%, #4F46E5 0%, rgba(79,70,229,0) 70%)' }} />
+    {/* blob 3 — cyan */}
+    <div className="aurora-blob drift-3 absolute bottom-[-18%] left-[28%] h-[56vh] w-[56vh] rounded-full opacity-40 blur-3xl"
+      style={{ background: 'radial-gradient(circle at 50% 50%, #0EA5E9 0%, rgba(14,165,233,0) 70%)' }} />
   </div>
 );
 
@@ -124,7 +139,7 @@ const SpotlightCard: React.FC<{ children: React.ReactNode; className?: string }>
   };
   const bg = useTransform(
     [mx, my],
-    ([x, y]: number[]) => `radial-gradient(220px circle at ${x}px ${y}px, rgba(168,85,247,0.14), transparent 72%)`
+    ([x, y]: number[]) => `radial-gradient(220px circle at ${x}px ${y}px, rgba(91,140,255,0.16), transparent 72%)`
   );
   return (
     <div
@@ -145,7 +160,7 @@ const ScrollProgress: React.FC = () => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
   return (
-    <motion.div aria-hidden style={{ scaleX, background: 'linear-gradient(90deg, #A855F7, #38BDF8)' }}
+    <motion.div aria-hidden style={{ scaleX, background: 'linear-gradient(90deg, #5B8CFF, #38BDF8)' }}
       className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left" />
   );
 };
@@ -154,10 +169,12 @@ const ScrollProgress: React.FC = () => {
 const TrustLogo: React.FC<{ name: string; src?: string }> = ({ name, src }) => {
   const [err, setErr] = useState(false);
   return (
-    <div className="glass flex h-20 items-center justify-center rounded-2xl px-5 transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(124,58,237,0.28)]">
+    <div className="glass flex h-20 items-center justify-center rounded-2xl px-5 transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
       {src && !err ? (
-        <img src={src} alt={name} loading="lazy" decoding="async" onError={() => setErr(true)}
-          className="max-h-9 w-auto max-w-[150px] object-contain" />
+        <span className="flex items-center justify-center rounded-xl bg-white px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.25)]">
+          <img src={src} alt={name} loading="lazy" decoding="async" onError={() => setErr(true)}
+            className="max-h-8 w-auto max-w-[130px] object-contain" />
+        </span>
       ) : (
         <span className="text-center font-display text-[15px] font-extrabold tracking-tight text-cream md:text-base">{name}</span>
       )}
@@ -180,7 +197,7 @@ const Nav: React.FC = () => {
     return () => window.removeEventListener('scroll', h);
   }, []);
   return (
-    <nav className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${s ? 'border-b border-white/40 bg-white/60 py-3 shadow-[0_8px_30px_-18px_rgba(124,58,237,0.4)] backdrop-blur-xl' : 'py-5'}`}>
+    <nav className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${s ? 'border-b border-[rgba(120,160,255,0.14)] bg-[rgba(7,11,22,0.72)] py-3 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.7)] backdrop-blur-xl' : 'py-5'}`}>
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 md:px-8">
         <a href="#top" className="font-display text-2xl tracking-tighter text-cream" style={{ fontWeight: 900 }}>
           AXEM<span className="aurora-text">.</span>
@@ -193,7 +210,7 @@ const Nav: React.FC = () => {
           ))}
         </div>
         <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
-          className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#9333EA] to-green-deep px-5 py-2.5 text-[13px] uppercase tracking-[0.06em] text-white shadow-[0_8px_24px_-10px_rgba(168,85,247,0.7)]" style={{ fontWeight: 800 }}>
+          className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-green to-cyan px-5 py-2.5 text-[13px] uppercase tracking-[0.06em] text-[#06101F] shadow-[0_8px_24px_-10px_rgba(91,140,255,0.8)]" style={{ fontWeight: 800 }}>
           Rendez-vous <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </Magnetic>
       </div>
@@ -202,22 +219,60 @@ const Nav: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// HERO — Aurora claire · 3 blobs pastel qui dérivent · glass chip · titre aurora
+// HERO SWITCHER — sélecteur fixe (haut droite) · 5 variantes navy en live
 // ---------------------------------------------------------------------
-const Hero: React.FC = () => {
+const HeroSwitcher: React.FC<{ value: NavyKey; onChange: (k: NavyKey) => void }> = ({ value, onChange }) => (
+  <div className="fixed right-4 top-20 z-[55] md:right-6 md:top-24">
+    <div className="glass-strong flex flex-col gap-2 rounded-2xl p-2.5">
+      <span className="px-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-soft">Hero navy</span>
+      <div className="flex flex-col gap-1.5">
+        {(Object.keys(NAVY) as NavyKey[]).map((k) => {
+          const active = k === value;
+          return (
+            <button
+              key={k} type="button" onClick={() => onChange(k)}
+              aria-pressed={active}
+              className={`group flex items-center gap-2 rounded-xl px-2 py-1.5 text-left transition ${active ? 'bg-white/8' : 'hover:bg-white/5'}`}>
+              <span className="h-4 w-4 shrink-0 rounded-full ring-1 ring-white/25"
+                style={{ background: `linear-gradient(135deg, ${NAVY[k].color1}, ${NAVY[k].color2})` }} />
+              <span className={`text-[11px] font-bold uppercase tracking-[0.08em] ${active ? 'text-cream' : 'text-cream-soft'}`}>
+                {NAVY_LABELS[k]}
+              </span>
+              {active && <span className="ml-auto text-[10px] text-green">●</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+);
+
+// ---------------------------------------------------------------------
+// HERO — Grainient navy (5 variantes live) · quadrillage · scrim · glass
+// ---------------------------------------------------------------------
+const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
   const reduce = useReducedMotion();
+  const p = NAVY[navy];
+  const pills = ['Stratégie IA', 'Formation sur-mesure', 'Automatisation n8n'];
   return (
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-32 md:px-8">
-      {/* BACKGROUND — aurora claire : base dégradée pastel + 3 blobs qui dérivent */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: 'linear-gradient(150deg, #ECE6FF 0%, #FFE9F3 48%, #FFF5EC 100%)' }} />
-      <AuroraBlobs className="z-0" />
-      {/* léger voile clair derrière le texte (lisibilité douce) */}
+      {/* BACKGROUND — gradient navy WebGL (Grainient), recoloré en live */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <Grainient
+          className="h-full w-full"
+          color1={p.color1} color2={p.color2} color3={p.color3}
+          timeSpeed={reduce ? 0 : 0.18} grainAmount={0.08} contrast={1.35}
+          saturation={1.05} zoom={0.95} warpStrength={1.2}
+        />
+      </div>
+      {/* QUADRILLAGE — grille fine navy, fondue aux bords */}
+      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
+      {/* SCRIM — assombrit pour la lisibilité du texte (AA) */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(60% 50% at 50% 44%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.18) 46%, transparent 74%)' }} />
-      {/* fondu bas vers le site clair */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[22%]"
-        style={{ background: 'linear-gradient(180deg, transparent, #FBF7FF)' }} />
+        style={{ background: 'radial-gradient(70% 60% at 50% 44%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
+      {/* fondu bas vers le site navy */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[24%]"
+        style={{ background: 'linear-gradient(180deg, transparent, #070B16)' }} />
 
       {/* CONTENU */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
@@ -250,7 +305,7 @@ const Hero: React.FC = () => {
 
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease }}
           className="mt-7 max-w-2xl font-display text-xl font-bold leading-snug text-cream md:text-2xl">
-          On vous forme, on vous conseille, on déploie. <span className="text-green-deep">Et on reste.</span>
+          On vous forme, on vous conseille, on déploie. <span className="text-cyan">Et on reste.</span>
         </motion.p>
 
         <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82, ease }}
@@ -258,30 +313,41 @@ const Hero: React.FC = () => {
           Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Nous accompagnons entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour déployer des solutions IA concrètes.
         </motion.p>
 
+        {/* 3 pills glass */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.9, ease }}
+          className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
+          {pills.map((label) => (
+            <span key={label} className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-cream md:text-[13px]">
+              <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
+              {label}
+            </span>
+          ))}
+        </motion.div>
+
         {/* double CTA */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.94, ease }}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
           className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
           <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
-            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-[#9333EA] to-green-deep px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-white shadow-[0_14px_44px_-12px_rgba(168,85,247,0.65)]" style={{ fontWeight: 900 }}>
+            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)]" style={{ fontWeight: 900 }}>
             <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
             <span className="relative">Prendre rendez-vous</span>
             <span className="relative transition-transform group-hover:translate-x-1">→</span>
           </Magnetic>
-          <a href="#formation" className="glass inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(124,58,237,0.28)]">
+          <a href="#formation" className="glass inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
             Voir le catalogue <span aria-hidden>↓</span>
           </a>
         </motion.div>
 
-        {/* badge preuve sociale duo (+55 000) avec les 2 avatars */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.06, ease }}
+        {/* preuve sociale — « Ils nous font confiance » + avatars duo (+55 000) */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.12, ease }}
           className="glass mt-10 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-5">
           <div className="flex -space-x-2.5">
-            <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-white/90" loading="lazy" />
-            <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-white/90" loading="lazy" />
+            <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
+            <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
           </div>
           <span className="text-sm font-semibold text-cream">
-            <span className="text-green-deep">+55 000</span> abonnés LinkedIn nous suivent
+            <span className="text-cyan">Ils nous font confiance</span> · +55 000 abonnés LinkedIn
           </span>
         </motion.div>
       </div>
@@ -311,7 +377,7 @@ const Trust: React.FC = () => {
     { name: 'Cegos', src: '/logos/cegos.png' },
   ];
   return (
-    <section id="references" className="relative border-y border-green/10 bg-white/40 px-5 py-20 md:px-8 md:py-24">
+    <section id="references" className="relative border-y border-green/10 bg-white/[0.02] px-5 py-20 md:px-8 md:py-24">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <div className="mb-12 flex flex-col items-center gap-2 text-center">
@@ -351,7 +417,7 @@ const Trust: React.FC = () => {
         {/* QUALIOPI réel */}
         <Reveal delay={0.1}>
           <div className="glass mt-12 flex flex-col items-center justify-center gap-4 rounded-3xl p-6 sm:flex-row sm:gap-6">
-            <div className="flex h-24 items-center justify-center rounded-2xl bg-white px-7 py-3 shadow-[0_1px_3px_rgba(124,58,237,0.12)]">
+            <div className="flex h-24 items-center justify-center rounded-2xl bg-white px-7 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.35)]">
               <img src="/logos/qualiopi.png" alt="Certification Qualiopi" className="max-h-16 w-auto object-contain" loading="lazy" />
             </div>
             <p className="max-w-md text-center text-sm leading-relaxed text-cream-soft sm:text-left">
@@ -412,7 +478,7 @@ const Duo: React.FC = () => {
     { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Institut Polytechnique de Paris', role: 'Tech · Déploiement · Systèmes', desc: "L'ingénieur. Je conçois et déploie l'IA en production. Expérience secteur financier & Private Equity.", n: 15000, li: 'https://www.linkedin.com/in/alexiszeitoun/' },
   ];
   return (
-    <section id="duo" className="border-y border-green/10 bg-white/45 px-5 py-24 md:px-8 md:py-32">
+    <section id="duo" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Les fondateurs</div></Reveal>
         <Reveal delay={0.08}>
@@ -429,7 +495,7 @@ const Duo: React.FC = () => {
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {founders.map((f, i) => (
             <Reveal key={f.name} delay={i * 0.1}>
-              <div className="group flex h-full flex-col overflow-hidden rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(124,58,237,0.4)]">
+              <div className="group flex h-full flex-col overflow-hidden rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                 <div className="relative overflow-hidden">
                   <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
                   {/* hover-reveal : voile + LinkedIn qui apparaît */}
@@ -482,14 +548,14 @@ const Method: React.FC = () => {
         {/* trait qui se dessine (desktop) */}
         <div className="relative mt-16">
           <svg aria-hidden className="absolute left-0 top-9 hidden h-2 w-full md:block" viewBox="0 0 100 2" preserveAspectRatio="none">
-            <motion.line x1="2" y1="1" x2="98" y2="1" stroke="#A855F7" strokeWidth="0.4" strokeLinecap="round"
+            <motion.line x1="2" y1="1" x2="98" y2="1" stroke="#5B8CFF" strokeWidth="0.4" strokeLinecap="round"
               initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 1.1, ease }} />
           </svg>
           <div className="grid gap-5 md:grid-cols-3">
             {steps.map((s, i) => (
               <Reveal key={s.n} delay={i * 0.12}>
-                <div className="group flex h-full flex-col gap-4 rounded-2xl glass p-7 transition-colors hover:bg-white/70 md:p-9">
+                <div className="group flex h-full flex-col gap-4 rounded-2xl glass p-7 transition-colors hover:bg-white/[0.05] md:p-9">
                   <div className="flex items-center justify-between">
                     <span className="font-display text-6xl text-cream transition-colors group-hover:text-green tighter md:text-7xl" style={{ fontWeight: 900 }}>{s.n}</span>
                     <span className="rounded-full bg-green-deep px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-white" style={{ fontWeight: 900 }}>{s.meta}</span>
@@ -557,7 +623,7 @@ const FORMATIONS: Formation[] = [
     programme: ['Matin · Images (Midjourney V7, DALL-E 4, Firefly 3, Nano Banana Pro), logos, infographies, sites 1h', 'Après-midi · Vidéo & voix (Synthesia, ElevenLabs, Kling/Sora/Veo), repurposing 1 contenu = 8 formats'],
     outils: 'Midjourney · Synthesia · ElevenLabs · Kling · Sora · Veo · CapCut', livrables: 'Guide 30 Outils Créatifs IA 2026 · Pack 50 Prompts Midjourney · Templates Gamma' },
 ];
-const LEVEL_DOT: Record<string, string> = { Socle: '#A855F7', Métiers: '#38BDF8', Automatisation: '#FBBF6B', Transversal: '#C9A8FF', Production: '#FF8FB0' };
+const LEVEL_DOT: Record<string, string> = { Socle: '#5B8CFF', Métiers: '#38BDF8', Automatisation: '#22D3EE', Transversal: '#818CF8', Production: '#60A5FA' };
 
 const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, onClose }) => {
   useEffect(() => {
@@ -569,10 +635,10 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
   return (
     <motion.div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-6"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-      <div className="absolute inset-0 backdrop-blur-md" style={{ background: 'rgba(124,58,237,0.18)' }} onClick={onClose} />
+      <div className="absolute inset-0 backdrop-blur-md" style={{ background: 'rgba(5,9,20,0.6)' }} onClick={onClose} />
       <motion.div role="dialog" aria-modal="true" aria-label={`${f.code} — ${f.t}`}
         initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }} transition={{ duration: 0.3, ease }}
-        className="glass-strong relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl bg-white/90 sm:rounded-3xl">
+        className="glass-strong relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl">
         <div className="flex items-start justify-between gap-4 border-b border-green/12 p-6 md:p-8">
           <div>
             <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -632,7 +698,7 @@ const FormationBlock: React.FC = () => {
   const [open, setOpen] = useState<Formation | null>(null);
   const filtered = level === 'Tous' ? FORMATIONS : FORMATIONS.filter((f) => f.niveau === level);
   return (
-    <section id="formation" className="border-y border-green/10 bg-white/45 px-5 py-24 md:px-8 md:py-32">
+    <section id="formation" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep">
@@ -669,7 +735,7 @@ const FormationBlock: React.FC = () => {
               <motion.div key={f.code} layout
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.4, delay: Math.min(i, 6) * 0.04, ease }}>
-                <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(124,58,237,0.4)]">
+                <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                   <button type="button" onClick={() => setOpen(f)} className="flex h-full w-full flex-col items-start gap-3 p-6 text-left">
                     <div className="flex w-full items-center justify-between">
                       <span className="font-display text-sm text-cream-soft" style={{ fontWeight: 800 }}>{f.code}</span>
@@ -777,7 +843,7 @@ const ConseilBlock: React.FC = () => {
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((s, i) => (
             <Reveal key={s.n} delay={Math.min(i, 5) * 0.06}>
-              <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(124,58,237,0.4)]">
+              <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                 <div className="flex h-full flex-col gap-3 p-7">
                   <div className="flex items-center justify-between">
                     <span className="font-display text-4xl text-green/30 md:text-5xl" style={{ fontWeight: 900 }}>{s.n}</span>
@@ -810,7 +876,7 @@ const Cases: React.FC = () => {
     { v: 95, s: ' k€', l: 'de charge annuelle neutralisée' },
   ];
   return (
-    <section id="resultats" className="border-y border-green/10 bg-white/45 px-5 py-24 md:px-8 md:py-32">
+    <section id="resultats" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Cas clients</div></Reveal>
         <Reveal delay={0.08}>
@@ -913,7 +979,7 @@ const FinalCTA: React.FC = () => {
     // on ne retire pas le script au démontage : la page est mono-route
   }, []);
   return (
-    <section id="rdv" className="border-t border-green/10 bg-white/45 px-5 py-24 md:px-8 md:py-32">
+    <section id="rdv" className="border-t border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr]">
           <div>
@@ -951,8 +1017,8 @@ const FinalCTA: React.FC = () => {
 // ---------------------------------------------------------------------
 const Footer: React.FC = () => (
   <footer className="relative overflow-hidden border-t border-green/12 px-5 py-16 md:px-8"
-    style={{ background: 'linear-gradient(180deg, #FBF7FF 0%, #F3ECFF 100%)' }}>
-    <AuroraBlobs className="opacity-60" />
+    style={{ background: 'linear-gradient(180deg, #0B1020 0%, #070B16 100%)' }}>
+    <AuroraBlobs className="opacity-50" />
     <div className="relative z-10 mx-auto max-w-[1400px]">
       <div className="font-display aurora-text leading-[0.85] tighter" style={{ fontWeight: 900, fontSize: 'clamp(64px, 16vw, 260px)' }}>
         AXEM<span className="text-cream">.</span>
@@ -992,13 +1058,16 @@ const Footer: React.FC = () => (
 // ---------------------------------------------------------------------
 // PAGE
 // ---------------------------------------------------------------------
-const Home: React.FC = () => (
+const Home: React.FC = () => {
+  const [navy, setNavy] = useState<NavyKey>('azur');
+  return (
   <MotionConfig reducedMotion="user">
-    <div className="min-h-screen text-cream" style={{ background: 'linear-gradient(180deg, #FBF7FF 0%, #FFF5EC 50%, #F3ECFF 100%)' }}>
+    <div className="min-h-screen text-cream" style={{ background: 'linear-gradient(180deg, #070B16 0%, #0B1020 50%, #0D1526 100%)' }}>
       <ScrollProgress />
       <Nav />
+      <HeroSwitcher value={navy} onChange={setNavy} />
       <main>
-        <Hero />
+        <Hero navy={navy} />
         <Trust />
         <Problem />
         <Duo />
@@ -1012,6 +1081,7 @@ const Home: React.FC = () => (
       <Footer />
     </div>
   </MotionConfig>
-);
+  );
+};
 
 export default Home;
