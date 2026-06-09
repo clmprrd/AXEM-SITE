@@ -248,14 +248,17 @@ const HeroSwitcher: React.FC<{ value: NavyKey; onChange: (k: NavyKey) => void }>
 );
 
 // ---------------------------------------------------------------------
-// HERO — Grainient navy (5 variantes live) · quadrillage · scrim · glass
+// HERO — « CENTRÉ MINIMAL PREMIUM » · Grainient navy (5 variantes live)
+// quadrillage · scrim · glass · typo géante mask-reveal mot-à-mot (la star)
+// Le plus épuré, le plus haut de gamme : pas de photo plein cadre — la typo,
+// le gradient navy et le quadrillage portent tout. Très aéré, vertical, centré.
 // ---------------------------------------------------------------------
 const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
   const reduce = useReducedMotion();
   const p = NAVY[navy];
   const pills = ['Stratégie IA', 'Formation sur-mesure', 'Automatisation n8n'];
   return (
-    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-32 md:px-8">
+    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-36 md:px-8 md:pt-40">
       {/* BACKGROUND — gradient navy WebGL (Grainient), recoloré en live */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <Grainient
@@ -265,57 +268,63 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           saturation={1.05} zoom={0.95} warpStrength={1.2}
         />
       </div>
-      {/* QUADRILLAGE — grille fine navy, fondue aux bords */}
+      {/* QUADRILLAGE — grille fine navy, fondue aux bords (bien visible) */}
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      {/* SCRIM — assombrit pour la lisibilité du texte (AA) */}
+      {/* SCRIM — assombrit pour la lisibilité du texte (AA), centré plus resserré */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(70% 60% at 50% 44%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
+        style={{ background: 'radial-gradient(60% 56% at 50% 46%, rgba(7,11,22,0.28) 0%, rgba(7,11,22,0.52) 52%, rgba(7,11,22,0.86) 100%)' }} />
+      {/* halo lumineux central — garde le gradient vivant derrière le titre */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[20%] z-[1] mx-auto h-[42vh] max-w-3xl blur-[80px]"
+        style={{ background: 'radial-gradient(50% 50% at 50% 50%, rgba(91,140,255,0.20) 0%, transparent 72%)' }} />
       {/* fondu bas vers le site navy */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[24%]"
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[26%]"
         style={{ background: 'linear-gradient(180deg, transparent, #070B16)' }} />
 
-      {/* CONTENU */}
+      {/* CONTENU — colonne centrée, très aérée */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
-        {/* eyebrow — glass chip */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
+        {/* eyebrow — petite pill glass, hairline filet au-dessus pour le côté editorial */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+          className="flex flex-col items-center">
+          <span aria-hidden className="mb-6 block h-9 w-px bg-gradient-to-b from-transparent via-green/45 to-green/0" />
           <div className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
             <span className="relative flex h-2 w-2">
               {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
               <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-cream md:text-[11px]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-cream md:text-[11px]">
               Agence d'IA <span className="text-green">×</span> organisme de formation Qualiopi
             </span>
           </div>
         </motion.div>
 
-        {/* TITRE créatif : se compose mot à mot */}
-        <h1 className="mt-7 font-display leading-[0.95] tracking-tight text-cream"
-          style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.6vw, 90px)' }}>
-          <RiseWords text="Votre partenaire IA," stagger={0.08} />
+        {/* TITRE géant créatif : se compose mot à mot (la star de la page) */}
+        <h1 className="mt-9 font-display leading-[0.92] tracking-[-0.035em] text-cream md:mt-10"
+          style={{ fontWeight: 900, fontSize: 'clamp(46px, 9vw, 112px)' }}>
+          <RiseWords text="Votre partenaire IA," stagger={0.085} />
           <br />
-          <span className="relative inline-block aurora-text">
-            <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
+          <span className="relative inline-block aurora-text pb-[0.12em]">
+            <RiseWords text="de A à Z." delay={0.3} stagger={0.085} />
             <motion.span aria-hidden
-              className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-gradient-to-r from-green to-cyan"
+              className="absolute bottom-[0.02em] left-0 block h-[0.07em] rounded-full bg-gradient-to-r from-green to-cyan"
               initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
-              transition={{ duration: 0.7, delay: 0.85, ease }} />
+              transition={{ duration: 0.8, delay: 0.95, ease }} />
           </span>
         </h1>
 
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease }}
-          className="mt-7 max-w-2xl font-display text-xl font-bold leading-snug text-cream md:text-2xl">
+        {/* sous-ligne — promesse forte, resserrée */}
+        <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.78, ease }}
+          className="mt-8 max-w-2xl font-display text-xl font-bold leading-snug text-cream md:text-[26px]">
           On vous forme, on vous conseille, on déploie. <span className="text-cyan">Et on reste.</span>
         </motion.p>
 
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82, ease }}
-          className="mt-5 max-w-2xl text-[15px] leading-relaxed text-cream-soft md:text-base">
-          Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Nous accompagnons entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour déployer des solutions IA concrètes.
+        <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.9, ease }}
+          className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream-soft md:text-base">
+          Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour des solutions IA concrètes.
         </motion.p>
 
         {/* 3 pills glass */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.9, ease }}
-          className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
           {pills.map((label) => (
             <span key={label} className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-cream md:text-[13px]">
               <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
@@ -324,9 +333,9 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           ))}
         </motion.div>
 
-        {/* double CTA */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
-          className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
+        {/* double CTA — RDV bleu + secondaire glass */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.1, ease }}
+          className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
             className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)]" style={{ fontWeight: 900 }}>
             <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -339,9 +348,9 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           </a>
         </motion.div>
 
-        {/* preuve sociale — « Ils nous font confiance » + avatars duo (+55 000) */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.12, ease }}
-          className="glass mt-10 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-5">
+        {/* preuve sociale — mini-avatars duo + « Ils nous font confiance » (+55 000) */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.22, ease }}
+          className="glass mt-11 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-5">
           <div className="flex -space-x-2.5">
             <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
             <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
