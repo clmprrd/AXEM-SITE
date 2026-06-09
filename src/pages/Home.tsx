@@ -248,14 +248,43 @@ const HeroSwitcher: React.FC<{ value: NavyKey; onChange: (k: NavyKey) => void }>
 );
 
 // ---------------------------------------------------------------------
-// HERO — Grainient navy (5 variantes live) · quadrillage · scrim · glass
+// HERO — « SPLIT FONDATEURS » · Grainient navy (5 variantes live) ·
+//   GAUCHE = pill CTA + titre mask-reveal + 3 pills + preuve sociale ·
+//   DROITE = photos des 2 fondateurs en grand (fondu navy + ring/halo bleu) ·
+//   quadrillage · scrim · glass. (reste du site inchangé)
 // ---------------------------------------------------------------------
 const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
   const reduce = useReducedMotion();
   const p = NAVY[navy];
   const pills = ['Stratégie IA', 'Formation sur-mesure', 'Automatisation n8n'];
+  // Photo fondateur — traitement premium (fondu vers le navy + ring/halo bleu)
+  const Founder: React.FC<{ src: string; name: string; tag: string; delay: number; tall?: boolean }> =
+    ({ src, name, tag, delay, tall = false }) => (
+      <motion.figure
+        initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.9, delay, ease }}
+        className={`group relative overflow-hidden rounded-[26px] glass ${tall ? 'row-span-2' : ''}`}>
+        {/* halo bleu derrière */}
+        <span aria-hidden className="pointer-events-none absolute -inset-px rounded-[26px] opacity-60"
+          style={{ boxShadow: 'inset 0 0 0 1px rgba(120,160,255,0.25), 0 24px 60px -24px rgba(91,140,255,0.5)' }} />
+        <img src={src} alt={name} loading="eager" decoding="async"
+          className={`w-full ${tall ? 'h-full min-h-[260px]' : 'min-h-[160px]'} object-cover object-top transition-transform duration-700 ${reduce ? '' : 'group-hover:scale-[1.04]'}`} />
+        {/* fondu vers le navy (bas + côté) pour fondre dans la DA */}
+        <span aria-hidden className="pointer-events-none absolute inset-0"
+          style={{ background: 'linear-gradient(180deg, rgba(7,11,22,0) 38%, rgba(7,11,22,0.55) 78%, rgba(7,11,22,0.92) 100%)' }} />
+        <span aria-hidden className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+          style={{ background: 'linear-gradient(120deg, rgba(91,140,255,0.18), transparent 55%)' }} />
+        {/* nom + rôle en bas */}
+        <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4 md:p-5">
+          <span>
+            <span className="block font-display text-base text-cream tighter md:text-lg" style={{ fontWeight: 900 }}>{name}</span>
+            <span className="block text-[10px] font-bold uppercase tracking-[0.12em] text-cyan md:text-[11px]">{tag}</span>
+          </span>
+        </figcaption>
+      </motion.figure>
+    );
   return (
-    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-32 md:px-8">
+    <section id="top" className="relative isolate flex min-h-[100svh] items-center overflow-hidden px-5 pb-24 pt-32 md:px-8">
       {/* BACKGROUND — gradient navy WebGL (Grainient), recoloré en live */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <Grainient
@@ -267,88 +296,127 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
       </div>
       {/* QUADRILLAGE — grille fine navy, fondue aux bords */}
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      {/* SCRIM — assombrit pour la lisibilité du texte (AA) */}
+      {/* SCRIM — appuyé à gauche (sous le texte) pour la lisibilité (AA) */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(70% 60% at 50% 44%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
+        style={{ background: 'radial-gradient(75% 80% at 28% 46%, rgba(7,11,22,0.42) 0%, rgba(7,11,22,0.6) 50%, rgba(7,11,22,0.82) 100%)' }} />
       {/* fondu bas vers le site navy */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[24%]"
         style={{ background: 'linear-gradient(180deg, transparent, #070B16)' }} />
 
-      {/* CONTENU */}
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
-        {/* eyebrow — glass chip */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
-          <div className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
-            <span className="relative flex h-2 w-2">
-              {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+      {/* CONTENU — 2 colonnes (empilé sur mobile) */}
+      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+
+        {/* ====== COLONNE GAUCHE ====== */}
+        <div className="flex flex-col items-start text-left">
+          {/* eyebrow — glass chip */}
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
+            <div className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
+              <span className="relative flex h-2 w-2">
+                {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-cream md:text-[11px]">
+                Agence d'IA <span className="text-green">×</span> organisme de formation Qualiopi
+              </span>
+            </div>
+          </motion.div>
+
+          {/* pill CTA glass — « Échangeons 30 minutes sur l'IA (gratuit) → » */}
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.08, ease }} className="mt-4">
+            <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.22}
+              className="glass group inline-flex items-center gap-2.5 rounded-full py-1.5 pl-2 pr-4 text-[12px] font-bold text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.4)] md:text-[13px]">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-green to-cyan text-[#06101F]">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
+              </span>
+              Échangeons 30 minutes sur l'IA <span className="text-cyan">(gratuit)</span>
+              <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+            </Magnetic>
+          </motion.div>
+
+          {/* TITRE créatif : se compose mot à mot */}
+          <h1 className="mt-6 font-display leading-[0.95] tracking-tight text-cream"
+            style={{ fontWeight: 900, fontSize: 'clamp(40px, 6.2vw, 84px)' }}>
+            <RiseWords text="Votre partenaire IA," stagger={0.08} />
+            <br />
+            <span className="relative inline-block aurora-text">
+              <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
+              <motion.span aria-hidden
+                className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-gradient-to-r from-green to-cyan"
+                initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
+                transition={{ duration: 0.7, delay: 0.85, ease }} />
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-cream md:text-[11px]">
-              Agence d'IA <span className="text-green">×</span> organisme de formation Qualiopi
+          </h1>
+
+          <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease }}
+            className="mt-6 max-w-xl font-display text-xl font-bold leading-snug text-cream md:text-2xl">
+            On vous forme, on vous conseille, on déploie. <span className="text-cyan">Et on reste.</span>
+          </motion.p>
+
+          <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82, ease }}
+            className="mt-4 max-w-xl text-[15px] leading-relaxed text-cream-soft md:text-base">
+            Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Nous accompagnons entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour déployer des solutions IA concrètes.
+          </motion.p>
+
+          {/* 3 pills glass */}
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.9, ease }}
+            className="mt-6 flex flex-wrap items-center gap-2.5">
+            {pills.map((label) => (
+              <span key={label} className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-cream md:text-[13px]">
+                <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
+                {label}
+              </span>
+            ))}
+          </motion.div>
+
+          {/* double CTA */}
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
+            className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+            <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
+              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)]" style={{ fontWeight: 900 }}>
+              <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
+              <span className="relative">Prendre rendez-vous</span>
+              <span className="relative transition-transform group-hover:translate-x-1">→</span>
+            </Magnetic>
+            <a href="#formation" className="glass inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
+              Voir le catalogue <span aria-hidden>↓</span>
+            </a>
+          </motion.div>
+
+          {/* preuve sociale — « Ils nous font confiance » + avatars duo (+55 000) */}
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.12, ease }}
+            className="glass mt-8 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-5">
+            <div className="flex -space-x-2.5">
+              <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
+              <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
+            </div>
+            <span className="text-sm font-semibold text-cream">
+              <span className="text-cyan">Ils nous font confiance</span> · +55 000 abonnés LinkedIn
             </span>
+          </motion.div>
+        </div>
+
+        {/* ====== COLONNE DROITE — PHOTOS DES 2 FONDATEURS EN GRAND ====== */}
+        <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.2, ease }}
+          className="relative">
+          {/* halo bleu d'ambiance derrière le duo */}
+          <div aria-hidden className="pointer-events-none absolute -inset-6 -z-[1] rounded-[40px] opacity-70 blur-2xl"
+            style={{ background: 'radial-gradient(60% 60% at 60% 30%, rgba(91,140,255,0.35), transparent 70%)' }} />
+          <div className="grid grid-cols-2 grid-rows-2 gap-3 md:gap-4">
+            {/* Clément — grande colonne gauche (pleine hauteur) */}
+            <Founder src={CLEMENT_IMG} name="Clément Predo" tag="Stratégie · ESSEC" delay={0.3} tall />
+            {/* Alexis — haut droite */}
+            <Founder src={ALEXIS_IMG} name="Alexis Zeitoun" tag="Tech · IP Paris" delay={0.42} />
+            {/* carte « le duo » — bas droite (glass, cohérent DA) */}
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.54, ease }}
+              className="glass flex flex-col justify-center gap-1.5 rounded-[26px] p-4 md:p-5">
+              <span className="font-display text-3xl text-cream tighter md:text-4xl" style={{ fontWeight: 900 }}>2</span>
+              <span className="text-[11px] font-bold uppercase leading-tight tracking-[0.1em] text-cream-soft">
+                fondateurs, <span className="text-cyan">un seul interlocuteur</span>
+              </span>
+              <span className="mt-1 h-px w-10 bg-gradient-to-r from-green to-cyan" />
+            </motion.div>
           </div>
-        </motion.div>
-
-        {/* TITRE créatif : se compose mot à mot */}
-        <h1 className="mt-7 font-display leading-[0.95] tracking-tight text-cream"
-          style={{ fontWeight: 900, fontSize: 'clamp(40px, 7.6vw, 90px)' }}>
-          <RiseWords text="Votre partenaire IA," stagger={0.08} />
-          <br />
-          <span className="relative inline-block aurora-text">
-            <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
-            <motion.span aria-hidden
-              className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-gradient-to-r from-green to-cyan"
-              initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
-              transition={{ duration: 0.7, delay: 0.85, ease }} />
-          </span>
-        </h1>
-
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease }}
-          className="mt-7 max-w-2xl font-display text-xl font-bold leading-snug text-cream md:text-2xl">
-          On vous forme, on vous conseille, on déploie. <span className="text-cyan">Et on reste.</span>
-        </motion.p>
-
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82, ease }}
-          className="mt-5 max-w-2xl text-[15px] leading-relaxed text-cream-soft md:text-base">
-          Agence spécialisée en IA générative et organisme de formation certifié Qualiopi. Nous accompagnons entreprises, administrations et particuliers : formation, conseil stratégique, audit et automatisation — pour déployer des solutions IA concrètes.
-        </motion.p>
-
-        {/* 3 pills glass */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.9, ease }}
-          className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
-          {pills.map((label) => (
-            <span key={label} className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-cream md:text-[13px]">
-              <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
-              {label}
-            </span>
-          ))}
-        </motion.div>
-
-        {/* double CTA */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
-          className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
-          <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
-            className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)]" style={{ fontWeight: 900 }}>
-            <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
-            <span className="relative">Prendre rendez-vous</span>
-            <span className="relative transition-transform group-hover:translate-x-1">→</span>
-          </Magnetic>
-          <a href="#formation" className="glass inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
-            Voir le catalogue <span aria-hidden>↓</span>
-          </a>
-        </motion.div>
-
-        {/* preuve sociale — « Ils nous font confiance » + avatars duo (+55 000) */}
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.12, ease }}
-          className="glass mt-10 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-5">
-          <div className="flex -space-x-2.5">
-            <img src={CLEMENT_IMG} alt="Clément Predo" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
-            <img src={ALEXIS_IMG} alt="Alexis Zeitoun" className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0B1020]" loading="lazy" />
-          </div>
-          <span className="text-sm font-semibold text-cream">
-            <span className="text-cyan">Ils nous font confiance</span> · +55 000 abonnés LinkedIn
-          </span>
         </motion.div>
       </div>
     </section>
