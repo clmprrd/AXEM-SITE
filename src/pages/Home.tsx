@@ -248,14 +248,179 @@ const HeroSwitcher: React.FC<{ value: NavyKey; onChange: (k: NavyKey) => void }>
 );
 
 // ---------------------------------------------------------------------
-// HERO — Grainient navy (5 variantes live) · quadrillage · scrim · glass
+// WORKFLOW NODE-GRAPH — schéma d'automatisation animé (métaphore agence IA)
+// 4 nœuds Audit → Automatisation → Déploiement → Suivi, connecteurs bézier
+// qui se tracent (pathLength), point de données qui circule (animateMotion),
+// nœuds qui s'allument en séquence. SVG viewBox (zéro débordement).
+// Desktop : flux horizontal. Mobile (<768px) : version empilée simplifiée.
+// transform/opacity/SVG pathLength/offset-path only · whileInView once · reduced-motion safe.
+// ---------------------------------------------------------------------
+const WF_STEPS = [
+  { n: '01', t: 'Audit',          d: 'On cartographie vos tâches.' },
+  { n: '02', t: 'Automatisation', d: 'On orchestre l’IA + n8n.' },
+  { n: '03', t: 'Déploiement',    d: 'On met en production.' },
+  { n: '04', t: 'Suivi',          d: 'On mesure et on reste.' },
+] as const;
+
+// Icônes glyph SVG par étape (stroke currentColor)
+const WfIcon: React.FC<{ i: number; className?: string }> = ({ i, className }) => {
+  const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden {...common}>
+      {i === 0 && (<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>)}
+      {i === 1 && (<><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><circle cx="12" cy="12" r="4" /></>)}
+      {i === 2 && (<><path d="M5 16V8l7-4 7 4v8l-7 4-7-4Z" /><path d="m5 8 7 4 7-4M12 12v8" /></>)}
+      {i === 3 && (<><path d="M3 18 9 11l4 4 8-9" /><path d="M21 6v5h-5" /></>)}
+    </svg>
+  );
+};
+
+const WorkflowGraph: React.FC = () => {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const play = inView && !reduce;
+
+  // ---- géométrie desktop (viewBox 880 x 230) ----
+  const NX = [110, 350, 590, 830];            // centre X des 4 nœuds
+  const NY = 92;                              // centre Y de la ligne de nœuds
+  const R = 30;                               // rayon nœud
+  // connecteur bézier entre nœud i et i+1 (léger vallonné, raconte un flux)
+  const connector = (i: number) => {
+    const x1 = NX[i] + R + 6, x2 = NX[i + 1] - R - 6;
+    const mid = (x1 + x2) / 2;
+    const bow = i % 2 === 0 ? 26 : -26;       // alterne haut/bas
+    return `M ${x1} ${NY} C ${mid} ${NY - bow}, ${mid} ${NY + bow}, ${x2} ${NY}`;
+  };
+
+  // pathLength draw-in pour les 3 connecteurs
+  const drawTransition = (i: number) => ({ duration: 0.7, delay: 0.2 + i * 0.55, ease });
+
+  return (
+    <div ref={ref} className="relative w-full">
+      {/* ======================= DESKTOP : flux horizontal ======================= */}
+      <div className="relative mx-auto hidden w-full max-w-3xl md:block">
+        <svg viewBox="0 0 880 230" className="w-full overflow-visible" role="img"
+          aria-label="Schéma du workflow Axem : Audit, Automatisation, Déploiement, Suivi.">
+          <defs>
+            <linearGradient id="wfLine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#5B8CFF" />
+              <stop offset="100%" stopColor="#38BDF8" />
+            </linearGradient>
+            <radialGradient id="wfDot" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#EAF6FF" />
+              <stop offset="60%" stopColor="#38BDF8" />
+              <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+            </radialGradient>
+            <filter id="wfGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="3.4" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+
+          {/* connecteurs (tracés en séquence) + point de données qui circule */}
+          {[0, 1, 2].map((i) => {
+            const dPath = connector(i);
+            return (
+              <g key={`c${i}`}>
+                {/* rail discret toujours visible */}
+                <path d={dPath} fill="none" stroke="rgba(120,160,255,0.18)" strokeWidth="2" />
+                {/* trait coloré qui se trace */}
+                <motion.path
+                  d={dPath} fill="none" stroke="url(#wfLine)" strokeWidth="2.4" strokeLinecap="round"
+                  initial={{ pathLength: reduce ? 1 : 0 }}
+                  animate={play ? { pathLength: 1 } : { pathLength: reduce ? 1 : 0 }}
+                  transition={drawTransition(i)}
+                />
+                {/* point de données qui circule le long du connecteur (animateMotion) */}
+                {play && (
+                  <circle r="5" fill="url(#wfDot)">
+                    <animateMotion dur="2.6s" begin={`${0.9 + i * 0.55}s`} repeatCount="indefinite" path={dPath} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+                  </circle>
+                )}
+              </g>
+            );
+          })}
+
+          {/* nœuds : s'allument en séquence */}
+          {WF_STEPS.map((s, i) => {
+            const cx = NX[i], cy = NY;
+            return (
+              <motion.g key={s.t}
+                initial={{ opacity: reduce ? 1 : 0 }}
+                animate={play ? { opacity: 1 } : { opacity: reduce ? 1 : 0.35 }}
+                transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.55, ease }}
+                style={{ filter: play ? 'url(#wfGlow)' : undefined }}>
+                {/* halo pulsé (sequence) */}
+                {play && (
+                  <motion.circle cx={cx} cy={cy} r={R} fill="none" stroke="#38BDF8" strokeWidth="1.5"
+                    initial={{ scale: 1, opacity: 0.5 }}
+                    animate={{ scale: [1, 1.5], opacity: [0.55, 0] }}
+                    transition={{ duration: 1.8, delay: i * 0.55, repeat: Infinity, repeatDelay: 1.4, ease: 'easeOut' }}
+                    style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
+                )}
+                <circle cx={cx} cy={cy} r={R} fill="rgba(13,21,38,0.72)" stroke="url(#wfLine)" strokeWidth="2" />
+                <g transform={`translate(${cx - 11} ${cy - 11})`} style={{ color: '#9FD7FF' }}>
+                  <WfIcon i={i} className="h-[22px] w-[22px]" />
+                </g>
+                {/* badge numéro */}
+                <circle cx={cx + R - 4} cy={cy - R + 4} r="9" fill="#3B6FE0" />
+                <text x={cx + R - 4} y={cy - R + 7.5} textAnchor="middle" fontSize="9" fontWeight="800" fill="#EAF0FF">{s.n}</text>
+                {/* libellé */}
+                <text x={cx} y={cy + R + 24} textAnchor="middle" fontSize="15" fontWeight="800" fill="#EAF0FF" letterSpacing="-0.2">{s.t}</text>
+                <text x={cx} y={cy + R + 42} textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#9FB0CE">{s.d}</text>
+              </motion.g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* ======================= MOBILE : version empilée simplifiée ======================= */}
+      <div className="relative mx-auto w-full max-w-sm md:hidden">
+        <svg viewBox="0 0 40 300" className="pointer-events-none absolute left-[26px] top-0 h-full w-10" aria-hidden preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wfLineV" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#5B8CFF" /><stop offset="100%" stopColor="#38BDF8" />
+            </linearGradient>
+          </defs>
+          <line x1="20" y1="6" x2="20" y2="294" stroke="rgba(120,160,255,0.18)" strokeWidth="2.5" />
+          <motion.line x1="20" y1="6" x2="20" y2="294" stroke="url(#wfLineV)" strokeWidth="2.5" strokeLinecap="round"
+            initial={{ pathLength: reduce ? 1 : 0 }}
+            animate={play ? { pathLength: 1 } : { pathLength: reduce ? 1 : 0 }}
+            transition={{ duration: 1.4, delay: 0.2, ease }} />
+        </svg>
+        <ol className="relative space-y-3">
+          {WF_STEPS.map((s, i) => (
+            <motion.li key={s.t} className="flex items-center gap-4"
+              initial={{ opacity: reduce ? 1 : 0, x: reduce ? 0 : -10 }}
+              animate={play ? { opacity: 1, x: 0 } : { opacity: reduce ? 1 : 0.4, x: 0 }}
+              transition={{ duration: 0.5, delay: reduce ? 0 : 0.25 + i * 0.18, ease }}>
+              <span className="relative z-10 flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl glass-strong text-[#9FD7FF]"
+                style={{ borderColor: 'rgba(56,189,248,0.45)' }}>
+                <WfIcon i={i} className="h-6 w-6" />
+                <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-deep text-[10px] font-extrabold text-cream">{s.n}</span>
+              </span>
+              <span className="min-w-0 text-left">
+                <span className="block font-display text-base text-cream" style={{ fontWeight: 800 }}>{s.t}</span>
+                <span className="block text-[12px] leading-snug text-cream-soft">{s.d}</span>
+              </span>
+            </motion.li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------
+// HERO — Grainient navy (5 variantes live) · quadrillage · workflow node-graph · glass
 // ---------------------------------------------------------------------
 const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
   const reduce = useReducedMotion();
   const p = NAVY[navy];
   const pills = ['Stratégie IA', 'Formation sur-mesure', 'Automatisation n8n'];
   return (
-    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-28 pt-32 md:px-8">
+    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-32 md:px-8 md:pb-20">
       {/* BACKGROUND — gradient navy WebGL (Grainient), recoloré en live */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <Grainient
@@ -349,6 +514,21 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           <span className="text-sm font-semibold text-cream">
             <span className="text-cyan">Ils nous font confiance</span> · +55 000 abonnés LinkedIn
           </span>
+        </motion.div>
+
+        {/* WORKFLOW NODE-GRAPH — le schéma qui raconte le métier (automatisation IA) */}
+        <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.24, ease }}
+          className="mt-12 w-full">
+          <div className="glass relative mx-auto w-full max-w-4xl overflow-hidden rounded-3xl px-6 py-8 md:px-10 md:py-9">
+            <div className="mb-6 flex items-center justify-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cream-soft md:text-[11px]">
+                Notre workflow d’automatisation IA
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-green to-cyan" />
+            </div>
+            <WorkflowGraph />
+          </div>
         </motion.div>
       </div>
     </section>
