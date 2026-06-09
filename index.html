@@ -13,25 +13,26 @@
         theme: {
           extend: {
             colors: {
-              // surfaces claires (vibe playful)
-              cream: "#FFFCF5",       // fond principal crème
-              "cream-2": "#FFF7E8",   // crème un peu plus chaud (sections)
-              white: "#FFFFFF",
-              ink: "#161616",         // texte principal foncé
-              "ink-soft": "#3C3A36",  // texte secondaire
-              "ink-dim": "#7A766E",   // texte tertiaire / méta
-              // palette joyeuse
-              mint: "#00FA9A",
-              "mint-deep": "#00C97D",
-              coral: "#FF6B4A",
-              "coral-deep": "#E8512F",
-              violet: "#7C5CFF",
-              "violet-deep": "#5E3DF0",
-              yellow: "#FFD23F",
-              "yellow-deep": "#F5BE00",
-              // alias historiques → mappés vibe claire (contenu inchangé)
-              green: "#00C97D",       // accent texte lisible sur crème
-              "green-deep": "#00A867",
+              // DA « BLEU NUIT » — mêmes noms de tokens que Playful, valeurs navy.
+              // Structure/contenu inchangés : seule la logique de couleur bascule.
+              cream: "#070B16",        // fond principal → bleu nuit profond
+              "cream-2": "#0B1020",    // sections alternées → surface navy
+              white: "#FFFFFF",        // pastilles logos (lisibilité sur sombre)
+              ink: "#EAF0FF",          // texte principal → blanc cassé bleuté
+              "ink-soft": "#9FB0CE",   // texte secondaire → gris-bleu clair
+              "ink-dim": "#6E7FA0",    // texte tertiaire / méta
+              // palette accents navy (ex-palette joyeuse remappée)
+              mint: "#38BDF8",         // ex-mint → cyan
+              "mint-deep": "#5BC8F8",  // cyan texte (lisible sur navy)
+              coral: "#FF6B4A",        // POINTE chaude conservée (logo dot + soulignement hero)
+              "coral-deep": "#3B6FE0", // bleu profond (icônes sur bouton clair)
+              violet: "#5B8CFF",       // ex-violet → bleu électrique
+              "violet-deep": "#9DB9FF",// bleu clair (texte accent sur navy)
+              yellow: "#A5C0FF",       // ex-jaune → périwinkle clair (chips/stickers)
+              "yellow-deep": "#8FB0FF",
+              // alias historiques
+              green: "#38BDF8",
+              "green-deep": "#5B8CFF",
             },
             fontFamily: {
               sans: ["Hanken Grotesque", "Inter", "sans-serif"],
@@ -49,16 +50,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesque:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      html { scroll-padding-top: 84px; background-color: #FFFCF5; }
+      html { scroll-padding-top: 84px; background-color: #070B16; }
       body {
         font-family: 'Hanken Grotesque', 'Inter', sans-serif;
-        background-color: #FFFCF5;
-        color: #161616;
+        background-color: #070B16;
+        color: #EAF0FF;
         overflow-x: hidden;
       }
       .font-display { font-family: 'Hanken Grotesque', 'Inter', sans-serif; }
-      ::selection { background: #FFD23F; color: #161616; }
-      ::-moz-selection { background: #FFD23F; color: #161616; }
+      ::selection { background: #5B8CFF; color: #070B16; }
+      ::-moz-selection { background: #5B8CFF; color: #070B16; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       /* gros titres : tracking rond et serré mais friendly */
@@ -70,18 +71,42 @@
       /* contours façon sticker pour les mots accentués */
       .outline-type {
         color: transparent;
-        -webkit-text-stroke: 2px #161616;
+        -webkit-text-stroke: 2px #EAF0FF;
       }
       .outline-green {
         color: transparent;
-        -webkit-text-stroke: 2px #00C97D;
+        -webkit-text-stroke: 2px #38BDF8;
       }
-      /* ombres douces colorées réutilisables */
-      .shadow-soft { box-shadow: 0 18px 40px -20px rgba(22,22,22,0.22); }
-      .shadow-mint { box-shadow: 0 18px 42px -18px rgba(0,201,125,0.55); }
-      .shadow-coral { box-shadow: 0 18px 42px -18px rgba(255,107,74,0.55); }
-      .shadow-violet { box-shadow: 0 18px 42px -18px rgba(124,92,255,0.55); }
-      .shadow-yellow { box-shadow: 0 18px 42px -18px rgba(245,190,0,0.55); }
+      /* GLASS — surface verre dépoli navy (cartes sur fond sombre) */
+      .glass {
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid rgba(120, 160, 255, 0.14);
+        backdrop-filter: blur(14px) saturate(1.3);
+        -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      }
+      /* QUADRILLAGE — grille fine navy fondue par masque radial (surtout hero) */
+      .grid-overlay {
+        background-image:
+          linear-gradient(rgba(120,160,255,0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(120,160,255,0.06) 1px, transparent 1px);
+        background-size: 48px 48px;
+        -webkit-mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 38%, transparent 100%);
+        mask-image: radial-gradient(ellipse 92% 82% at 50% 42%, #000 38%, transparent 100%);
+      }
+      .grid-overlay-soft {
+        background-image:
+          linear-gradient(rgba(120,160,255,0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(120,160,255,0.04) 1px, transparent 1px);
+        background-size: 48px 48px;
+        -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 45%, #000 30%, transparent 100%);
+        mask-image: radial-gradient(ellipse 85% 75% at 50% 45%, #000 30%, transparent 100%);
+      }
+      /* ombres : profondeur noire + glows bleus discrets (ex-ombres colorées) */
+      .shadow-soft { box-shadow: 0 18px 40px -20px rgba(0,0,0,0.55); }
+      .shadow-mint { box-shadow: 0 18px 46px -18px rgba(56,189,248,0.28); }
+      .shadow-coral { box-shadow: 0 18px 46px -18px rgba(91,140,255,0.28); }
+      .shadow-violet { box-shadow: 0 18px 46px -18px rgba(91,140,255,0.30); }
+      .shadow-yellow { box-shadow: 0 18px 46px -18px rgba(165,192,255,0.25); }
       @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
       @keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
       .floaty { animation: floaty 7s ease-in-out infinite; }
