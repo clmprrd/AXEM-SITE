@@ -7,127 +7,13 @@
     <title>AXEM IA — Votre partenaire IA, de A à Z.</title>
     <meta name="description" content="AXEM IA, agence d'IA & organisme de formation certifié Qualiopi. Audit, conseil, automatisation et formation IA pour les entreprises, administrations et particuliers." />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              /* BLEU NUIT / NAVY GLASS — fond navy profond + noir + gris-bleu, accents bleu électrique + cyan */
-              ink: "#070B16",        /* fond navy de base (bleu nuit profond) */
-              "ink-2": "#0B1020",    /* surface navy (cartes) */
-              "ink-3": "#0D1526",    /* surface navy alternée */
-              "ink-4": "#1A2236",    /* gris-bleu (bordures / surfaces hautes) */
-              cream: "#EAF0FF",      /* texte principal (blanc cassé bleuté) */
-              "cream-soft": "#9FB0CE", /* texte secondaire (gris-bleu clair) */
-              "cream-dim": "#6E7FA0",  /* texte tertiaire */
-              green: "#5B8CFF",      /* accent principal (bleu électrique) */
-              "green-deep": "#3B6FE0", /* accent profond (bleu) */
-              cyan: "#38BDF8",       /* accent secondaire (cyan) */
-              mint: "#5EEAD4",       /* touche mint */
-            },
-            fontFamily: {
-              sans: ["Inter", "sans-serif"],
-              display: ["Inter", "sans-serif"],
-            }
-          },
-        },
-      }
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-      html { scroll-padding-top: 80px; background-color: #070B16; }
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #070B16;
-        color: #EAF0FF;
-        overflow-x: hidden;
-      }
-      .font-display { font-family: 'Inter', sans-serif; }
-      ::selection { background: #5B8CFF; color: #070B16; }
-      ::-moz-selection { background: #5B8CFF; color: #070B16; }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      /* huge type kills its own tracking */
-      .tight { letter-spacing: -0.03em; }
-      .tighter { letter-spacing: -0.04em; }
-      /* titres en dégradé navy (bleu électrique → cyan) */
-      .aurora-text {
-        background: linear-gradient(100deg, #5B8CFF 0%, #3B6FE0 45%, #38BDF8 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-      .outline-type {
-        background: linear-gradient(100deg, #5B8CFF, #38BDF8);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        -webkit-text-stroke: 0;
-      }
-      .outline-green {
-        background: linear-gradient(100deg, #3B6FE0, #38BDF8);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        -webkit-text-stroke: 0;
-      }
-      /* GLASS — carte verre dépoli navy (teintée bleu nuit) */
-      .glass {
-        background: rgba(255, 255, 255, 0.04);
-        backdrop-filter: blur(18px) saturate(1.4);
-        -webkit-backdrop-filter: blur(18px) saturate(1.4);
-        border: 1px solid rgba(120, 160, 255, 0.14);
-        box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.05);
-      }
-      .glass-strong {
-        background: rgba(13, 21, 38, 0.78);
-        backdrop-filter: blur(22px) saturate(1.5);
-        -webkit-backdrop-filter: blur(22px) saturate(1.5);
-        border: 1px solid rgba(120, 160, 255, 0.2);
-        box-shadow: 0 12px 40px -14px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255,255,255,0.06);
-      }
-      /* QUADRILLAGE — grille fine navy, fondue par un masque radial */
-      .grid-overlay {
-        background-image:
-          linear-gradient(rgba(120,160,255,0.06) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(120,160,255,0.06) 1px, transparent 1px);
-        background-size: 48px 48px;
-        -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
-        mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
-      }
-      /* AURORA BLOBS — dérive douce (transform/opacity only) */
-      @keyframes drift1 {
-        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-        33%  { transform: translate3d(6%, 4%, 0) scale(1.08); }
-        66%  { transform: translate3d(-4%, 7%, 0) scale(0.96); }
-      }
-      @keyframes drift2 {
-        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-        33%  { transform: translate3d(-7%, 5%, 0) scale(1.1); }
-        66%  { transform: translate3d(5%, -5%, 0) scale(0.94); }
-      }
-      @keyframes drift3 {
-        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-        50%  { transform: translate3d(4%, -6%, 0) scale(1.12); }
-      }
-      .aurora-blob { will-change: transform; mix-blend-mode: screen; }
-      .drift-1 { animation: drift1 22s ease-in-out infinite; }
-      .drift-2 { animation: drift2 28s ease-in-out infinite; }
-      .drift-3 { animation: drift3 25s ease-in-out infinite; }
-      @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
-      /* respect users who prefer reduced motion */
-      @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
-        .aurora-blob { animation: none !important; }
-      }
-      /* Calendly inline widget — keep it from overflowing on mobile */
-      .calendly-inline-widget { max-width: 100%; }
-    </style>
+    <!-- Tailwind + styles custom : buildés localement via src/index.css (importé dans index.tsx) -->
   </head>
   <body>
+    <a href="#contenu" class="skip-link">Aller au contenu</a>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -129,6 +129,9 @@ const Grainient = ({
   className = ''
 }) => {
   const containerRef = useRef(null);
+  // timeSpeed live dans une ref : la boucle rAF la lit sans rebuild du contexte
+  const timeSpeedRef = useRef(timeSpeed);
+  timeSpeedRef.current = timeSpeed;
 
   // Effect 1: build WebGL context once, pause when offscreen / tab hidden
   useEffect(() => {
@@ -206,10 +209,14 @@ const Grainient = ({
     const loop = t => {
       program.uniforms.iTime.value = (t - t0) * 0.001;
       renderer.render({ scene: mesh });
+      // reduced-motion (timeSpeed === 0) : on rend UNE fois puis on coupe la boucle (batterie)
+      if (timeSpeedRef.current === 0) { raf = 0; return; }
       raf = requestAnimationFrame(loop);
     };
 
     const tryStart = () => {
+      // En reduced-motion on rend une frame statique sans enchaîner de rAF
+      if (timeSpeedRef.current === 0) { renderer.render({ scene: mesh }); return; }
       if (isVisible && isPageVisible && raf === 0) raf = requestAnimationFrame(loop);
     };
     const tryStop = () => {

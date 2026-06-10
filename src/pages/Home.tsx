@@ -14,7 +14,7 @@ import Grainient from '../components/Grainient';
 // Hero = Grainient navy + quadrillage + sélecteur 5 variantes (live state).
 // =====================================================================
 
-// 5 variantes de gradient navy pour le Grainient du hero (togglables en live)
+// 5 variantes de gradient navy pour le Grainient du hero — variante figée pour la prod
 const NAVY = {
   nuit:    { color1: '#2A4BD0', color2: '#0EA5E9', color3: '#05091A' },
   indigo:  { color1: '#6366F1', color2: '#3B82F6', color3: '#0A0F2C' },
@@ -23,9 +23,8 @@ const NAVY = {
   azur:    { color1: '#5B8CFF', color2: '#1E40AF', color3: '#070C1A' },
 } as const;
 type NavyKey = keyof typeof NAVY;
-const NAVY_LABELS: Record<NavyKey, string> = {
-  nuit: 'Nuit', indigo: 'Indigo', cyan: 'Cyan', violet: 'Violet', azur: 'Azur',
-};
+// Variante navy retenue pour la prod (plus de sélecteur live)
+const NAVY_VARIANT: NavyKey = 'azur';
 
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CALENDLY_EMBED = 'https://calendly.com/clem-pred/30min?hide_gdpr_banner=1';
@@ -58,8 +57,8 @@ const AuroraBlobs: React.FC<{ className?: string }> = ({ className = '' }) => (
 // ---------------------------------------------------------------------
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className }) => (
   <motion.div
-    initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, delay, ease }}
+    initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.45, delay, ease }}
     className={className}>{children}</motion.div>
 );
 
@@ -73,8 +72,8 @@ const RiseWords: React.FC<{ text: string; className?: string; delay?: number; st
           <span key={i} className="inline-block overflow-hidden align-bottom" aria-hidden>
             <motion.span
               className={`inline-block ${greenLast && i === words.length - 1 ? 'text-green' : ''}`}
-              initial={{ y: '115%' }} animate={{ y: 0 }}
-              transition={{ duration: 0.85, delay: delay + i * stagger, ease }}>
+              initial={{ y: '100%' }} animate={{ y: 0 }}
+              transition={{ duration: 0.6, delay: delay + i * stagger, ease }}>
               {w}{i < words.length - 1 ? ' ' : ''}
             </motion.span>
           </span>
@@ -169,7 +168,7 @@ const ScrollProgress: React.FC = () => {
 const TrustLogo: React.FC<{ name: string; src?: string }> = ({ name, src }) => {
   const [err, setErr] = useState(false);
   return (
-    <div className="glass flex h-20 items-center justify-center rounded-2xl px-5 transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
+    <div className="glass flex h-20 items-center justify-center rounded-2xl px-5 transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
       {src && !err ? (
         <span className="flex items-center justify-center rounded-xl bg-white px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.25)]">
           <img src={src} alt={name} loading="lazy" decoding="async" onError={() => setErr(true)}
@@ -189,66 +188,84 @@ const NAV_LINKS: [string, string][] = [
   ['Formation', '#formation'], ['Conseil', '#conseil'],
   ['Le duo', '#duo'], ['Résultats', '#resultats'],
 ];
+// Ancres du menu mobile (burger)
+const NAV_LINKS_MOBILE: [string, string][] = [
+  ['Formation', '#formation'], ['Conseil', '#conseil'],
+  ['Résultats', '#resultats'], ['Rendez-vous', '#rdv'],
+];
 const Nav: React.FC = () => {
   const [s, setS] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const h = () => setS(window.scrollY > 24);
     window.addEventListener('scroll', h, { passive: true });
     return () => window.removeEventListener('scroll', h);
   }, []);
+  // Fermer le menu mobile à l'échap + verrouiller le scroll quand ouvert
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev; };
+  }, [menuOpen]);
   return (
-    <nav className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${s ? 'border-b border-[rgba(120,160,255,0.14)] bg-[rgba(7,11,22,0.72)] py-3 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.7)] backdrop-blur-xl' : 'py-5'}`}>
+    <nav className={`fixed inset-x-0 top-0 z-50 transition-[padding,background-color,border-color,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] ${s ? 'border-b border-[rgba(120,160,255,0.24)] bg-[rgba(7,11,22,0.72)] py-3 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.7)] backdrop-blur-xl' : 'py-5'}`}>
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 md:px-8">
-        <a href="#top" className="font-display text-2xl tracking-tighter text-cream" style={{ fontWeight: 900 }}>
+        <a href="#top" className="font-display text-2xl tracking-tighter text-cream [touch-action:manipulation]" style={{ fontWeight: 900 }}>
           AXEM<span className="aurora-text">.</span>
         </a>
         <div className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map(([l, h]) => (
-            <a key={l} href={h} className="group relative text-[13px] font-semibold uppercase tracking-[0.12em] text-cream-soft transition-colors hover:text-cream">
-              {l}<span className="absolute -bottom-1.5 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-all duration-300 group-hover:w-full" />
+            <a key={l} href={h} className="group relative py-1.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-cream-soft transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream [touch-action:manipulation]">
+              {l}<span className="absolute -bottom-0 left-0 h-[2px] w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full" />
             </a>
           ))}
         </div>
-        <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
-          className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-green to-cyan px-5 py-2.5 text-[13px] uppercase tracking-[0.06em] text-[#06101F] shadow-[0_8px_24px_-10px_rgba(91,140,255,0.8)]" style={{ fontWeight: 800 }}>
-          Rendez-vous <span className="transition-transform group-hover:translate-x-0.5">→</span>
-        </Magnetic>
+        <div className="flex items-center gap-2">
+          <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
+            className="group hidden items-center gap-1.5 rounded-full bg-gradient-to-r from-green to-cyan px-5 py-2.5 text-[13px] uppercase tracking-[0.06em] text-[#06101F] shadow-[0_8px_24px_-10px_rgba(91,140,255,0.8)] transition-transform [transition-timing-function:var(--ease-out)] active:scale-[0.97] [touch-action:manipulation] sm:inline-flex" style={{ fontWeight: 800 }}>
+            Rendez-vous <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </Magnetic>
+          {/* Burger mobile (<768px) */}
+          <button type="button" onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={menuOpen} aria-controls="mobile-menu"
+            className="glass inline-flex h-11 w-11 items-center justify-center rounded-full text-cream transition-transform [transition-timing-function:var(--ease-out)] active:scale-[0.95] [touch-action:manipulation] md:hidden">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
+        </div>
       </div>
+      {/* Panneau menu mobile */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div id="mobile-menu"
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease }}
+            className="glass-strong mx-4 mt-2 overflow-hidden rounded-2xl p-2 md:hidden">
+            <div className="flex flex-col">
+              {NAV_LINKS_MOBILE.map(([l, h]) => (
+                <a key={l} href={h} onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-cream transition-colors [transition-timing-function:var(--ease-out)] hover:bg-white/5 [touch-action:manipulation]">
+                  {l}<span aria-hidden className="text-green">→</span>
+                </a>
+              ))}
+              <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0}
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green to-cyan px-4 py-3.5 text-sm uppercase tracking-[0.06em] text-[#06101F] transition-transform [transition-timing-function:var(--ease-out)] active:scale-[0.97] [touch-action:manipulation]" style={{ fontWeight: 900 }}>
+                Prendre rendez-vous →
+              </Magnetic>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
 
 // ---------------------------------------------------------------------
-// HERO SWITCHER — sélecteur fixe (haut droite) · 5 variantes navy en live
-// ---------------------------------------------------------------------
-const HeroSwitcher: React.FC<{ value: NavyKey; onChange: (k: NavyKey) => void }> = ({ value, onChange }) => (
-  <div className="fixed right-4 top-20 z-[55] md:right-6 md:top-24">
-    <div className="glass-strong flex flex-col gap-2 rounded-2xl p-2.5">
-      <span className="px-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-soft">Hero navy</span>
-      <div className="flex flex-col gap-1.5">
-        {(Object.keys(NAVY) as NavyKey[]).map((k) => {
-          const active = k === value;
-          return (
-            <button
-              key={k} type="button" onClick={() => onChange(k)}
-              aria-pressed={active}
-              className={`group flex items-center gap-2 rounded-xl px-2 py-1.5 text-left transition ${active ? 'bg-white/8' : 'hover:bg-white/5'}`}>
-              <span className="h-4 w-4 shrink-0 rounded-full ring-1 ring-white/25"
-                style={{ background: `linear-gradient(135deg, ${NAVY[k].color1}, ${NAVY[k].color2})` }} />
-              <span className={`text-[11px] font-bold uppercase tracking-[0.08em] ${active ? 'text-cream' : 'text-cream-soft'}`}>
-                {NAVY_LABELS[k]}
-              </span>
-              {active && <span className="ml-auto text-[10px] text-green">●</span>}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-);
-
-// ---------------------------------------------------------------------
-// HERO — « SPLIT FONDATEURS » · Grainient navy (5 variantes live) ·
+// HERO — « SPLIT FONDATEURS » · Grainient navy (variante figée) ·
 //   GAUCHE = pill CTA + titre mask-reveal + 3 pills + preuve sociale ·
 //   DROITE = photos des 2 fondateurs en grand (fondu navy + ring/halo bleu) ·
 //   quadrillage · scrim · glass. (reste du site inchangé)
@@ -324,7 +341,7 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           {/* pill CTA glass — « Échangeons 30 minutes sur l'IA (gratuit) → » */}
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.08, ease }} className="mt-4">
             <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.22}
-              className="glass group inline-flex items-center gap-2.5 rounded-full py-1.5 pl-2 pr-4 text-[12px] font-bold text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.4)] md:text-[13px]">
+              className="glass group inline-flex items-center gap-2.5 rounded-full py-1.5 pl-2 pr-4 text-[12px] font-bold text-cream transition-[transform,box-shadow] [transition-timing-function:var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.4)] active:scale-[0.97] [touch-action:manipulation] md:text-[13px]">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-green to-cyan text-[#06101F]">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
               </span>
@@ -333,17 +350,19 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
             </Magnetic>
           </motion.div>
 
-          {/* TITRE créatif : se compose mot à mot */}
-          <h1 className="mt-6 font-display leading-[0.95] tracking-tight text-cream"
+          {/* TITRE créatif : se compose mot à mot (contenu animé masqué aux AT, libellé sur le h1) */}
+          <h1 aria-label="Votre partenaire IA, de A à Z." className="mt-6 font-display leading-[0.95] tracking-tight text-cream"
             style={{ fontWeight: 900, fontSize: 'clamp(40px, 6.2vw, 84px)' }}>
-            <RiseWords text="Votre partenaire IA," stagger={0.08} />
-            <br />
-            <span className="relative inline-block aurora-text">
-              <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
-              <motion.span aria-hidden
-                className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-gradient-to-r from-green to-cyan"
-                initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
-                transition={{ duration: 0.7, delay: 0.85, ease }} />
+            <span aria-hidden="true">
+              <RiseWords text="Votre partenaire IA," stagger={0.08} />
+              <br />
+              <span className="relative inline-block aurora-text">
+                <RiseWords text="de A à Z." delay={0.28} stagger={0.08} />
+                <motion.span aria-hidden
+                  className="absolute -bottom-1 left-0 block h-[0.1em] rounded-full bg-gradient-to-r from-green to-cyan"
+                  initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} style={{ originX: 0, width: '100%' }}
+                  transition={{ duration: 0.7, delay: 0.85, ease }} />
+              </span>
             </span>
           </h1>
 
@@ -372,13 +391,13 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
             className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
             <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.32}
-              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)]" style={{ fontWeight: 900 }}>
+              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-green to-cyan px-8 py-4 text-[15px] uppercase tracking-[0.03em] text-[#06101F] shadow-[0_14px_44px_-12px_rgba(91,140,255,0.7)] transition-transform [transition-timing-function:var(--ease-out)] active:scale-[0.97] [touch-action:manipulation]" style={{ fontWeight: 900 }}>
               <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
               <svg className="relative h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" /></svg>
               <span className="relative">Prendre rendez-vous</span>
               <span className="relative transition-transform group-hover:translate-x-1">→</span>
             </Magnetic>
-            <a href="#formation" className="glass inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
+            <a href="#formation" className="glass inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.06em] text-cream transition-[transform,box-shadow] [transition-timing-function:var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)] active:scale-[0.97] [touch-action:manipulation]">
               Voir le catalogue <span aria-hidden>↓</span>
             </a>
           </motion.div>
@@ -449,7 +468,7 @@ const Trust: React.FC = () => {
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <div className="mb-12 flex flex-col items-center gap-2 text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-green-deep">Ils nous font confiance</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-green">Ils nous font confiance</p>
             <p className="font-display text-2xl text-cream md:text-4xl" style={{ fontWeight: 800 }}>
               Des PME aux grands comptes <span className="text-cream-soft">&amp;</span> administrations.
             </p>
@@ -510,7 +529,7 @@ const Problem: React.FC = () => {
   return (
     <section className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Pourquoi la plupart échouent</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Pourquoi la plupart échouent</div></Reveal>
         <Reveal delay={0.08}>
           <h2 className="font-display leading-[0.92] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(36px, 6.2vw, 96px)' }}>
             3 pièges qui font<br /><span className="outline-type">échouer l'IA.</span>
@@ -548,7 +567,7 @@ const Duo: React.FC = () => {
   return (
     <section id="duo" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Les fondateurs</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Les fondateurs</div></Reveal>
         <Reveal delay={0.08}>
           <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 120px)' }}>
             Deux experts,<br /><span className="text-green">un seul interlocuteur.</span>
@@ -563,13 +582,13 @@ const Duo: React.FC = () => {
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {founders.map((f, i) => (
             <Reveal key={f.name} delay={i * 0.1}>
-              <div className="group flex h-full flex-col overflow-hidden rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
+              <div className="group flex h-full flex-col overflow-hidden rounded-2xl glass transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                 <div className="relative overflow-hidden">
-                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-all duration-500 group-hover:scale-[1.03] group-hover:grayscale-0" />
+                  <img src={f.img} alt={f.name} loading="lazy" className="aspect-[5/4] w-full object-cover grayscale transition-[transform,filter] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.03] group-hover:grayscale-0" />
                   {/* hover-reveal : voile + LinkedIn qui apparaît */}
                   <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <a href={f.li} target="_blank" rel="noopener noreferrer"
-                    className="absolute right-5 top-5 flex h-11 w-11 translate-y-1 items-center justify-center rounded-xl bg-green-deep text-white opacity-0 shadow-lg transition-all duration-300 hover:scale-110 group-hover:translate-y-0 group-hover:opacity-100"
+                    className="absolute right-5 top-5 flex h-11 w-11 translate-y-1 items-center justify-center rounded-xl bg-green-deep text-white opacity-0 shadow-lg transition-[transform,opacity] duration-300 [transition-timing-function:var(--ease-out)] hover:scale-110 active:scale-[0.95] group-hover:translate-y-0 group-hover:opacity-100 [touch-action:manipulation]"
                     aria-label={`LinkedIn ${f.name}`}>
                     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34V9.99H5.67v8.35h2.67zM7 8.84a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.5v-4.58c0-2.45-1.31-3.59-3.06-3.59-1.41 0-2.04.78-2.4 1.33v-1.14h-2.66c.04.75 0 8.35 0 8.35h2.66v-4.66c0-.24.02-.48.09-.65.19-.48.63-.97 1.36-.97.96 0 1.35.73 1.35 1.8v4.48h2.66z" /></svg>
                   </a>
@@ -577,7 +596,7 @@ const Duo: React.FC = () => {
                 <div className="flex flex-1 flex-col gap-3 p-7 md:p-9">
                   <div>
                     <h3 className="font-display text-3xl text-cream tighter md:text-4xl" style={{ fontWeight: 900 }}>{f.name}</h3>
-                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-green-deep">{f.school}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-green">{f.school}</p>
                     <p className="text-sm text-cream-soft">{f.role}</p>
                   </div>
                   <p className="text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
@@ -717,16 +736,16 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
               <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-soft">{f.duree}</span>
             </div>
             <h3 className="font-display text-2xl text-cream tighter md:text-3xl" style={{ fontWeight: 900 }}>{f.t}</h3>
-            <p className="mt-1 text-sm italic text-green-deep">« {f.tag} »</p>
+            <p className="mt-1 text-sm italic text-green">« {f.tag} »</p>
           </div>
-          <button onClick={onClose} aria-label="Fermer" className="shrink-0 rounded-full border border-cream/15 p-2 text-cream-soft transition hover:bg-cream/10 hover:text-cream">
+          <button onClick={onClose} aria-label="Fermer" className="shrink-0 rounded-full border border-cream/15 p-2 text-cream-soft transition-colors [transition-timing-function:var(--ease-out)] hover:bg-cream/10 hover:text-cream active:scale-[0.95] [touch-action:manipulation]">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" /></svg>
           </button>
         </div>
         <div className="flex-1 space-y-6 overflow-y-auto p-6 md:p-8">
           <p className="text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
           <div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-green-deep">Programme</p>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-green">Programme</p>
             <ul className="space-y-2">
               {f.programme.map((p, i) => (
                 <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft">
@@ -737,11 +756,11 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-green-deep">Outils</p>
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-green">Outils</p>
               <p className="text-sm leading-relaxed text-cream-soft">{f.outils}</p>
             </div>
             <div>
-              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-green-deep">Livrables</p>
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-green">Livrables</p>
               <p className="text-sm leading-relaxed text-cream-soft">{f.livrables}</p>
             </div>
           </div>
@@ -752,7 +771,7 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-cream-soft">HT / participant</span>
           </div>
           <Magnetic href={CALENDLY} target="_blank" rel="noopener noreferrer" strength={0.25}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-deep px-6 py-3 text-sm uppercase tracking-[0.04em] text-white sm:w-auto" style={{ fontWeight: 900 }}>
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-deep px-6 py-3 text-sm uppercase tracking-[0.04em] text-white transition-transform [transition-timing-function:var(--ease-out)] active:scale-[0.97] [touch-action:manipulation] sm:w-auto" style={{ fontWeight: 900 }}>
             Réserver cette formation →
           </Magnetic>
         </div>
@@ -761,15 +780,21 @@ const FormationDetail: React.FC<{ f: Formation; onClose: () => void }> = ({ f, o
   );
 };
 
+// Formations phares mises en avant par défaut (catalogue curé)
+const FEATURED_CODES = ['F01', 'F03', 'F05'] as const;
 const FormationBlock: React.FC = () => {
   const [level, setLevel] = useState<(typeof LEVELS)[number]>('Tous');
   const [open, setOpen] = useState<Formation | null>(null);
-  const filtered = level === 'Tous' ? FORMATIONS : FORMATIONS.filter((f) => f.niveau === level);
+  const [showAll, setShowAll] = useState(false);
+  // Par défaut : 3 formations phares. Déplié : les 10, filtrables par niveau.
+  const featured = FORMATIONS.filter((f) => (FEATURED_CODES as readonly string[]).includes(f.code));
+  const byLevel = level === 'Tous' ? FORMATIONS : FORMATIONS.filter((f) => f.niveau === level);
+  const filtered = showAll ? byLevel : featured;
   return (
     <section id="formation" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep">
+          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green">
             <span className="rounded bg-green-deep px-2 py-0.5 text-white" style={{ fontWeight: 900 }}>Bloc 1</span> Organisme de formation Qualiopi
           </div>
         </Reveal>
@@ -784,17 +809,20 @@ const FormationBlock: React.FC = () => {
           </p>
         </Reveal>
 
-        {/* filtre par niveau */}
-        <Reveal delay={0.18}>
-          <div className="mt-9 flex flex-wrap gap-2">
-            {LEVELS.map((lv) => (
-              <button key={lv} type="button" onClick={() => setLevel(lv)}
-                className={`rounded-full border px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] transition ${level === lv ? 'border-green-deep bg-green-deep text-white' : 'border-cream/15 text-cream-soft hover:border-cream/35 hover:text-cream'}`}>
-                {lv}
-              </button>
-            ))}
-          </div>
-        </Reveal>
+        {/* filtre par niveau — secondaire, visible une fois le catalogue déplié */}
+        {showAll && (
+          <Reveal delay={0.05}>
+            <div className="mt-9 flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cream-dim">Filtrer</span>
+              {LEVELS.map((lv) => (
+                <button key={lv} type="button" onClick={() => setLevel(lv)}
+                  className={`rounded-full border px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-colors [transition-timing-function:var(--ease-out)] active:scale-[0.97] [touch-action:manipulation] ${level === lv ? 'border-green-deep bg-green-deep text-white' : 'border-cream/12 text-cream-soft hover:border-cream/35 hover:text-cream'}`}>
+                  {lv}
+                </button>
+              ))}
+            </div>
+          </Reveal>
+        )}
 
         {/* grille catalogue */}
         <motion.div layout className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -803,7 +831,7 @@ const FormationBlock: React.FC = () => {
               <motion.div key={f.code} layout
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.4, delay: Math.min(i, 6) * 0.04, ease }}>
-                <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
+                <SpotlightCard className="h-full rounded-2xl glass transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                   <button type="button" onClick={() => setOpen(f)} className="flex h-full w-full flex-col items-start gap-3 p-6 text-left">
                     <div className="flex w-full items-center justify-between">
                       <span className="font-display text-sm text-cream-soft" style={{ fontWeight: 800 }}>{f.code}</span>
@@ -815,7 +843,7 @@ const FormationBlock: React.FC = () => {
                     <p className="text-sm leading-relaxed text-cream-soft">{f.tag}</p>
                     <div className="mt-auto flex w-full items-center justify-between pt-3">
                       <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-cream-soft">{f.duree} · {f.prix}</span>
-                      <span className="inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[0.08em] text-green-deep">Détails <span className="transition-transform group-hover:translate-x-0.5">→</span></span>
+                      <span className="inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[0.08em] text-green">Détails <span className="transition-transform group-hover:translate-x-0.5">→</span></span>
                     </div>
                   </button>
                 </SpotlightCard>
@@ -823,6 +851,17 @@ const FormationBlock: React.FC = () => {
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {/* Voir tout / Réduire le catalogue */}
+        <div className="mt-8 flex justify-center">
+          <button type="button"
+            onClick={() => { setShowAll((v) => !v); if (showAll) setLevel('Tous'); }}
+            aria-expanded={showAll}
+            className="glass inline-flex min-h-[44px] items-center gap-2 rounded-full px-6 py-3 text-[13px] font-bold uppercase tracking-[0.08em] text-cream transition-[transform,box-shadow] [transition-timing-function:var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)] active:scale-[0.97] [touch-action:manipulation]">
+            {showAll ? 'Réduire' : 'Voir les 10 formations'}
+            <span aria-hidden className={`transition-transform [transition-timing-function:var(--ease-out)] ${showAll ? 'rotate-180' : ''}`}>↓</span>
+          </button>
+        </div>
 
         {/* formats complémentaires : Coaching · Bootcamps · Vidéos */}
         <div className="mt-12 grid gap-4 md:grid-cols-3">
@@ -835,7 +874,7 @@ const FormationBlock: React.FC = () => {
               <div className="flex h-full flex-col gap-2 rounded-2xl glass p-6">
                 <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 800 }}>{c.t}</h3>
                 <p className="text-sm leading-relaxed text-cream-soft">{c.d}</p>
-                <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green-deep">{c.price}</span>
+                <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green">{c.price}</span>
               </div>
             </Reveal>
           ))}
@@ -849,7 +888,7 @@ const FormationBlock: React.FC = () => {
                 <img src="/logos/qualiopi-full.png" alt="Qualiopi — Actions de formation" className="h-20 w-auto max-w-[180px] object-contain md:h-24" loading="lazy" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-green-deep">Financement</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-green">Financement</p>
                 <h3 className="mt-1 font-display text-2xl text-cream tight md:text-3xl" style={{ fontWeight: 800 }}>Formations finançables OPCO.</h3>
                 <p className="mt-2 text-sm leading-relaxed text-cream-soft md:text-[15px]">
                   Organisme certifié Qualiopi : prise en charge possible jusqu'à 100 %, interlocuteur unique côté AXEM, démarches simplifiées.
@@ -861,7 +900,7 @@ const FormationBlock: React.FC = () => {
                     { n: '03', t: 'Formation', d: 'Équipes opérationnelles dès J+1, livrables concrets, suivi post-formation.' },
                   ].map((s) => (
                     <div key={s.n} className="rounded-xl glass p-4">
-                      <span className="font-display text-lg text-green-deep" style={{ fontWeight: 900 }}>{s.n}</span>
+                      <span className="font-display text-lg text-green" style={{ fontWeight: 900 }}>{s.n}</span>
                       <p className="mt-1 text-sm font-bold text-cream">{s.t}</p>
                       <p className="mt-1 text-[13px] leading-relaxed text-cream-soft">{s.d}</p>
                     </div>
@@ -893,7 +932,7 @@ const ConseilBlock: React.FC = () => {
     <section id="conseil" className="px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep">
+          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green">
             <span className="rounded bg-green-deep px-2 py-0.5 text-white" style={{ fontWeight: 900 }}>Bloc 2</span> Agence · Conseil & déploiement
           </div>
         </Reveal>
@@ -907,18 +946,23 @@ const ConseilBlock: React.FC = () => {
             Quand la formation ne suffit pas : on conçoit, on déploie et on maintient vos solutions IA. Un seul interlocuteur, du diagnostic à la production.
           </p>
         </Reveal>
+        <Reveal delay={0.18}>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-cream-soft">
+            Outils maîtrisés : OpenAI · Claude / Anthropic · Gemini · Mistral · Meta · DeepSeek · n8n · Make.
+          </p>
+        </Reveal>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((s, i) => (
             <Reveal key={s.n} delay={Math.min(i, 5) * 0.06}>
-              <SpotlightCard className="h-full rounded-2xl glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
+              <SpotlightCard className="h-full rounded-2xl glass transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)]">
                 <div className="flex h-full flex-col gap-3 p-7">
                   <div className="flex items-center justify-between">
                     <span className="font-display text-4xl text-green/30 md:text-5xl" style={{ fontWeight: 900 }}>{s.n}</span>
                   </div>
                   <h3 className="font-display text-xl text-cream transition-colors group-hover:text-green md:text-2xl" style={{ fontWeight: 800 }}>{s.t}</h3>
                   <p className="text-sm leading-relaxed text-cream-soft">{s.d}</p>
-                  <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green-deep">{s.price}</span>
+                  <span className="mt-auto pt-3 text-[12px] font-bold uppercase tracking-[0.1em] text-green">{s.price}</span>
                 </div>
               </SpotlightCard>
             </Reveal>
@@ -946,7 +990,7 @@ const Cases: React.FC = () => {
   return (
     <section id="resultats" className="border-y border-green/10 bg-white/[0.025] px-5 py-24 md:px-8 md:py-32">
       <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Cas clients</div></Reveal>
+        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Cas clients</div></Reveal>
         <Reveal delay={0.08}>
           <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 120px)' }}>
             Des résultats.<br /><span className="outline-green">Pas des slides.</span>
@@ -983,51 +1027,10 @@ const Cases: React.FC = () => {
 
         <Reveal delay={0.1}>
           <a href={NOTION_CASES} target="_blank" rel="noopener noreferrer"
-            className="group mt-14 inline-flex items-center gap-2.5 rounded-full border border-green/40 bg-green/10 px-6 py-3.5 text-sm font-bold uppercase tracking-[0.06em] text-green transition hover:bg-green-deep hover:text-white">
+            className="group mt-14 inline-flex items-center gap-2.5 rounded-full border border-green/40 bg-green/10 px-6 py-3.5 text-sm font-bold uppercase tracking-[0.06em] text-green transition-colors [transition-timing-function:var(--ease-out)] hover:bg-green-deep hover:text-white active:scale-[0.97] [touch-action:manipulation]">
             Voir tous les cas clients en détail
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </a>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// POURQUOI AXEM — 5 raisons
-// ---------------------------------------------------------------------
-const Why: React.FC = () => {
-  const reasons = [
-    { n: '01', t: 'Partenaire sur la durée', d: "De l'audit à l'autonomie. On ne disparaît pas après le kickoff." },
-    { n: '02', t: '70 % de pratique minimum', d: "Opérationnel dès J+1. Chaque formation produit un livrable réel." },
-    { n: '03', t: 'Résultats mesurés', d: "ROI documenté. Des livrables concrets, pas des slides." },
-    { n: '04', t: 'Toujours à jour', d: "Outils & méthodes 2025/2026. Un champ qui bouge tous les mois." },
-    { n: '05', t: 'Un seul interlocuteur', d: "Du diagnostic au déploiement. Vous parlez à ceux qui livrent." },
-  ];
-  return (
-    <section className="px-5 py-24 md:px-8 md:py-32">
-      <div className="mx-auto max-w-[1400px]">
-        <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Pourquoi AXEM</div></Reveal>
-        <Reveal delay={0.08}>
-          <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 7vw, 116px)' }}>
-            5 raisons<br /><span className="text-green">de nous choisir.</span>
-          </h2>
-        </Reveal>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {reasons.map((r, i) => (
-            <Reveal key={r.n} delay={Math.min(i, 5) * 0.06}>
-              <div className="flex h-full flex-col gap-2.5 rounded-2xl glass p-7">
-                <span className="font-display text-3xl text-green" style={{ fontWeight: 900 }}>{r.n}</span>
-                <h3 className="font-display text-lg text-cream md:text-xl" style={{ fontWeight: 800 }}>{r.t}</h3>
-                <p className="text-sm leading-relaxed text-cream-soft md:text-[15px]">{r.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal delay={0.1}>
-          <p className="mt-10 text-sm text-cream-soft">
-            Outils maîtrisés : OpenAI · Claude / Anthropic · Gemini · Mistral · Meta · DeepSeek · n8n · Make.
-          </p>
         </Reveal>
       </div>
     </section>
@@ -1051,7 +1054,7 @@ const FinalCTA: React.FC = () => {
       <div className="mx-auto max-w-[1400px]">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr]">
           <div>
-            <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green-deep"><span className="h-1.5 w-1.5 bg-green" />Rendez-vous</div></Reveal>
+            <Reveal><div className="mb-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-green"><span className="h-1.5 w-1.5 bg-green" />Rendez-vous</div></Reveal>
             <Reveal delay={0.08}>
               <h2 className="font-display leading-[0.9] text-cream tighter" style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 96px)' }}>
                 Démarrons par un<br /><span className="text-green">diagnostic gratuit.</span>
@@ -1062,8 +1065,29 @@ const FinalCTA: React.FC = () => {
                 30 minutes pour identifier vos 3 leviers IA prioritaires. Pas un commercial — directement Clément ou Alexis.
               </p>
             </Reveal>
-            <Reveal delay={0.2}>
-              <a href={`mailto:${EMAIL}`} className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-cream transition hover:text-green">
+            {/* Ce qu'on regarde en 30 min */}
+            <Reveal delay={0.18}>
+              <div className="glass mt-7 max-w-md rounded-2xl p-5">
+                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-green">Ce qu'on regarde en 30 min</p>
+                <ul className="space-y-2.5">
+                  {[
+                    'Vos 3 cas d\'usage IA les plus rentables, priorisés.',
+                    'Formation, conseil ou automatisation : ce qui colle à votre besoin.',
+                    'Le financement OPCO possible et les prochaines étapes concrètes.',
+                  ].map((b) => (
+                    <li key={b} className="flex gap-2.5 text-sm leading-relaxed text-cream-soft">
+                      <svg className="mt-0.5 h-4 w-4 shrink-0 text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"><path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 border-t border-green/15 pt-3 text-[13px] font-semibold text-cream-soft">
+                  Gratuit <span className="text-cream-dim">·</span> sans engagement <span className="text-cream-dim">·</span> vos données restent chez vous.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.24}>
+              <a href={`mailto:${EMAIL}`} className="mt-7 inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-cream transition-colors [transition-timing-function:var(--ease-out)] hover:text-green [touch-action:manipulation]">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 {EMAIL}
               </a>
@@ -1071,7 +1095,11 @@ const FinalCTA: React.FC = () => {
           </div>
           <Reveal delay={0.12}>
             <div className="glass-strong overflow-hidden rounded-3xl bg-white p-1.5">
-              <div className="calendly-inline-widget overflow-hidden rounded-2xl" data-url={CALENDLY_EMBED} style={{ minWidth: 320, height: 700 }} />
+              <div
+                className="calendly-inline-widget h-[78vh] min-h-[640px] w-full overflow-hidden rounded-2xl md:h-[700px] md:min-h-[700px]"
+                data-url={CALENDLY_EMBED}
+                style={{ minWidth: 0 }}
+              />
             </div>
           </Reveal>
         </div>
@@ -1096,19 +1124,19 @@ const Footer: React.FC = () => (
           <p className="max-w-xs text-sm text-cream-soft">Votre partenaire IA, de A à Z. Agence d'IA & organisme de formation certifié Qualiopi.</p>
         </div>
         <div>
-          <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-soft">Navigation</div>
-          <ul className="space-y-2 text-sm text-cream-soft">
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-soft">Navigation</div>
+          <ul className="text-sm text-cream-soft">
             {[['Formation', '#formation'], ['Conseil', '#conseil'], ['Le duo', '#duo'], ['Résultats', '#resultats'], ['Rendez-vous', '#rdv']].map(([l, h]) => (
-              <li key={l}><a href={h} className="transition-colors hover:text-cream">{l}</a></li>
+              <li key={l}><a href={h} className="inline-flex min-h-[44px] items-center transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream [touch-action:manipulation]">{l}</a></li>
             ))}
           </ul>
         </div>
         <div>
-          <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-soft">Contact</div>
-          <ul className="space-y-2 text-sm text-cream-soft">
-            <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-cream">Prendre rendez-vous</a></li>
-            <li><a href={`mailto:${EMAIL}`} className="transition-colors hover:text-cream">{EMAIL}</a></li>
-            <li>axem-ia.fr</li>
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-soft">Contact</div>
+          <ul className="text-sm text-cream-soft">
+            <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream [touch-action:manipulation]">Prendre rendez-vous</a></li>
+            <li><a href={`mailto:${EMAIL}`} className="inline-flex min-h-[44px] items-center break-all transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream [touch-action:manipulation]">{EMAIL}</a></li>
+            <li className="flex min-h-[44px] items-center">axem-ia.fr</li>
           </ul>
         </div>
       </div>
@@ -1127,15 +1155,13 @@ const Footer: React.FC = () => (
 // PAGE
 // ---------------------------------------------------------------------
 const Home: React.FC = () => {
-  const [navy, setNavy] = useState<NavyKey>('azur');
   return (
   <MotionConfig reducedMotion="user">
     <div className="min-h-screen text-cream" style={{ background: 'linear-gradient(180deg, #070B16 0%, #0B1020 50%, #0D1526 100%)' }}>
       <ScrollProgress />
       <Nav />
-      <HeroSwitcher value={navy} onChange={setNavy} />
-      <main>
-        <Hero navy={navy} />
+      <main id="contenu">
+        <Hero navy={NAVY_VARIANT} />
         <Trust />
         <Problem />
         <Duo />
@@ -1143,7 +1169,6 @@ const Home: React.FC = () => {
         <FormationBlock />
         <ConseilBlock />
         <Cases />
-        <Why />
         <FinalCTA />
       </main>
       <Footer />
