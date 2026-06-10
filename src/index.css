@@ -65,6 +65,27 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* SERIF ÉDITORIAL — langage « Limitless » : titres display géants, leading serré */
+.font-serif-display {
+  font-family: 'Instrument Serif', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.font-serif-display.italic {
+  font-style: italic;
+}
+
+/* WATERMARK serif — wordmark géant semi-transparent par-dessus le Grainient */
+.serif-watermark {
+  font-family: 'Instrument Serif', 'Times New Roman', serif;
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 ::selection {
   background: #5b8cff;
   color: #070b16;
