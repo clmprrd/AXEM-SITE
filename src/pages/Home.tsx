@@ -161,7 +161,7 @@ const Hero: React.FC = () => {
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," stagger={0.08} />
             <br />
-            <span className="aurora-text inline-block">
+            <span className="aurora-solid inline-block">
               <RiseWords text="de A à Z." delay={0.3} stagger={0.09} />
             </span>
           </span>

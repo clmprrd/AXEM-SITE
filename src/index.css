@@ -111,12 +111,25 @@ body {
   letter-spacing: -0.04em;
 }
 
-/* titres en dégradé navy (bleu électrique → cyan) */
+/* titres en dégradé navy (bleu électrique → cyan)
+   NB : couleur pleine #7fb3ff en FALLBACK — si background-clip:text ne s'applique
+   pas (texte transparent invisible sur navy), le titre reste lisible. */
 .aurora-text {
-  background: linear-gradient(100deg, #5b8cff 0%, #3b6fe0 45%, #38bdf8 100%);
+  background-image: linear-gradient(100deg, #5b8cff 0%, #3b6fe0 45%, #38bdf8 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
+  color: #7fb3ff;
+}
+/* HERO — la 2e ligne « de A à Z. » utilise le reveal mot-à-mot : ses glyphes
+   vivent dans des <span> imbriqués (inline-block) où background-clip:text ne
+   se propage pas → texte invisible. On force donc une COULEUR PLEINE lisible
+   (pas de gradient-text transparent sur ce gros titre). */
+.aurora-solid,
+.aurora-solid * {
+  background: none !important;
+  -webkit-text-fill-color: #7fb3ff !important;
+  color: #7fb3ff !important;
 }
 .outline-type {
   background: linear-gradient(100deg, #5b8cff, #38bdf8);
