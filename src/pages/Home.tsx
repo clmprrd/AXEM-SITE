@@ -164,18 +164,27 @@ const ScrollProgress: React.FC = () => {
   );
 };
 
-// Logo « confiance » : image couleur sur carte blanche, sinon fallback nom net
-const TrustLogo: React.FC<{ name: string; src?: string }> = ({ name, src }) => {
+// Logo « confiance » : image en COULEUR sur carte blanche (sans grayscale ni
+// opacity réduite), sinon fallback nom net. `dark` = logo blanc/clair → carte
+// navy pour garantir le contraste (un logo blanc ne peut pas être lisible sur blanc).
+const TrustLogo: React.FC<{ name: string; src?: string; dark?: boolean }> = ({ name, src, dark }) => {
   const [err, setErr] = useState(false);
   return (
     <div className="glass flex h-20 items-center justify-center rounded-2xl px-5 transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-12px_rgba(91,140,255,0.35)]">
       {src && !err ? (
-        <span className="flex items-center justify-center rounded-xl bg-white px-3 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.25)]">
+        <span
+          className={
+            'flex h-14 w-full items-center justify-center rounded-xl px-3 py-2 ' +
+            (dark
+              ? 'bg-ink-2 ring-1 ring-white/10 shadow-[0_1px_3px_rgba(0,0,0,0.4)]'
+              : 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.25)]')
+          }
+        >
           <img src={src} alt={name} loading="lazy" decoding="async" onError={() => setErr(true)}
-            className="max-h-8 w-auto max-w-[130px] object-contain" />
+            className="max-h-9 w-auto max-w-[130px] object-contain" />
         </span>
       ) : (
-        <span className="text-center font-display text-[15px] font-extrabold tracking-tight text-cream md:text-base">{name}</span>
+        <span className="flex h-14 w-full items-center justify-center rounded-xl bg-white px-3 py-2 text-center font-display text-[15px] font-extrabold tracking-tight text-ink shadow-[0_1px_3px_rgba(0,0,0,0.25)] md:text-base">{name}</span>
       )}
     </div>
   );
@@ -446,16 +455,17 @@ const Hero: React.FC<{ navy: NavyKey }> = ({ navy }) => {
 // TRUST — logos COULEUR sur cartes blanches · 2 groupes · TOUS visibles
 // ---------------------------------------------------------------------
 const Trust: React.FC = () => {
-  const clients = [
+  type Logo = { name: string; src?: string; dark?: boolean };
+  const clients: Logo[] = [
     { name: 'Carrefour', src: '/logos/carrefour.svg' },
     { name: 'BlackFin Capital', src: '/logos/blackfin.png' },
-    { name: 'Avantis', src: '/logos/avantis.png' },
+    { name: 'Avantis', src: '/logos/avantis.png', dark: true }, // logo blanc → carte navy pour contraste
     { name: 'KIT France', src: '/logos/kit.png' },
     { name: 'Espace 2', src: '/logos/espace2.png' },
     { name: 'Socos', src: '/logos/socos.png' },
     { name: 'Gravotech', src: '/logos/gravotech.png' },
   ];
-  const organismes = [
+  const organismes: Logo[] = [
     { name: 'myconnecting', src: '/logos/myconnecting.png' },
     { name: 'synapse ia' }, // fallback nom net (logo introuvable)
     { name: 'ASphere', src: '/logos/asphere.png' },
@@ -484,7 +494,7 @@ const Trust: React.FC = () => {
         </Reveal>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
           {clients.map((l, i) => (
-            <Reveal key={l.name} delay={Math.min(i, 6) * 0.04}><TrustLogo name={l.name} src={l.src} /></Reveal>
+            <Reveal key={l.name} delay={Math.min(i, 6) * 0.04}><TrustLogo name={l.name} src={l.src} dark={l.dark} /></Reveal>
           ))}
         </div>
 
@@ -497,7 +507,7 @@ const Trust: React.FC = () => {
         </Reveal>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
           {organismes.map((l, i) => (
-            <Reveal key={l.name} delay={Math.min(i, 6) * 0.04}><TrustLogo name={l.name} src={l.src} /></Reveal>
+            <Reveal key={l.name} delay={Math.min(i, 6) * 0.04}><TrustLogo name={l.name} src={l.src} dark={l.dark} /></Reveal>
           ))}
         </div>
 
