@@ -444,10 +444,10 @@ const Conseil: React.FC = () => {
         <div ref={ref} className="relative mt-16 pl-10 md:pl-16">
           {/* RAIL SVG — ligne qui se trace au scroll (pathLength) */}
           <svg aria-hidden className="pointer-events-none absolute left-[14px] top-2 h-full w-2 md:left-[22px]"
-            viewBox="0 0 2 100" preserveAspectRatio="none">
-            <line x1="1" y1="0" x2="1" y2="100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" />
-            <motion.line x1="1" y1="0" x2="1" y2="100"
-              stroke="url(#railGrad)" strokeWidth="2" strokeLinecap="round"
+            viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
+            <path d="M1 0 V100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            <motion.path d="M1 0 V100"
+              stroke="url(#railGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke"
               style={{ pathLength }} />
             <defs>
               <linearGradient id="railGrad" x1="0" y1="0" x2="0" y2="1">
@@ -621,9 +621,9 @@ const Methode: React.FC = () => {
 
       <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
-          viewBox="0 0 2 100" preserveAspectRatio="none">
-          <line x1="1" y1="0" x2="1" y2="100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" />
-          <motion.line x1="1" y1="0" x2="1" y2="100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" style={{ pathLength }} />
+          viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
+          <path d="M1 0 V100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
           <defs>
             <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#5B8CFF" />
