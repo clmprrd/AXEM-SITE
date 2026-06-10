@@ -9,6 +9,11 @@
 
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* accent bleu profond maîtrisé pour les boutons (pas de néon) */
+  --btn: #2a4bd0;
+  --btn-hover: #3b6fe0;
+  --btn-ink: #f4f7ff;
 }
 
 html {
@@ -215,4 +220,202 @@ body {
 /* Calendly inline widget — keep it from overflowing on mobile */
 .calendly-inline-widget {
   max-width: 100%;
+}
+
+/* =====================================================================
+   BOUTONS ÉDITORIAUX — refonte anti « vibe-codé ».
+   Couleur pleine maîtrisée (bleu profond), PAS de dégradé néon ni d'outer-glow.
+   Micro-interaction intentionnelle : flèche qui glisse + fill-sweep discret.
+   Lettrage sans-serif soigné. :active scale · :focus-visible ring.
+   ===================================================================== */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  border-radius: 9999px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out),
+    background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out),
+    color 0.22s var(--ease-out);
+  will-change: transform;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:focus-visible {
+  outline: 2px solid #7fb3ff;
+  outline-offset: 3px;
+}
+
+/* PRIMAIRE — bleu profond plein. Lift discret + ombre nette (pas de glow flou). */
+.btn-primary {
+  padding: 0.95rem 1.6rem;
+  color: var(--btn-ink);
+  background-color: var(--btn);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.14) inset,
+    0 10px 22px -14px rgba(20, 40, 110, 0.9);
+}
+.btn-primary:hover {
+  background-color: var(--btn-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 16px 30px -16px rgba(30, 60, 150, 0.95);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+}
+/* fill-sweep discret : une bande claire balaie au hover (transform only) */
+.btn-primary .btn-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.btn-primary .btn-sweep::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-101%);
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 100%
+  );
+  transition: transform 0.6s var(--ease-out);
+}
+.btn-primary:hover .btn-sweep::before {
+  transform: translateX(101%);
+}
+/* flèche qui glisse */
+.btn-arrow {
+  display: inline-block;
+  transition: transform 0.22s var(--ease-out);
+}
+.btn-primary:hover .btn-arrow,
+.btn-secondary:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+/* SECONDAIRE — ghost/outline glass. Bordure + texte s'éclaircissent,
+   soulignement qui se révèle au hover. */
+.btn-secondary {
+  padding: 0.95rem 1.5rem;
+  color: #c3d2f0;
+  background-color: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(120, 160, 255, 0.28);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.btn-secondary:hover {
+  color: #eaf0ff;
+  border-color: rgba(160, 190, 255, 0.55);
+  transform: translateY(-1px);
+}
+.btn-secondary:active {
+  transform: translateY(0) scale(0.97);
+}
+/* soulignement révélé : un trait fin sous le label */
+.btn-underline {
+  position: relative;
+}
+.btn-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0.55;
+  transition: transform 0.28s var(--ease-out);
+}
+.btn-secondary:hover .btn-underline::after {
+  transform: scaleX(1);
+}
+
+/* TAILLES */
+.btn-lg {
+  font-size: 16px;
+  padding: 1.05rem 1.9rem;
+}
+.btn-sm {
+  font-size: 13.5px;
+  padding: 0.65rem 1.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn-arrow,
+  .btn-primary .btn-sweep::before,
+  .btn-underline::after {
+    transition: none !important;
+  }
+}
+
+/* =====================================================================
+   TIMELINE / PARCOURS — nœuds qui s'allument
+   ===================================================================== */
+.node-dot {
+  box-shadow: 0 0 0 0 rgba(91, 140, 255, 0);
+  transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out);
+}
+.node-dot[data-on='true'] {
+  background-color: #5b8cff;
+  box-shadow: 0 0 0 5px rgba(91, 140, 255, 0.12);
+}
+
+/* watermark de section : ne jamais provoquer de scroll horizontal */
+.section-clip {
+  overflow-x: clip;
+}
+
+/* hairline divider réutilisable */
+.hairline {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 160, 255, 0.22) 50%,
+    transparent
+  );
+}
+
+/* chiffres tabulaires pour les count-up (pas de saut de largeur) */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* logo grayscale -> couleur au hover (bande confiance) */
+.logo-chip img {
+  transition: filter 0.4s var(--ease-out), opacity 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
+  filter: grayscale(1) brightness(1.7) contrast(0.9);
+  opacity: 0.62;
+}
+.logo-chip:hover img {
+  filter: grayscale(0) brightness(1);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-chip img {
+    transition: none !important;
+  }
 }
