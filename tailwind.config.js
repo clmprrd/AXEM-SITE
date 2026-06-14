@@ -10,11 +10,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* BLEU NUIT / NAVY GLASS — fond navy profond + noir + gris-bleu, accents bleu électrique + cyan */
-        ink: '#070B16',          /* fond navy de base (bleu nuit profond) */
-        'ink-2': '#0B1020',      /* surface navy (cartes) */
-        'ink-3': '#0D1526',      /* surface navy alternée */
-        'ink-4': '#1A2236',      /* gris-bleu (bordures / surfaces hautes) */
+        /* BLEU NUIT / NAVY GLASS — base plus profonde/cinématique (Limitless black space), accents bleu électrique + cyan */
+        ink: '#060912',          /* fond navy de base (bleu nuit très sombre) */
+        'ink-2': '#0A0F1E',      /* surface navy (cartes) */
+        'ink-3': '#0C1322',      /* surface navy alternée */
+        'ink-4': '#182034',      /* gris-bleu (bordures / surfaces hautes) */
         cream: '#EAF0FF',        /* texte principal (blanc cassé bleuté) */
         'cream-soft': '#9FB0CE', /* texte secondaire (gris-bleu clair) */
         'cream-dim': '#6E7FA0',  /* texte tertiaire */
@@ -26,6 +26,7 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         display: ['Inter', 'sans-serif'],
+        satoshi: ['Satoshi', 'Inter', 'sans-serif'],
       },
     },
   },

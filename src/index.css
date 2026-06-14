@@ -20,12 +20,13 @@
 
 html {
   scroll-padding-top: 80px;
-  background-color: #070b16;
+  /* base un peu plus profonde/cinématique (Limitless-like black space) */
+  background-color: #060912;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #070b16;
+  background-color: #060912;
   color: #eaf0ff;
   overflow-x: hidden;
 }
@@ -70,6 +71,20 @@ body {
 
 .font-display {
   font-family: 'Inter', sans-serif;
+}
+
+/* SATOSHI — eyebrows / labels / small-caps crisp (langage Limitless).
+   Fallback Inter si Fontshare indispo. Toujours appliqué aux .eyebrow / .label. */
+.font-satoshi,
+.eyebrow,
+.label-mono {
+  font-family: 'Satoshi', 'Inter', sans-serif;
+  font-feature-settings: 'ss01' 1;
+}
+.eyebrow {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
 }
 
 /* SERIF ÉDITORIAL — langage « Limitless » : titres display géants, leading serré */
@@ -258,7 +273,7 @@ body {
   position: relative;
   z-index: 1;
   /* fond navy opaque : masque le footer fixe tant qu'on n'est pas en bas */
-  background: linear-gradient(180deg, #070b16 0%, #0b1020 55%, #0d1526 100%);
+  background: linear-gradient(180deg, #060912 0%, #0a0f1e 55%, #0c1322 100%);
 }
 .footer-fixed {
   position: fixed;

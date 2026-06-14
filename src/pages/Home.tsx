@@ -25,8 +25,10 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// Grainient — variante navy « azur »
-const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#070C1A' } as const;
+// Grainient — variante navy « azur » (base plus profonde/cinématique)
+const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#05080F' } as const;
+// navy de fond commun aux fondus / overlays cinématiques
+const NAVY = '#060912';
 
 // ---------------------------------------------------------------------
 // NAV — pilule flottante centrée. RÉPLIQUE LIMITLESS « scroll-glass » :
@@ -68,17 +70,46 @@ const Nav: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// HERO (gardé) — fond navy, titre serif géant, double CTA éditorial.
+// HERO — MOMENT VERRE #1. Fond Grainient navy plein cadre (le « glass »
+// récurrent Limitless) + watermark serif « de A à Z » en parallax léger,
+// fondu radial navy pour garder la lisibilité. Titre serif géant, double
+// CTA éditorial. Cascade spring (mount) conservée.
 // ---------------------------------------------------------------------
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
+  const wmYRaw = useTransform(scrollYProgress, [0, 1], ['0%', '-14%']);
+  const y = reduce ? '0%' : yRaw;
+  const wmY = reduce ? '0%' : wmYRaw;
   return (
-    <section id="top" className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-0" />
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(91,140,255,0.28), transparent 65%)' }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[22%]"
-        style={{ background: 'linear-gradient(180deg, transparent, #070B16)' }} />
+    <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
+      {/* MOMENT VERRE plein cadre — Grainient navy en fond du hero */}
+      <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
+        <Grainient
+          className="h-full w-full"
+          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
+          timeSpeed={reduce ? 0 : 0.13} grainAmount={0.085} contrast={1.32}
+          saturation={1.0} zoom={1.05} warpStrength={1.15}
+        />
+      </motion.div>
+      {/* fondu radial + bas : garde le centre lisible, fond noir profond aux bords */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(6,9,18,0.30) 0%, rgba(6,9,18,0.62) 58%, rgba(6,9,18,0.92) 100%)' }} />
+      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
+        style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
+      {/* watermark serif parallax — souffle cinématique derrière le titre */}
+      <motion.div aria-hidden style={{ y: wmY }}
+        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
+        <motion.span
+          {...revealWatermark(0.2, !!reduce)}
+          className="serif-watermark font-serif-display text-cream/[0.05]"
+          style={{ fontSize: 'clamp(140px, 40vw, 600px)' }}>
+          A → Z
+        </motion.span>
+      </motion.div>
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
         {/* CASCADE HERO (mount) stagger 0.2s — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
@@ -89,7 +120,7 @@ const Hero: React.FC = () => {
             {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-cream">
+          <span className="eyebrow text-[11px] text-cream">
             Agence d'IA <span className="text-cyan">×</span> Formation
           </span>
         </motion.div>
@@ -100,7 +131,7 @@ const Hero: React.FC = () => {
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
-            <span className="aurora-solid inline-block">
+            <span className="aurora-solid italic inline-block">
               <RiseWords text="de A à Z." delay={0.55} stagger={0.09} />
             </span>
           </span>
@@ -147,7 +178,7 @@ const TrustBar: React.FC = () => {
   return (
     <section aria-label="Ils nous font confiance" className="section-clip relative border-y border-green/10 py-14">
       <Reveal>
-        <p className="mb-8 text-center text-[11px] font-bold uppercase tracking-[0.3em] text-cream-dim">
+        <p className="eyebrow mb-8 text-center text-[11px] tracking-[0.3em] text-cream-dim">
           Ils nous font confiance
         </p>
       </Reveal>
@@ -202,13 +233,13 @@ const SectionA: React.FC = () => {
           {...revealWatermark(0, !!reduce)}
           className="serif-watermark font-serif-display text-cream/[0.07]"
           style={{ fontSize: 'clamp(120px, 34vw, 520px)' }}>
-          de A à Z
+          autonomie
         </motion.span>
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <Reveal>
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan">Le parcours AXEM</p>
+          <p className="eyebrow text-[11px] tracking-[0.3em] text-cyan">Le parcours AXEM</p>
         </Reveal>
         <Reveal delay={0.08} perspective>
           <p className="font-serif-display mt-5 leading-[0.98] tracking-[-0.01em] text-cream"
@@ -216,6 +247,57 @@ const SectionA: React.FC = () => {
             De l'audit à <span className="aurora-text italic">l'autonomie.</span>
           </p>
         </Reveal>
+      </div>
+    </section>
+  );
+};
+
+// ---------------------------------------------------------------------
+// MARQUEE CAPACITÉS — (= leur marquee de catégories Limitless). Défile en
+// continu nos capacités / outils. Deux rangées en sens opposés, masque bords,
+// ralentit au hover. transform-only, pause hors-vue (via animate conditionnel).
+// ---------------------------------------------------------------------
+const CAPS_A = ['Agents IA', 'Automatisation n8n', 'RAG', 'OCR', 'Formation sur-mesure', 'Claude Code', 'Make', 'Vision', 'Voix'];
+const CAPS_B = ['Audit IA', 'Assistants métier', 'Pipelines documentaires', 'Intégrations API', 'Scraping', 'Fine-tuning prompts', 'Tableaux de bord', 'Conformité', 'Support continu'];
+const CapRow: React.FC<{ items: string[]; reverse?: boolean; reduce: boolean }> = ({ items, reverse, reduce }) => {
+  const row = [...items, ...items];
+  const [dur, setDur] = React.useState(reverse ? 48 : 40);
+  const base = reverse ? 48 : 40;
+  return (
+    <div className="ticker-mask group relative overflow-hidden py-1">
+      <motion.div
+        className="flex w-max items-center gap-4 md:gap-6"
+        animate={reduce ? undefined : { x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
+        transition={reduce ? undefined : { duration: dur, ease: 'linear', repeat: Infinity }}
+        onMouseEnter={() => !reduce && setDur(base * 2.6)}
+        onMouseLeave={() => !reduce && setDur(base)}>
+        {row.map((c, i) => (
+          <span key={c + i}
+            className="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-full border border-green/14 bg-white/[0.02] px-5 py-2.5 text-[14px] text-cream-soft md:text-[15px]">
+            <span aria-hidden className="h-1 w-1 rounded-full bg-cyan/70" />
+            {c}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+const CapabilitiesMarquee: React.FC = () => {
+  const reduce = useReducedMotion();
+  return (
+    <section id="capacites" aria-label="Nos capacités et outils"
+      className="section-clip relative overflow-hidden py-[clamp(80px,12vh,160px)]">
+      <div className="mx-auto mb-12 max-w-5xl px-5 text-center md:px-8">
+        <Reveal><div className="flex justify-center"><Eyebrow>La boîte à outils</Eyebrow></div></Reveal>
+        <Reveal delay={0.06} perspective>
+          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
+            Tout l'arsenal IA, <span className="aurora-text italic">au même endroit.</span>
+          </h2>
+        </Reveal>
+      </div>
+      <div className="flex flex-col gap-4">
+        <CapRow items={CAPS_A} reduce={!!reduce} />
+        <CapRow items={CAPS_B} reverse reduce={!!reduce} />
       </div>
     </section>
   );
@@ -233,7 +315,7 @@ const CARDS: { k: string; t: string; d: string }[] = [
 const Manifeste: React.FC = () => {
   const reduce = useReducedMotion();
   return (
-    <section id="manifeste" className="section-clip relative overflow-hidden px-5 py-28 md:px-8 md:py-40">
+    <section id="manifeste" className="section-clip relative overflow-hidden px-5 py-[clamp(128px,20vh,260px)] md:px-8">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/3 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 rounded-full opacity-40 blur-[120px]"
         style={{ background: 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.18), transparent 65%)' }} />
       <div className="mx-auto max-w-5xl text-center">
@@ -269,10 +351,60 @@ const Manifeste: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
+// MOMENT VERRE #3 (interlude milieu) — Grainient navy plein cadre + watermark
+// serif parallax. Réutilisable : c'est le souffle cinématique récurrent qui
+// rythme la page entre deux blocs denses. Pause hors-vue (Grainient IO).
+// ---------------------------------------------------------------------
+const GlassInterlude: React.FC<{
+  id?: string; watermark: string; eyebrow: string;
+  title: React.ReactNode; zoom?: number;
+}> = ({ id, watermark, eyebrow, title, zoom = 1.0 }) => {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['-10%', '14%']);
+  const y = reduce ? '0%' : yRaw;
+  return (
+    <section id={id} ref={ref}
+      className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <Grainient
+          className="h-full w-full"
+          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
+          timeSpeed={reduce ? 0 : 0.15} grainAmount={0.08} contrast={1.34}
+          saturation={1.02} zoom={zoom} warpStrength={1.18}
+        />
+      </div>
+      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: 'radial-gradient(82% 82% at 50% 50%, rgba(6,9,18,0.34) 0%, rgba(6,9,18,0.62) 60%, rgba(6,9,18,0.88) 100%)' }} />
+      <motion.div aria-hidden style={{ y }}
+        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
+        <motion.span
+          {...revealWatermark(0, !!reduce)}
+          className="serif-watermark font-serif-display text-cream/[0.06]"
+          style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
+          {watermark}
+        </motion.span>
+      </motion.div>
+      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+        <Reveal><div className="flex justify-center"><Eyebrow>{eyebrow}</Eyebrow></div></Reveal>
+        <Reveal delay={0.08} perspective>
+          <p className="font-serif-display mt-5 leading-[0.98] tracking-[-0.01em] text-cream"
+            style={{ fontSize: 'clamp(38px, 6.5vw, 84px)' }}>
+            {title}
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+// ---------------------------------------------------------------------
 // SECTION HEADER — eyebrow + titre serif, réutilisé.
 // ---------------------------------------------------------------------
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-cyan">
+  <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
     <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
   </div>
 );
@@ -315,7 +447,7 @@ const Formation: React.FC = () => {
   const reduce = useReducedMotion();
   const [open, setOpen] = React.useState(false);
   return (
-    <section id="formation" className="section-clip relative px-5 py-28 md:px-8 md:py-36">
+    <section id="formation" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <Reveal><Eyebrow>Formation</Eyebrow></Reveal>
@@ -339,7 +471,7 @@ const Formation: React.FC = () => {
               {...reveal(i * 0.1, !!reduce)}
               whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
               className="group glass relative flex flex-col rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-8">
-              <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[f.level]}`}>{f.level}</span>
+              <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[f.level]}`}>{f.level}</span>
               <h3 className="font-serif-display mt-5 text-[28px] leading-[1.05] text-cream">{f.code}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-cream-soft">{f.pitch}</p>
               {/* détail révélé : grid-rows 0fr → 1fr (height anim sans saut) */}
@@ -350,7 +482,7 @@ const Formation: React.FC = () => {
               </div>
               <div className="mt-auto flex items-end justify-between pt-6">
                 <span className="font-serif-display text-4xl text-cream">{f.price}</span>
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-cream-dim">/ pers.</span>
+                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.1em] text-cream-dim">/ pers.</span>
               </div>
             </motion.article>
           ))}
@@ -374,7 +506,7 @@ const Formation: React.FC = () => {
                 transition={{ duration: 0.5, ease }}
                 className="w-full overflow-hidden">
                 <div className="glass overflow-hidden rounded-3xl">
-                  <div className="hidden grid-cols-[64px_1fr_140px_100px] gap-4 border-b border-green/12 px-6 py-4 text-[11px] font-bold uppercase tracking-[0.14em] text-cream-dim md:grid">
+                  <div className="hidden grid-cols-[64px_1fr_140px_100px] gap-4 border-b border-green/12 px-6 py-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-dim md:grid">
                     <span>Réf.</span><span>Formation</span><span>Niveau</span><span className="text-right">Prix</span>
                   </div>
                   <ul>
@@ -386,7 +518,7 @@ const Formation: React.FC = () => {
                         className="grid grid-cols-[48px_1fr_auto] items-center gap-3 border-b border-green/8 px-5 py-4 transition-colors [transition-timing-function:var(--ease-limitless)] last:border-0 hover:bg-white/[0.03] md:grid-cols-[64px_1fr_140px_100px] md:gap-4 md:px-6">
                         <span className="font-serif-display text-lg text-green/60">{code}</span>
                         <span className="text-[15px] text-cream">{title}</span>
-                        <span className={`hidden text-[12px] font-bold uppercase tracking-[0.1em] md:inline ${LEVEL_TINT[level].split(' ')[0]}`}>{level}</span>
+                        <span className={`hidden text-[12px] font-satoshi font-bold uppercase tracking-[0.1em] md:inline ${LEVEL_TINT[level].split(' ')[0]}`}>{level}</span>
                         <span className="text-right text-[14px] font-semibold text-cream-soft md:text-cream">{price}</span>
                       </motion.li>
                     ))}
@@ -429,7 +561,7 @@ const Conseil: React.FC = () => {
   });
 
   return (
-    <section id="conseil" className="section-clip relative bg-ink-2/40 px-5 py-28 md:px-8 md:py-36">
+    <section id="conseil" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="max-w-2xl">
           <Reveal><Eyebrow>Conseil &amp; agence</Eyebrow></Reveal>
@@ -512,7 +644,7 @@ const CASES = [
 const Resultats: React.FC = () => {
   const reduce = useReducedMotion();
   return (
-    <section id="resultats" className="section-clip relative px-5 py-28 md:px-8 md:py-36">
+    <section id="resultats" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
           <div>
@@ -551,14 +683,14 @@ const Resultats: React.FC = () => {
               {...reveal((i % 2) * 0.1, !!reduce)}
               whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
               className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
-              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
+              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
               <div className="space-y-3 text-[14.5px] leading-relaxed">
                 <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
                 <p className="text-cream-soft"><span className="font-semibold text-cream">Solution · </span>{c.solution}</p>
               </div>
               {/* RÉSULTAT révélé au hover : chiffre serif qui apparaît */}
               <div className="mt-auto flex items-end justify-between border-t border-green/12 pt-5">
-                <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-cream-dim">Résultat</span>
+                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.12em] text-cream-dim">Résultat</span>
                 <span className="font-serif-display text-cream transition-[transform,color] duration-400 [transition-timing-function:var(--ease-out)] group-hover:text-green group-focus-within:text-green md:translate-y-1 md:opacity-70 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100"
                   style={{ fontSize: 'clamp(40px, 6vw, 64px)' }}>
                   {c.result}
@@ -601,7 +733,7 @@ const Methode: React.FC = () => {
   });
 
   return (
-    <section id="methode" className="section-clip relative px-5 py-28 md:px-8 md:py-36">
+    <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
         style={{ background: 'radial-gradient(circle at 50% 50%, rgba(91,140,255,0.18), transparent 65%)' }} />
       <div className="mx-auto max-w-4xl text-center">
@@ -633,7 +765,7 @@ const Methode: React.FC = () => {
               <Reveal delay={0.05 * i}>
                 <div className="flex flex-wrap items-baseline gap-3">
                   <h3 className="font-serif-display text-[30px] leading-none text-cream md:text-[40px]">{s.k}</h3>
-                  <span className="rounded-full border border-green/30 px-3 py-1 text-[12px] font-bold uppercase tracking-[0.12em] text-green">{s.meta}</span>
+                  <span className="rounded-full border border-green/30 px-3 py-1 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-green">{s.meta}</span>
                 </div>
                 <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
               </Reveal>
@@ -690,7 +822,7 @@ const TiltCard: React.FC<{ f: typeof FOUNDERS[number]; i: number }> = ({ f, i })
           </a>
         </div>
         <div className="p-7 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
+          <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
           <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
           <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
           <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
@@ -700,7 +832,7 @@ const TiltCard: React.FC<{ f: typeof FOUNDERS[number]; i: number }> = ({ f, i })
   );
 };
 const Duo: React.FC = () => (
-  <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-28 md:px-8 md:py-36">
+  <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
     <div className="mx-auto max-w-5xl">
       <div className="max-w-2xl">
         <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
@@ -727,7 +859,7 @@ const Duo: React.FC = () => (
           <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
             <CountUp to={55000} suffix=" +" />
           </span>
-          <span className="text-[12px] font-bold uppercase tracking-[0.18em] text-cream-dim">abonnés LinkedIn cumulés</span>
+          <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">abonnés LinkedIn cumulés</span>
         </div>
       </Reveal>
     </div>
@@ -776,12 +908,12 @@ const FaqRow: React.FC<{ q: string; a: string; idx: number }> = ({ q, a, idx }) 
   );
 };
 const Faq: React.FC = () => (
-  <section id="faq" className="section-clip relative px-5 py-28 md:px-8 md:py-36">
+  <section id="faq" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
       <Reveal delay={0.06} perspective>
         <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
-          Tout ce qu'on nous demande.
+          Tout ce qu'on <span className="aurora-text italic">nous demande.</span>
         </h2>
       </Reveal>
       <div>
@@ -800,7 +932,7 @@ const CtaFinal: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: '-20%' });
   return (
     <section id="contact" ref={ref}
-      className="section-clip relative isolate overflow-hidden bg-ink px-5 py-28 md:px-8 md:py-36">
+      className="section-clip relative isolate overflow-hidden bg-ink px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <Grainient
           className="h-full w-full"
@@ -881,7 +1013,7 @@ const Footer: React.FC = () => {
             </p>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
+            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
             <ul className="space-y-2 text-sm text-cream-soft">
               {NAV_LINKS.map(([l, h]) => (
                 <li key={l}><a href={h} className="link-limitless hover:text-cream">{l}</a></li>
@@ -889,7 +1021,7 @@ const Footer: React.FC = () => {
             </ul>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
+            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
             <ul className="space-y-2 text-sm text-cream-soft">
               <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Réserver un appel</a></li>
               <li><a href="mailto:contact@axem-ia.fr" className="link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
@@ -921,15 +1053,26 @@ const Home: React.FC = () => {
       <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">
+          {/* Blueprint Limitless → AXEM :
+              Hero (verre #1) · Marquee logos · Process 3 étapes · INTERLUDE VERRE #2
+              · Benefits + preuve duo · Features (parcours) · Marquee capacités
+              · INTERLUDE VERRE #3 · Count-up résultats · Formation · FAQ · CTA (verre #4) */}
           <Hero />
           <TrustBar />
+          <Methode />
           <SectionA />
           <Manifeste />
-          <Formation />
-          <Conseil />
-          <Resultats />
-          <Methode />
           <Duo />
+          <Conseil />
+          <CapabilitiesMarquee />
+          <GlassInterlude
+            id="interlude"
+            eyebrow="Notre promesse"
+            watermark="et on reste"
+            title={<>On ne livre pas. <span className="aurora-text italic">On accompagne.</span></>}
+          />
+          <Resultats />
+          <Formation />
           <Faq />
           <CtaFinal />
         </main>
