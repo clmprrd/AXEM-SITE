@@ -4,15 +4,18 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
-import { RiseWords, Reveal, CountUp, EASE } from '../ui/motion';
+import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount, revealWatermark } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 
 // =====================================================================
 // AXEM IA — SITE COMPLET « LIMITLESS × NAVY »
-// Storytelling bleu nuit, langage éditorial. Une interaction intelligente
-// par section. Boutons éditoriaux (Button.tsx) branchés partout.
-// Motion : transform/opacity/SVG only · whileInView once ·
-//   MotionConfig reducedMotion="user" + gardes useReducedMotion · 60fps.
+// Moteur d'animation RÉPLIQUÉ du template Framer « Limitless » :
+//   · spring unique 320/60/1 sur TOUTES les entrées (opacity 0.001→1, y 40→0)
+//   · cascade hero stagger 0.2s (watermark 0 · eyebrow .1 · H1 .3 · p .5 · CTA .7 · visuel .9)
+//   · nav scroll-glass (pas d'auto-hide) · marquee ticker (mask 25px + slow au hover)
+//   · footer-reveal rideau (footer fixe révélé en fin de scroll)
+// DA navy + hero serif + Grainient navy conservés. transform/opacity/SVG only.
+// MotionConfig reducedMotion="user" : reduced → opacity only, footer-reveal off.
 // =====================================================================
 
 const ease = EASE;
@@ -26,46 +29,41 @@ const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194
 const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#070C1A' } as const;
 
 // ---------------------------------------------------------------------
-// NAV — pilule flottante centrée, frosted glass, auto-hide au scroll.
+// NAV — pilule flottante centrée. RÉPLIQUE LIMITLESS « scroll-glass » :
+// transparente en haut, devient verre frosted navy dès qu'on scrolle (>80px).
+// PAS d'auto-hide. useScroll + useMotionValueEvent pilotent data-scrolled.
 // ---------------------------------------------------------------------
 const NAV_LINKS: [string, string][] = [
   ['Formation', '#formation'], ['Conseil', '#conseil'],
   ['Résultats', '#resultats'], ['Méthode', '#methode'], ['Le duo', '#duo'],
 ];
 const Nav: React.FC = () => {
-  const reduce = useReducedMotion();
   const { scrollY } = useScroll();
-  const [hidden, setHidden] = React.useState(false);
-  const last = useRef(0);
+  const [scrolled, setScrolled] = React.useState(false);
   useMotionValueEvent(scrollY, 'change', (y) => {
-    if (reduce) return;
-    const prev = last.current;
-    if (y > prev && y > 120) setHidden(true);
-    else if (y < prev) setHidden(false);
-    last.current = y;
+    const next = y > 80;
+    setScrolled((prev) => (prev === next ? prev : next));
   });
   return (
-    <motion.header
-      initial={false}
-      animate={{ y: hidden ? '-160%' : '0%' }}
-      transition={{ duration: 0.45, ease }}
-      className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 will-change-transform md:top-6">
-      <nav className="glass flex w-full max-w-3xl items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2 backdrop-blur-xl">
-        <a href="#top" className="font-serif-display text-2xl leading-none tracking-tight text-cream [touch-action:manipulation]">
+    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6">
+      <nav
+        data-scrolled={scrolled ? 'true' : 'false'}
+        className="nav-pill flex w-full max-w-3xl items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2">
+        <a href="#top" className="link-limitless font-serif-display text-2xl leading-none tracking-tight text-cream hover:text-cream [touch-action:manipulation]">
           AXEM<span className="aurora-text">.</span>
         </a>
         <div className="hidden items-center gap-6 md:flex">
           {NAV_LINKS.map(([l, h]) => (
             <a key={l} href={h}
-              className="group relative text-[13px] font-medium text-cream-soft transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream [touch-action:manipulation]">
+              className="group link-limitless relative text-[13px] font-medium text-cream-soft hover:text-cream [touch-action:manipulation]">
               {l}
-              <span className="absolute -bottom-1 left-0 h-px w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 h-px w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-limitless)] group-hover:w-full" />
             </a>
           ))}
         </div>
         <SecondaryButton href={CALENDLY} external size="sm" className="!py-2.5">Réserver un appel</SecondaryButton>
       </nav>
-    </motion.header>
+    </header>
   );
 };
 
@@ -83,9 +81,9 @@ const Hero: React.FC = () => {
         style={{ background: 'linear-gradient(180deg, transparent, #070B16)' }} />
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
+        {/* CASCADE HERO (mount) stagger 0.2s — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
         <motion.div
-          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+          {...revealMount(0.1, !!reduce)}
           className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
           <span className="relative flex h-2 w-2">
             {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
@@ -98,27 +96,25 @@ const Hero: React.FC = () => {
 
         <h1 aria-label="Votre partenaire IA, de A à Z."
           className="font-serif-display mt-8 leading-[0.92] tracking-[-0.02em] text-cream"
-          style={{ fontSize: 'clamp(48px, 11vw, 120px)' }}>
+          style={{ fontSize: 'clamp(48px, 11vw, 120px)', transformPerspective: 1200 }}>
           <span aria-hidden>
-            <RiseWords text="Votre partenaire IA," stagger={0.08} />
+            <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
             <span className="aurora-solid inline-block">
-              <RiseWords text="de A à Z." delay={0.3} stagger={0.09} />
+              <RiseWords text="de A à Z." delay={0.55} stagger={0.09} />
             </span>
           </span>
         </h1>
 
         <motion.p
-          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.85, ease }}
+          {...revealMount(0.5, !!reduce)}
           className="mt-8 max-w-2xl text-balance text-lg leading-relaxed text-cream-soft md:text-xl">
           On forme vos équipes, on conseille votre stratégie, on déploie vos automatisations.
           <span className="text-cream"> Et on reste.</span>
         </motion.p>
 
         <motion.div
-          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.0, ease }}
+          {...revealMount(0.7, !!reduce)}
           className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <PrimaryButton href={CALENDLY} external size="lg">Réserver un appel</PrimaryButton>
           <SecondaryButton href="#resultats" size="lg">Voir nos résultats</SecondaryButton>
@@ -142,9 +138,12 @@ const LOGOS: [string, string][] = [
   ['Socos', '/logos/socos.png'],
   ['Gravotech', '/logos/gravotech.png'],
 ];
+const TICKER_DUR = 34; // durée normale (s)
+const TICKER_DUR_SLOW = 90; // ralenti au hover
 const TrustBar: React.FC = () => {
   const reduce = useReducedMotion();
-  const row = [...LOGOS, ...LOGOS];
+  const row = [...LOGOS, ...LOGOS]; // contenu DUPLIQUÉ pour boucle sans couture
+  const [dur, setDur] = React.useState(TICKER_DUR);
   return (
     <section aria-label="Ils nous font confiance" className="section-clip relative border-y border-green/10 py-14">
       <Reveal>
@@ -152,20 +151,21 @@ const TrustBar: React.FC = () => {
           Ils nous font confiance
         </p>
       </Reveal>
-      <div className="group relative overflow-hidden"
-        style={{ maskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 7%, black 93%, transparent)' }}>
-        <div
+      {/* TICKER fidèle Limitless : translateX [0, -50%], linear infinite, masque dégradé 25px */}
+      <div className="ticker-mask group relative overflow-hidden">
+        <motion.div
           className="flex w-max items-center gap-14 md:gap-20"
-          style={reduce ? undefined : { animation: 'marquee 34s linear infinite' }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.animationPlayState = 'paused'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.animationPlayState = 'running'; }}>
+          animate={reduce ? undefined : { x: ['0%', '-50%'] }}
+          transition={reduce ? undefined : { duration: dur, ease: 'linear', repeat: Infinity }}
+          onMouseEnter={() => !reduce && setDur(TICKER_DUR_SLOW)}
+          onMouseLeave={() => !reduce && setDur(TICKER_DUR)}>
           {row.map(([name, src], i) => (
             <span key={name + i} className="logo-chip shrink-0" title={name}>
               <img src={src} alt={name} loading="lazy"
                 className="h-7 w-auto max-w-[150px] object-contain md:h-9" />
             </span>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -195,19 +195,22 @@ const SectionA: React.FC = () => {
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
         style={{ background: 'radial-gradient(80% 80% at 50% 50%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.6) 60%, rgba(7,11,22,0.85) 100%)' }} />
+      {/* div externe : parallax scroll. span interne : entrée watermark y -150→0 (spring) */}
       <motion.div aria-hidden style={{ y }}
         className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <span className="serif-watermark font-serif-display text-cream/[0.07]"
+        <motion.span
+          {...revealWatermark(0, !!reduce)}
+          className="serif-watermark font-serif-display text-cream/[0.07]"
           style={{ fontSize: 'clamp(120px, 34vw, 520px)' }}>
           de A à Z
-        </span>
+        </motion.span>
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <Reveal>
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan">Le parcours AXEM</p>
         </Reveal>
-        <Reveal delay={0.08} y={28}>
+        <Reveal delay={0.08} perspective>
           <p className="font-serif-display mt-5 leading-[0.98] tracking-[-0.01em] text-cream"
             style={{ fontSize: 'clamp(40px, 7vw, 88px)' }}>
             De l'audit à <span className="aurora-text italic">l'autonomie.</span>
@@ -251,11 +254,9 @@ const Manifeste: React.FC = () => {
         <div className="mt-20 grid gap-5 text-left md:grid-cols-3">
           {CARDS.map((c, i) => (
             <motion.div key={c.k}
-              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, delay: i * 0.12, ease }}
-              className="glass flex h-full flex-col gap-3 rounded-3xl p-7 transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_22px_50px_-20px_rgba(91,140,255,0.4)] md:p-8">
+              {...reveal(i * 0.12, !!reduce)}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              className="glass flex h-full flex-col gap-3 rounded-3xl p-7 md:p-8">
               <span className="font-serif-display text-5xl text-green/40">{c.k}</span>
               <h3 className="font-serif-display text-3xl leading-none text-cream">{c.t}</h3>
               <p className="text-[15px] leading-relaxed text-cream-soft">{c.d}</p>
@@ -318,7 +319,7 @@ const Formation: React.FC = () => {
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <Reveal><Eyebrow>Formation</Eyebrow></Reveal>
-          <Reveal delay={0.06} y={28}>
+          <Reveal delay={0.06} perspective>
             <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
               70 % de pratique.<br /><span className="aurora-text italic">Opérationnel dès J+1.</span>
             </h2>
@@ -335,11 +336,9 @@ const Formation: React.FC = () => {
         <div className="mt-14 grid gap-5 md:grid-cols-3">
           {FORMATIONS_PHARES.map((f, i) => (
             <motion.article key={f.code} tabIndex={0}
-              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease }}
-              className="group glass relative flex flex-col rounded-3xl p-7 outline-none transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_24px_60px_-22px_rgba(91,140,255,0.45)] focus-visible:-translate-y-1 md:p-8">
+              {...reveal(i * 0.1, !!reduce)}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              className="group glass relative flex flex-col rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-8">
               <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[f.level]}`}>{f.level}</span>
               <h3 className="font-serif-display mt-5 text-[28px] leading-[1.05] text-cream">{f.code}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-cream-soft">{f.pitch}</p>
@@ -381,10 +380,10 @@ const Formation: React.FC = () => {
                   <ul>
                     {CATALOGUE.map(([code, title, level, price], i) => (
                       <motion.li key={code}
-                        initial={reduce ? { opacity: 1 } : { opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: 0.04 * i, ease }}
-                        className="grid grid-cols-[48px_1fr_auto] items-center gap-3 border-b border-green/8 px-5 py-4 transition-colors [transition-timing-function:var(--ease-out)] last:border-0 hover:bg-white/[0.03] md:grid-cols-[64px_1fr_140px_100px] md:gap-4 md:px-6">
+                        initial={reduce ? { opacity: 0.001 } : { opacity: 0.001, y: 12 }}
+                        animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                        transition={reduce ? { duration: 0.3, delay: 0.04 * i } : { ...SPRING, delay: 0.04 * i }}
+                        className="grid grid-cols-[48px_1fr_auto] items-center gap-3 border-b border-green/8 px-5 py-4 transition-colors [transition-timing-function:var(--ease-limitless)] last:border-0 hover:bg-white/[0.03] md:grid-cols-[64px_1fr_140px_100px] md:gap-4 md:px-6">
                         <span className="font-serif-display text-lg text-green/60">{code}</span>
                         <span className="text-[15px] text-cream">{title}</span>
                         <span className={`hidden text-[12px] font-bold uppercase tracking-[0.1em] md:inline ${LEVEL_TINT[level].split(' ')[0]}`}>{level}</span>
@@ -434,7 +433,7 @@ const Conseil: React.FC = () => {
       <div className="mx-auto max-w-5xl">
         <div className="max-w-2xl">
           <Reveal><Eyebrow>Conseil &amp; agence</Eyebrow></Reveal>
-          <Reveal delay={0.06} y={28}>
+          <Reveal delay={0.06} perspective>
             <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
               Un seul parcours,<br /><span className="aurora-text italic">de bout en bout.</span>
             </h2>
@@ -518,7 +517,7 @@ const Resultats: React.FC = () => {
         <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
           <div>
             <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
-            <Reveal delay={0.06} y={28}>
+            <Reveal delay={0.06} perspective>
               <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
                 Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
               </h2>
@@ -535,10 +534,7 @@ const Resultats: React.FC = () => {
         <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
           {KPIS.map((k, i) => (
             <motion.div key={i}
-              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.55, delay: (i % 3) * 0.08, ease }}
+              {...reveal((i % 3) * 0.08, !!reduce)}
               className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
               <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
                 {k.val}
@@ -552,11 +548,9 @@ const Resultats: React.FC = () => {
         <div className="mt-24 grid gap-5 md:grid-cols-2">
           {CASES.map((c, i) => (
             <motion.article key={c.sector} tabIndex={0}
-              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, delay: (i % 2) * 0.1, ease }}
-              className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-out)] hover:-translate-y-1 hover:shadow-[0_24px_60px_-22px_rgba(91,140,255,0.45)] focus-visible:-translate-y-1 md:p-9">
+              {...reveal((i % 2) * 0.1, !!reduce)}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
               <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
               <div className="space-y-3 text-[14.5px] leading-relaxed">
                 <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
@@ -612,7 +606,7 @@ const Methode: React.FC = () => {
         style={{ background: 'radial-gradient(circle at 50% 50%, rgba(91,140,255,0.18), transparent 65%)' }} />
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>Méthode</Eyebrow></div></Reveal>
-        <Reveal delay={0.06} y={28}>
+        <Reveal delay={0.06} perspective>
           <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 80px)' }}>
             En 3 étapes.<br /><span className="aurora-text italic">Pas une de plus.</span>
           </h2>
@@ -679,10 +673,7 @@ const TiltCard: React.FC<{ f: typeof FOUNDERS[number]; i: number }> = ({ f, i })
   const reset = () => setT({ rx: 0, ry: 0 });
   return (
     <motion.div
-      initial={reduce ? { opacity: 1 } : { opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6, delay: i * 0.12, ease }}
+      {...reveal(i * 0.12, !!reduce)}
       style={{ perspective: 1000 }}>
       <div ref={ref} onMouseMove={onMove} onMouseLeave={reset}
         className="group glass relative overflow-hidden rounded-3xl transition-transform duration-200 [transform-style:preserve-3d] [transition-timing-function:var(--ease-out)]"
@@ -713,7 +704,7 @@ const Duo: React.FC = () => (
     <div className="mx-auto max-w-5xl">
       <div className="max-w-2xl">
         <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
-        <Reveal delay={0.06} y={28}>
+        <Reveal delay={0.06} perspective>
           <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
             Deux experts,<br /><span className="aurora-text italic">un seul interlocuteur.</span>
           </h2>
@@ -788,7 +779,7 @@ const Faq: React.FC = () => (
   <section id="faq" className="section-clip relative px-5 py-28 md:px-8 md:py-36">
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
-      <Reveal delay={0.06} y={24}>
+      <Reveal delay={0.06} perspective>
         <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
           Tout ce qu'on nous demande.
         </h2>
@@ -824,7 +815,7 @@ const CtaFinal: React.FC = () => {
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
           <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
-          <Reveal delay={0.06} y={28}>
+          <Reveal delay={0.06} perspective>
             <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
               Échangeons 30 minutes <span className="aurora-text italic">sur l'IA.</span>
             </h2>
@@ -861,41 +852,58 @@ const CtaFinal: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// FOOTER — enrichi.
+// FOOTER — enrichi. Dispositif « footer-reveal » : rendu en position fixe
+// (.footer-fixed) DERRIÈRE le <main>, révélé par effet rideau en fin de scroll.
+// Fond Grainient navy subtil + radial pour rester dans la DA.
 // ---------------------------------------------------------------------
-const Footer: React.FC = () => (
-  <footer className="relative border-t border-green/12 px-5 py-16 md:px-8">
-    <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
-      <div>
-        <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl">
-          AXEM<span className="aurora-text">.</span>
-        </a>
-        <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-soft">
-          Votre partenaire IA, de A à Z. Formation, conseil, audit, production &amp; automatisation IA.
-        </p>
+const Footer: React.FC = () => {
+  const reduce = useReducedMotion();
+  return (
+    <footer className="footer-fixed isolate border-t border-green/12 px-5 py-16 md:px-8">
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <Grainient
+          className="h-full w-full"
+          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
+          timeSpeed={reduce ? 0 : 0.1} grainAmount={0.07} contrast={1.25}
+          saturation={0.95} zoom={1.05} warpStrength={1.0}
+        />
+        <div className="absolute inset-0"
+          style={{ background: 'radial-gradient(120% 120% at 50% 0%, rgba(7,11,22,0.55) 0%, rgba(7,11,22,0.8) 60%, rgba(7,11,22,0.95) 100%)' }} />
       </div>
-      <div>
-        <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
-        <ul className="space-y-2 text-sm text-cream-soft">
-          {NAV_LINKS.map(([l, h]) => (
-            <li key={l}><a href={h} className="transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream">{l}</a></li>
-          ))}
-        </ul>
+      <div className="relative z-10 w-full">
+        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl">
+              AXEM<span className="aurora-text">.</span>
+            </a>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-soft">
+              Votre partenaire IA, de A à Z. Formation, conseil, audit, production &amp; automatisation IA.
+            </p>
+          </div>
+          <div>
+            <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
+            <ul className="space-y-2 text-sm text-cream-soft">
+              {NAV_LINKS.map(([l, h]) => (
+                <li key={l}><a href={h} className="link-limitless hover:text-cream">{l}</a></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
+            <ul className="space-y-2 text-sm text-cream-soft">
+              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Réserver un appel</a></li>
+              <li><a href="mailto:contact@axem-ia.fr" className="link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
+              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Cas clients</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="mx-auto mt-12 max-w-5xl border-t border-green/8 pt-6 text-center text-xs text-cream-dim">
+          © 2026 AXEM IA — Paris, France.
+        </div>
       </div>
-      <div>
-        <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
-        <ul className="space-y-2 text-sm text-cream-soft">
-          <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream">Réserver un appel</a></li>
-          <li><a href="mailto:contact@axem-ia.fr" className="transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream">contact@axem-ia.fr</a></li>
-          <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="transition-colors [transition-timing-function:var(--ease-out)] hover:text-cream">Cas clients</a></li>
-        </ul>
-      </div>
-    </div>
-    <div className="mx-auto mt-12 max-w-5xl border-t border-green/8 pt-6 text-center text-xs text-cream-dim">
-      © 2026 AXEM IA — Paris, France.
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 // ---------------------------------------------------------------------
 // PAGE
@@ -904,10 +912,12 @@ const Home: React.FC = () => {
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
-      <div className="min-h-screen overflow-x-hidden text-cream"
-        style={{ background: 'linear-gradient(180deg, #070B16 0%, #0B1020 55%, #0D1526 100%)' }}>
+      {/* has-footer-reveal : wrapper du dispositif rideau. Footer fixe DERRIÈRE,
+          le <main>.reveal-main (fond navy opaque + margin-bottom = footer) glisse
+          vers le haut en fin de scroll et révèle le footer. */}
+      <div className="has-footer-reveal min-h-screen overflow-x-hidden text-cream">
         <Nav />
-        <main id="contenu">
+        <main id="contenu" className="reveal-main">
           <Hero />
           <TrustBar />
           <SectionA />

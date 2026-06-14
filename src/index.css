@@ -10,6 +10,8 @@
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* easing « Limitless » pour les transitions de couleur (liens, hovers texte) */
+  --ease-limitless: cubic-bezier(0.44, 0, 0.56, 1);
   /* accent bleu profond maîtrisé pour les boutons (pas de néon) */
   --btn: #2a4bd0;
   --btn-hover: #3b6fe0;
@@ -204,6 +206,88 @@ body {
   to { transform: translateX(-50%); }
 }
 
+/* =====================================================================
+   NAV SCROLL-GLASS (réplique Limitless) — PAS d'auto-hide.
+   En haut : transparente, sans bordure, sans blur.
+   Au scroll (>80px) : pilule verre frosted navy.
+   ===================================================================== */
+.nav-pill {
+  background: transparent;
+  border: 1px solid transparent;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  box-shadow: none;
+  transition: background-color 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+    backdrop-filter 0.4s var(--ease-out), -webkit-backdrop-filter 0.4s var(--ease-out),
+    box-shadow 0.4s var(--ease-out);
+}
+.nav-pill[data-scrolled='true'] {
+  background: rgba(11, 16, 32, 0.5);
+  border-color: rgba(120, 160, 255, 0.18);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: 0 8px 30px -16px rgba(0, 0, 0, 0.6);
+}
+
+/* =====================================================================
+   MARQUEE / TICKER (réplique Limitless) — masque dégradé 25px sur les bords,
+   ralentit au hover (la durée vit dans --marquee-dur, modifiée au survol).
+   ===================================================================== */
+.ticker-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25px, #000 calc(100% - 25px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 25px, #000 calc(100% - 25px), transparent);
+}
+
+/* =====================================================================
+   FOOTER REVEAL signature (effet rideau).
+   Footer fixé en bas, DERRIÈRE le contenu. Le <main> a un fond navy opaque
+   + un margin-bottom = hauteur du footer → en fin de scroll, le contenu
+   glisse vers le haut et révèle le footer fixe en dessous.
+   ===================================================================== */
+:root {
+  --footer-h: 80vh;
+}
+.has-footer-reveal {
+  position: relative;
+  z-index: 0;
+}
+.has-footer-reveal .reveal-main {
+  position: relative;
+  z-index: 1;
+  /* fond navy opaque : masque le footer fixe tant qu'on n'est pas en bas */
+  background: linear-gradient(180deg, #070b16 0%, #0b1020 55%, #0d1526 100%);
+  margin-bottom: var(--footer-h);
+}
+.footer-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: var(--footer-h);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+@media (max-width: 768px) {
+  :root {
+    --footer-h: 68vh;
+  }
+}
+/* reduced-motion : footer en flux normal, pas de rideau */
+@media (prefers-reduced-motion: reduce) {
+  .has-footer-reveal .reveal-main {
+    margin-bottom: 0;
+    z-index: 0;
+  }
+  .footer-fixed {
+    position: relative;
+    height: auto;
+    z-index: auto;
+    display: block;
+  }
+}
+
 /* respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -268,7 +352,8 @@ body {
 }
 .btn-primary:hover {
   background-color: var(--btn-hover);
-  transform: translateY(-1px);
+  /* hover « Limitless » : scale 1.03 (pas de glow néon) */
+  transform: translateY(-1px) scale(1.03);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
     0 16px 30px -16px rgba(30, 60, 150, 0.95);
 }
@@ -306,7 +391,8 @@ body {
 }
 .btn-primary:hover .btn-arrow,
 .btn-secondary:hover .btn-arrow {
-  transform: translateX(3px);
+  /* flèche qui glisse +4px (réplique Limitless) */
+  transform: translateX(4px);
 }
 
 /* SECONDAIRE — ghost/outline glass. Bordure + texte s'éclaircissent,
@@ -322,7 +408,7 @@ body {
 .btn-secondary:hover {
   color: #eaf0ff;
   border-color: rgba(160, 190, 255, 0.55);
-  transform: translateY(-1px);
+  transform: translateY(-1px) scale(1.03);
 }
 .btn-secondary:active {
   transform: translateY(0) scale(0.97);
@@ -400,6 +486,11 @@ body {
 .tnum {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
+}
+
+/* lien texte « Limitless » : transition couleur 0.25s cubic-bezier(.44,0,.56,1) */
+.link-limitless {
+  transition: color 0.25s var(--ease-limitless);
 }
 
 /* logo grayscale -> couleur au hover (bande confiance) */
