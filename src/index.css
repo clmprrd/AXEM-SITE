@@ -245,18 +245,20 @@ body {
    glisse vers le haut et révèle le footer fixe en dessous.
    ===================================================================== */
 :root {
-  --footer-h: 80vh;
+  --footer-h: 72vh;
 }
 .has-footer-reveal {
   position: relative;
   z-index: 0;
+  /* padding (PAS margin sur le main) : zone transparente en bas qui révèle le
+     footer fixe. Évite le margin-collapse qui rognait la hauteur scrollable. */
+  padding-bottom: var(--footer-h);
 }
 .has-footer-reveal .reveal-main {
   position: relative;
   z-index: 1;
   /* fond navy opaque : masque le footer fixe tant qu'on n'est pas en bas */
   background: linear-gradient(180deg, #070b16 0%, #0b1020 55%, #0d1526 100%);
-  margin-bottom: var(--footer-h);
 }
 .footer-fixed {
   position: fixed;
@@ -266,18 +268,22 @@ body {
   z-index: 0;
   height: var(--footer-h);
   display: flex;
-  align-items: center;
+  /* contenu ancré en bas : il vit dans la bande systématiquement révélée en fin
+     de scroll (le haut du footer peut rester sous le <main> selon les hauteurs). */
+  align-items: flex-end;
   overflow: hidden;
 }
 @media (max-width: 768px) {
   :root {
-    --footer-h: 68vh;
+    --footer-h: 60vh;
   }
 }
 /* reduced-motion : footer en flux normal, pas de rideau */
 @media (prefers-reduced-motion: reduce) {
+  .has-footer-reveal {
+    padding-bottom: 0;
+  }
   .has-footer-reveal .reveal-main {
-    margin-bottom: 0;
     z-index: 0;
   }
   .footer-fixed {

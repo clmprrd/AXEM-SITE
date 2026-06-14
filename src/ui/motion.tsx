@@ -74,18 +74,23 @@ export const RiseWords: React.FC<{
           ? { duration: 0.3, delay: delay + i * stagger }
           : { ...SPRING, delay: delay + i * stagger };
         return (
-          <span key={i} className="inline-block overflow-hidden align-bottom pb-[0.06em]" aria-hidden>
-            <motion.span
-              className="inline-block will-change-transform"
-              style={{ transformPerspective: 1200 }}
-              initial={init}
-              {...(onScroll
-                ? { whileInView: anim, viewport: { once: true, amount: 0.3 } }
-                : { animate: anim })}
-              transition={t}>
-              {w}{!last ? ' ' : ''}
-            </motion.span>
-          </span>
+          // L'espace inter-mots vit HORS du wrapper overflow-hidden (sinon il est
+          // rogné par le masque inline-block → mots collés). Fragment + ' '.
+          <React.Fragment key={i}>
+            <span className="inline-block overflow-hidden align-bottom pb-[0.06em]" aria-hidden>
+              <motion.span
+                className="inline-block will-change-transform"
+                style={{ transformPerspective: 1200 }}
+                initial={init}
+                {...(onScroll
+                  ? { whileInView: anim, viewport: { once: true, amount: 0.3 } }
+                  : { animate: anim })}
+                transition={t}>
+                {w}
+              </motion.span>
+            </span>
+            {!last ? ' ' : ''}
+          </React.Fragment>
         );
       })}
     </span>

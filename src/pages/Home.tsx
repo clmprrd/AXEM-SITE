@@ -868,7 +868,7 @@ const Footer: React.FC = () => {
           saturation={0.95} zoom={1.05} warpStrength={1.0}
         />
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(120% 120% at 50% 0%, rgba(7,11,22,0.55) 0%, rgba(7,11,22,0.8) 60%, rgba(7,11,22,0.95) 100%)' }} />
+          style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
       </div>
       <div className="relative z-10 w-full">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
@@ -914,8 +914,11 @@ const Home: React.FC = () => {
       <a href="#contenu" className="skip-link">Aller au contenu</a>
       {/* has-footer-reveal : wrapper du dispositif rideau. Footer fixe DERRIÈRE,
           le <main>.reveal-main (fond navy opaque + margin-bottom = footer) glisse
-          vers le haut en fin de scroll et révèle le footer. */}
-      <div className="has-footer-reveal min-h-screen overflow-x-hidden text-cream">
+          vers le haut en fin de scroll et révèle le footer.
+          PAS d'overflow-x-hidden ici : ça transformerait le wrapper en scroller
+          interne (overflow-y→auto) et casserait le scroll fenêtre + le footer fixe.
+          Le clamp overflow-x est porté par <body> (index.css) + .section-clip. */}
+      <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">
           <Hero />
