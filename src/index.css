@@ -531,3 +531,136 @@ body {
     transition: none !important;
   }
 }
+
+/* =====================================================================
+   🅰️ LA LIGNE — la signature. Une ligne lumineuse continue qui naît du
+   « A » du hero, traverse TOUT le site (longueur tracée = progression du
+   scroll global), change de teinte selon le récit, et ne se rompt jamais.
+   Le SVG est fixé en overlay plein écran, pointer-events:none.
+   ===================================================================== */
+.ligne-fixed {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  z-index: 5; /* au-dessus du contenu navy, sous la nav (z-50) et le footer-reveal main (z-1)… */
+  pointer-events: none;
+  overflow: visible;
+}
+/* le SVG doit flotter au-dessus du <main> opaque du footer-reveal */
+.has-footer-reveal .ligne-fixed {
+  z-index: 6;
+}
+/* le tracé de la ligne : glow doux + extrémité ronde. La couleur (stroke)
+   et la longueur (stroke-dashoffset / pathLength) sont pilotées en JS. */
+.ligne-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(91, 140, 255, 0.55))
+    drop-shadow(0 0 16px rgba(56, 189, 248, 0.35));
+}
+.ligne-rail {
+  fill: none;
+  stroke: rgba(120, 160, 255, 0.10);
+  stroke-linecap: round;
+}
+/* la « tête » lumineuse — petit point qui suit la pointe du tracé */
+.ligne-head {
+  filter: drop-shadow(0 0 8px rgba(122, 170, 255, 0.9))
+    drop-shadow(0 0 22px rgba(56, 189, 248, 0.55));
+}
+@media (prefers-reduced-motion: reduce) {
+  /* reduced motion : ligne statique, tracée pleine, pas de tête animée */
+  .ligne-head {
+    display: none;
+  }
+}
+
+/* nœud de section, posé sur la ligne, qui s'allume quand le tracé l'atteint */
+.ligne-node {
+  transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out),
+    border-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.ligne-node[data-on='true'] {
+  background-color: #7aa2ff;
+  border-color: rgba(122, 162, 255, 0.9);
+  box-shadow: 0 0 0 5px rgba(91, 140, 255, 0.14), 0 0 18px rgba(56, 189, 248, 0.6);
+  transform: scale(1.12);
+}
+
+/* =====================================================================
+   MÉTAMORPHOSE (LE WOW) — section pinnée. Avant (chaos tableur) → après
+   (workflow n8n propre). On scrub le morph via une variable --morph 0→1.
+   Les cellules désaturées s'effacent, les nœuds workflow se composent.
+   ===================================================================== */
+.morph-stage {
+  position: relative;
+}
+/* faux tableur chaotique (avant) */
+.sheet-cell {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(120, 160, 255, 0.12);
+  color: #6e7fa0;
+  font-variant-numeric: tabular-nums;
+  will-change: transform, opacity;
+}
+/* nœud de workflow n8n (après) */
+.flow-node {
+  background: rgba(13, 21, 38, 0.72);
+  border: 1px solid rgba(120, 160, 255, 0.34);
+  box-shadow: 0 8px 30px -14px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(91, 140, 255, 0.06);
+  will-change: transform, opacity;
+}
+.flow-wire {
+  stroke: url(#flowGrad);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* =====================================================================
+   PARCOURS 7 ÉTAPES — scrub horizontal pinné. Désactivé/empilé en mobile.
+   ===================================================================== */
+.steps-track {
+  will-change: transform;
+}
+.step-card {
+  transition: border-color 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
+}
+.step-card[data-active='true'] {
+  border-color: rgba(122, 162, 255, 0.6);
+  box-shadow: 0 20px 60px -20px rgba(91, 140, 255, 0.35), 0 0 0 1px rgba(91, 140, 255, 0.1);
+}
+@media (max-width: 860px) {
+  /* mobile : pas de scrub horizontal, on empile */
+  .steps-pin {
+    height: auto !important;
+  }
+  .steps-sticky {
+    position: static !important;
+    height: auto !important;
+    display: block !important;
+  }
+  .steps-track {
+    transform: none !important;
+    flex-direction: column;
+    width: 100% !important;
+  }
+  .step-card {
+    width: 100% !important;
+  }
+}
+
+/* drag horizontal (galerie formation) — cache la scrollbar, snap doux */
+.drag-x {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  cursor: grab;
+}
+.drag-x::-webkit-scrollbar { display: none; }
+.drag-x:active { cursor: grabbing; }
+.drag-x > * { scroll-snap-align: start; }
