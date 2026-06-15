@@ -531,3 +531,70 @@ body {
     transition: none !important;
   }
 }
+
+/* =====================================================================
+   TERRAIN DE JEU — primitives jouables
+   ===================================================================== */
+
+/* PlaySlider : input range natif transparent superposé. On garde un thumb
+   réel (large) pour la hitbox tactile, mais invisible (le visuel est custom). */
+.play-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 100%;
+  margin: 0;
+}
+.play-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+}
+.play-range:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+.play-range::-moz-range-thumb {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+}
+.play-range::-moz-range-track {
+  background: transparent;
+}
+.play-range:focus-visible {
+  outline: none;
+}
+/* anneau de focus clavier reporté sur le thumb visuel (sibling) */
+.play-range:focus-visible + * ,
+.play-range:focus-visible ~ * {
+  /* noop : géré côté composant si besoin */
+}
+
+/* MagneticLogos : N&B → couleur au hover du conteneur */
+.logo-chip-img {
+  filter: grayscale(1) brightness(1.6) contrast(0.9);
+  opacity: 0.6;
+  transition: filter 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
+}
+.group:hover .logo-chip-img {
+  filter: grayscale(0) brightness(1);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-chip-img {
+    transition: none !important;
+  }
+}
+
+/* odomètre (DuoLive) — chiffres tabulaires, pas de saut de largeur */
+.odometer {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
