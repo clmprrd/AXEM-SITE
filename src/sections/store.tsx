@@ -69,17 +69,27 @@ type Ctx = PlaygroundState & {
 
 const PlaygroundContext = React.createContext<Ctx | null>(null);
 
-// Formules du business case — cohérentes, calées sur le ROI médian ~159 %.
-// heures gagnées/mois = équipe × heures/sem × 4.33 × part automatisable
-// € économisés/an = heures gagnées/mois × 12 × coût horaire chargé
-// ROI = (gain annuel - coût programme estimé) / coût programme estimé
+// Formules du business case — calibrées CRÉDIBLES, jamais en contradiction
+// avec le « 159 % de ROI médian » affiché ailleurs sur le site.
+//
+// 1) Heures récupérables/mois = équipe × heures/sem × 4.33 × part automatisable
+//    (inchangé — cohérent avec la promesse du hero).
+// 2) Valeur du temps libéré/an = heures/mois × 12 × coût horaire × COEF réaliste.
+//    On ne valorise PAS 100 % des heures au taux plein toute l'année : un
+//    coefficient de réalisation conservateur (0.4) évite les chiffres gonflés
+//    (ex. 178 k€ → ~71 k€ pour 8 pers × 10 h). Arrondi propre au millier (k€).
+// 3) ROI = ancre documentée FIXE de 159 % (médian constaté sur nos missions),
+//    NON piloté par les curseurs → fini le 774 % incohérent.
+export const ROI_MEDIAN = 159; // % — médian documenté, identique au reste du site
+const REALIZATION_COEF = 0.4;  // part réellement convertible en valeur (conservateur)
+
 export function computeDerived(sector: Sector, teamSize: number, hoursPerWeek: number) {
   const hoursSavedMonth = Math.round(teamSize * hoursPerWeek * 4.33 * sector.automatable);
-  const euroSavedYear = Math.round(hoursSavedMonth * 12 * sector.hourlyCost);
-  // coût programme estimé (audit + déploiement + accompagnement), borné réaliste
-  const programCost = Math.max(8000, Math.min(60000, teamSize * 1800 + 6000));
-  const roiRaw = euroSavedYear > 0 ? ((euroSavedYear - programCost) / programCost) * 100 : 0;
-  const roi = Math.max(0, Math.round(roiRaw));
+  const euroRaw = hoursSavedMonth * 12 * sector.hourlyCost * REALIZATION_COEF;
+  // arrondi propre au millier (k€) pour un chiffre lisible et crédible
+  const euroSavedYear = Math.round(euroRaw / 1000) * 1000;
+  // ROI = ancre médiane fixe (pas de calcul délirant piloté par les curseurs)
+  const roi = ROI_MEDIAN;
   return { hoursSavedMonth, euroSavedYear, roi };
 }
 

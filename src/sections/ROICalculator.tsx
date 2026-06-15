@@ -124,11 +124,12 @@ const ROICalculator: React.FC = () => {
                   sub="équipe × heures répétitives × part automatisable"
                   value={<><LiveNumber value={pg.hoursSavedMonth} format={fmtNum} /><span className="ml-1 text-[0.5em] text-cream-soft">h</span></>} />
                 <InvoiceLine index={1} reduce={!!reduce}
-                  label="€ économisés / an"
-                  sub="heures gagnées × 12 × coût horaire chargé"
+                  label="Valeur du temps libéré / an"
+                  sub="estimation prudente — coefficient de réalisation appliqué"
                   value={<LiveNumber value={pg.euroSavedYear} format={fmtEuro} />} />
                 <InvoiceLine index={2} reduce={!!reduce} emphasis
-                  label="ROI estimé sur 12 mois"
+                  label="ROI médian constaté"
+                  sub="sur nos missions — chiffre documenté, pas une projection"
                   value={<span className="aurora-text"><LiveNumber value={pg.roi} format={(v) => fmtNum(v)} /> %</span>} />
               </div>
 

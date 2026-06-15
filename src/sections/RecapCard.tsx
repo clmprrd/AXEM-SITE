@@ -45,8 +45,8 @@ const RecapCard: React.FC = () => {
             <div className="mt-6 grid gap-5 sm:grid-cols-3">
               {[
                 { v: `${fmtNum(pg.hoursSavedMonth)}`, u: 'h/mois', l: 'récupérables' },
-                { v: fmtEuro(pg.euroSavedYear), u: '/an', l: 'économisés' },
-                { v: `${fmtNum(pg.roi)} %`, u: '', l: 'ROI estimé 12 mois' },
+                { v: fmtEuro(pg.euroSavedYear), u: '/an', l: 'valeur du temps libéré' },
+                { v: `${fmtNum(pg.roi)} %`, u: '', l: 'ROI médian constaté' },
               ].map((k) => (
                 <div key={k.l} className="rounded-2xl border border-green/12 bg-white/[0.02] px-5 py-5">
                   <div className="font-serif-display leading-[0.9] text-cream" style={{ fontSize: 'clamp(30px, 5vw, 46px)' }}>

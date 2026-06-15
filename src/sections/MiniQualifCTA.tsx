@@ -84,7 +84,7 @@ const MiniQualifCTA: React.FC = () => {
                 {fmtNum(pg.hoursSavedMonth)} h/mois récupérables
               </span>
               <span className="rounded-full border border-cyan/30 bg-cyan/[0.06] px-3.5 py-1.5 text-[12.5px] text-cream">
-                {fmtEuro(pg.euroSavedYear)}/an · ROI {fmtNum(pg.roi)} %
+                {fmtEuro(pg.euroSavedYear)}/an libérés · ROI médian {fmtNum(pg.roi)} %
               </span>
             </div>
           )}
