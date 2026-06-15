@@ -142,7 +142,9 @@ const Grainient = ({
       webgl: 2,
       alpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 2)
+      // dpr cappé à 1.5 : moins de pixels à shader chaque frame → GPU soulagé,
+      // imperceptible derrière l'overlay sombre + le grain.
+      dpr: Math.min(window.devicePixelRatio || 1, 1.5)
     });
 
     const gl = renderer.gl;

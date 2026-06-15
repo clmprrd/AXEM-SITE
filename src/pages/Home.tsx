@@ -9,6 +9,8 @@ import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 import { Ligne } from '../components/Ligne';
 import { Metamorphose } from '../components/Metamorphose';
 import { Parcours } from '../components/Parcours';
+import { useLenis } from '../ui/useLenis';
+import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
 // AXEM IA — DIRECTION « 🅰️ LA LIGNE » — le parcours vivant.
@@ -858,6 +860,7 @@ const Footer: React.FC = () => {
 // PAGE — l'ordre des sections suit le récit « LA LIGNE ».
 // ---------------------------------------------------------------------
 const Home: React.FC = () => {
+  useLenis();
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
@@ -873,8 +876,9 @@ const Home: React.FC = () => {
           <TrustBar />
           <Duo />
           <Probleme />
-          <Metamorphose />
-          <Parcours />
+          {/* sections pinnées lourdes : montées seulement à l'approche du viewport */}
+          <LazySection minHeight="300vh"><Metamorphose /></LazySection>
+          <LazySection minHeight="420vh"><Parcours /></LazySection>
           <Resultats />
           <Formation />
           <Methode />

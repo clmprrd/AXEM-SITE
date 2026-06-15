@@ -1,12 +1,17 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion, useMotionValueEvent } from 'framer-motion';
-import { Reveal } from '../ui/motion';
+import { motion, useScroll, useSpring, useTransform, useReducedMotion, useMotionValueEvent } from 'framer-motion';
 
 // =====================================================================
-// 5. LE PARCOURS — 7 ÉTAPES.
-// Pin + scrub horizontal le long de la ligne ; chaque étape s'allume quand
-// le scrub l'atteint ; la 7e ne se referme pas (la ligne continue).
-// Mobile : pin + scrub DÉSACTIVÉS → empilé vertical (via CSS .steps-* + JS garde).
+// 5. LE PARCOURS — 7 ÉTAPES (refonte perf).
+// Pin + scrub horizontal le long de la ligne ; chaque étape s'allume quand le
+// scrub l'atteint ; la 7e ne se referme pas (la ligne continue).
+//
+// PERF — ce qui tue l'ancien lag :
+// • l'ancien `setP(v)` re-render­ait toute la section à CHAQUE FRAME. Désormais
+//   le translate horizontal est une motion value spring-lissée (GPU), et
+//   l'étape active n'est mise à jour qu'au FRANCHISSEMENT de seuil (rare) ;
+// • la barre de progression est animée par scaleX (transform), pas par re-render.
+// Mobile : pin + scrub DÉSACTIVÉS → empilé vertical.
 // =====================================================================
 
 const STEPS = [
@@ -32,16 +37,27 @@ export const Parcours: React.FC = () => {
     return () => mq.removeEventListener('change', upd);
   }, []);
 
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  // translation horizontale du rail : 0 → -(largeur - 1 écran).
-  // 7 cartes, on glisse jusqu'à montrer la dernière. réversible.
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-78%']);
-  const [p, setP] = React.useState(reduce || stacked ? 1 : 0);
-  useMotionValueEvent(scrollYProgress, 'change', (v) => setP(v));
-
   const pinDisabled = reduce || stacked;
-  // étape active : suit le scrub horizontal
-  const activeIdx = pinDisabled ? STEPS.length - 1 : Math.min(STEPS.length - 1, Math.floor(p * STEPS.length + 0.15));
+
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
+  // SPRING-lissage → glissement horizontal fluide et amorti.
+  const smooth = useSpring(scrollYProgress, { stiffness: 130, damping: 32, mass: 0.5 });
+  const prog = pinDisabled ? scrollYProgress : smooth;
+  // translation horizontale du rail (réversible). GPU only.
+  const x = useTransform(prog, [0, 1], ['0%', '-78%']);
+  // barre de progression : scaleX 0→1 (transform, pas de re-render).
+  const barScaleX = useTransform(prog, [0, 1], [0, 1]);
+
+  // étape active : seulement mise à jour au FRANCHISSEMENT (pas chaque frame).
+  const [activeIdx, setActiveIdx] = React.useState(pinDisabled ? STEPS.length - 1 : 0);
+  useMotionValueEvent(prog, 'change', (v) => {
+    if (pinDisabled) return;
+    const idx = Math.min(STEPS.length - 1, Math.floor(v * STEPS.length + 0.15));
+    setActiveIdx((prev) => (prev === idx ? prev : idx));
+  });
+  React.useEffect(() => {
+    if (pinDisabled) setActiveIdx(STEPS.length - 1);
+  }, [pinDisabled]);
 
   return (
     <section
@@ -93,16 +109,15 @@ export const Parcours: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* indicateur de progression du scrub (desktop) */}
+        {/* indicateur de progression du scrub (desktop) — scaleX, pas de re-render */}
         {!pinDisabled && (
-          <div className="mx-auto mt-10 flex w-full max-w-6xl items-center gap-2 px-5 md:px-8">
-            {STEPS.map((_, i) => (
-              <span
-                key={i}
-                className="h-1 flex-1 rounded-full transition-colors duration-500"
-                style={{ background: i <= activeIdx ? '#5b8cff' : 'rgba(120,160,255,0.14)' }}
+          <div className="mx-auto mt-10 w-full max-w-6xl px-5 md:px-8">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(120,160,255,0.14)]">
+              <motion.div
+                className="h-full origin-left rounded-full bg-gradient-to-r from-green to-cyan"
+                style={{ scaleX: barScaleX }}
               />
-            ))}
+            </div>
           </div>
         )}
       </div>

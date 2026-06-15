@@ -1,21 +1,34 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion, useMotionValueEvent } from 'framer-motion';
+import {
+  motion, useScroll, useSpring, useTransform, useReducedMotion, useMotionValueEvent,
+} from 'framer-motion';
 import { CountUp } from '../ui/motion';
 
 // =====================================================================
-// 4. LA MÉTAMORPHOSE (LE WOW) ⭐ — section PINNÉE.
-// À gauche : un tableur/document chaotique. En scrollant, il se DÉSASSEMBLE
-// et se RECOMPOSE en workflow n8n propre (scrub lié au scroll), pendant que
-// « 95 000 € / an » et « 80 % » montent en count-up et que la ligne passe du
-// rouge au bleu lumineux (géré globalement par <Ligne>).
-// Réversible en remontant. reduced-motion → simple fondu avant/après.
-// Mobile : pas de pin agressif, on dégrade en fondu empilé.
+// 4. LA MÉTAMORPHOSE (LE WOW) ⭐ — section PINNÉE (refonte perf).
+// À gauche : un tableur chaotique se DÉSASSEMBLE et se RECOMPOSE en workflow
+// n8n propre (scrub lié au scroll), pendant que « 95 000 € » et « 80 % »
+// montent et que la ligne passe du rouge au bleu (géré par <Ligne>).
+//
+// PERF — ce qui tue l'ancien lag :
+// • plus AUCUN setState au scroll. L'ancien `setM(v)` re-render­ait 30 cellules
+//   + 5 nœuds À CHAQUE FRAME (réconciliation React massive). Désormais tout est
+//   piloté par des motion values (transform/opacity composités) ;
+// • scroll-progress SPRING-lissé → scrub fluide, pas de jitter ;
+// • chaque cellule reçoit ses propres useTransform (x/y/rotate) — GPU only ;
+// • les compteurs s'écrivent dans le DOM via useMotionValueEvent (textContent),
+//   sans déclencher de rendu React.
+// Mobile : pas de pin agressif, fondu empilé. reduced-motion → fondu simple.
 // =====================================================================
 
 // fausses cellules du tableur chaotique (avant)
 const CELLS = Array.from({ length: 30 }, (_, i) => ({
   v: ['REF-0' + (i + 12), '4 820', '—', 'ERR', '12,4', 'n/a', '88,0', 'TODO', '#REF!', '0,00'][i % 10],
   bad: i % 7 === 0 || i % 5 === 0,
+  // signes de dispersion précalculés (pas de calcul par frame)
+  dx: (i % 2 ? 1 : -1) * 58,
+  dy: (i % 3 - 1) * 38,
+  dr: (i % 2 ? 1 : -1) * 7,
 }));
 
 // nœuds du workflow n8n propre (après) — positions en % dans la scène
@@ -34,6 +47,51 @@ const WIRES = [
   'M62 42 C 74 42, 76 42, 88 42',
 ];
 
+// clamp01 helper
+const c01 = (n: number) => Math.min(1, Math.max(0, n));
+
+// --- une cellule : ses transforms sont des motion values dérivées du morph ---
+const Cell: React.FC<{ morph: any; c: typeof CELLS[number]; reduce: boolean }> = ({ morph, c, reduce }) => {
+  const x = useTransform(morph, [0.2, 1], [0, c.dx]);
+  const y = useTransform(morph, [0.2, 1], [0, c.dy]);
+  const rotate = useTransform(morph, [0.2, 1], [0, c.dr]);
+  return (
+    <motion.div
+      className="sheet-cell flex items-center justify-center rounded-[3px] text-[10px] md:text-[12px]"
+      style={reduce ? undefined : { x, y, rotate }}>
+      <span className={c.bad ? 'text-[#ff6b7d]' : ''}>{c.v}</span>
+    </motion.div>
+  );
+};
+
+// --- un nœud workflow : opacité + scale dérivés du morph ---
+const FlowNode: React.FC<{ morph: any; n: typeof FLOW[number]; i: number; reduce: boolean }> = ({ morph, n, i, reduce }) => {
+  const start = 0.4 + i * 0.05;
+  const opacity = useTransform(morph, [start, start + 0.15], [0, 1]);
+  const scale = useTransform(morph, [start, start + 0.15], [0.8, 1]);
+  return (
+    <motion.div
+      className="flow-node absolute -translate-x-1/2 -translate-y-1/2 rounded-xl px-3 py-2 text-[11px] font-semibold text-cream md:text-[13px]"
+      style={{ left: `${n.x}%`, top: `${n.y}%`, ...(reduce ? {} : { opacity, scale }) }}>
+      <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'cyan' ? 'bg-cyan' : n.tone === 'green' ? 'bg-green' : 'bg-green-deep'}`} />
+      {n.label}
+    </motion.div>
+  );
+};
+
+// --- un câble : pathLength dérivé du morph ---
+const FlowWire: React.FC<{ morph: any; d: string; reduce: boolean }> = ({ morph, d, reduce }) => {
+  const pathLength = useTransform(morph, [0.4, 0.7], [0, 1]);
+  return (
+    <motion.path
+      d={d}
+      className="flow-wire"
+      vectorEffect="non-scaling-stroke"
+      style={reduce ? { pathLength: 1 } : { pathLength }}
+    />
+  );
+};
+
 export const Metamorphose: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
@@ -42,20 +100,31 @@ export const Metamorphose: React.FC = () => {
     target: ref,
     offset: ['start start', 'end end'],
   });
-  // morph 0→1 (réversible). reduced → fondu simple sur visibilité.
-  const morph = reduce ? 1 : scrollYProgress;
+  // SPRING-lissage du scrub → métamorphose fluide, sans à-coups.
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 32, mass: 0.5 });
+  const morph = reduce ? scrollYProgress : smooth;
 
-  const [m, setM] = React.useState(reduce ? 1 : 0);
-  useMotionValueEvent(scrollYProgress, 'change', (v) => { if (!reduce) setM(v); });
-
-  // mappings d'opacité : chaos s'efface, workflow se compose
+  // opacités de scène — composées, pas de state
   const chaosOpacity = useTransform(morph, [0, 0.45], [1, 0]);
   const flowOpacity = useTransform(morph, [0.35, 0.7], [0, 1]);
   const sceneScale = useTransform(morph, [0, 1], [reduce ? 1 : 0.98, 1]);
 
-  // count-up piloté par le scrub (pas de useInView : suit le morph)
-  const eurosVal = Math.round(95000 * Math.min(1, Math.max(0, (m - 0.2) / 0.6)));
-  const pctVal = Math.round(80 * Math.min(1, Math.max(0, (m - 0.2) / 0.6)));
+  // libellé avant/après — seul élément qui mérite un (rare) état booléen
+  const [after, setAfter] = React.useState(reduce);
+  useMotionValueEvent(morph, 'change', (v) => {
+    const next = v >= 0.5;
+    setAfter((prev) => (prev === next ? prev : next)); // setState seulement au franchissement
+  });
+
+  // compteurs : écrits dans le DOM via refs (zéro re-render React).
+  const eurosRef = useRef<HTMLSpanElement>(null);
+  const pctRef = useRef<HTMLSpanElement>(null);
+  useMotionValueEvent(morph, 'change', (v) => {
+    if (reduce) return;
+    const k = c01((v - 0.2) / 0.6);
+    if (eurosRef.current) eurosRef.current.textContent = `${Math.round(95000 * k).toLocaleString('fr-FR')} €`;
+    if (pctRef.current) pctRef.current.textContent = `${Math.round(80 * k)} %`;
+  });
 
   return (
     <section
@@ -75,28 +144,18 @@ export const Metamorphose: React.FC = () => {
             {/* AVANT — grille de cellules désaturées, lourdes */}
             <motion.div
               aria-hidden
-              style={{ opacity: reduce ? undefined : chaosOpacity }}
-              className={`absolute inset-0 grid grid-cols-6 grid-rows-5 gap-px p-3 ${reduce ? 'opacity-0' : ''}`}>
+              style={{ opacity: reduce ? 0 : chaosOpacity }}
+              className="absolute inset-0 grid grid-cols-6 grid-rows-5 gap-px p-3">
               {CELLS.map((c, i) => (
-                <motion.div
-                  key={i}
-                  className="sheet-cell flex items-center justify-center rounded-[3px] text-[10px] md:text-[12px]"
-                  animate={reduce ? undefined : {
-                    x: m > 0.2 ? (i % 2 ? 1 : -1) * (m - 0.2) * 60 : 0,
-                    y: m > 0.2 ? (i % 3 - 1) * (m - 0.2) * 40 : 0,
-                    rotate: m > 0.2 ? (i % 2 ? 1 : -1) * (m - 0.2) * 8 : 0,
-                  }}
-                  transition={{ type: 'tween', duration: 0.1, ease: 'linear' }}>
-                  <span className={c.bad ? 'text-[#ff6b7d]' : ''}>{c.v}</span>
-                </motion.div>
+                <Cell key={i} morph={morph} c={c} reduce={!!reduce} />
               ))}
             </motion.div>
 
             {/* APRÈS — workflow n8n propre qui se compose */}
             <motion.div
               aria-hidden
-              style={{ opacity: reduce ? undefined : flowOpacity }}
-              className={`absolute inset-0 ${reduce ? 'opacity-100' : ''}`}>
+              style={{ opacity: reduce ? 1 : flowOpacity }}
+              className="absolute inset-0">
               <svg viewBox="0 0 96 84" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full p-4">
                 <defs>
                   <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
@@ -105,41 +164,21 @@ export const Metamorphose: React.FC = () => {
                   </linearGradient>
                 </defs>
                 {WIRES.map((d, i) => (
-                  <motion.path
-                    key={i}
-                    d={d}
-                    className="flow-wire"
-                    vectorEffect="non-scaling-stroke"
-                    initial={false}
-                    animate={reduce ? { pathLength: 1 } : { pathLength: Math.min(1, Math.max(0, (m - 0.4) / 0.3)) }}
-                    transition={{ duration: 0.05 }}
-                  />
+                  <FlowWire key={i} morph={morph} d={d} reduce={!!reduce} />
                 ))}
               </svg>
               {FLOW.map((n, i) => (
-                <motion.div
-                  key={n.label}
-                  className="flow-node absolute -translate-x-1/2 -translate-y-1/2 rounded-xl px-3 py-2 text-[11px] font-semibold text-cream md:text-[13px]"
-                  style={{ left: `${n.x}%`, top: `${n.y}%` }}
-                  initial={false}
-                  animate={reduce ? { opacity: 1, scale: 1 } : {
-                    opacity: Math.min(1, Math.max(0, (m - (0.4 + i * 0.05)) / 0.15)),
-                    scale: 0.8 + 0.2 * Math.min(1, Math.max(0, (m - (0.4 + i * 0.05)) / 0.15)),
-                  }}
-                  transition={{ duration: 0.05 }}>
-                  <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'cyan' ? 'bg-cyan' : n.tone === 'green' ? 'bg-green' : 'bg-green-deep'}`} />
-                  {n.label}
-                </motion.div>
+                <FlowNode key={n.label} morph={morph} n={n} i={i} reduce={!!reduce} />
               ))}
             </motion.div>
 
             {/* étiquette d'état avant/après */}
             <div className="absolute left-4 top-4 z-10 rounded-full border border-green/20 bg-ink/70 px-3 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-soft backdrop-blur">
-              {m < 0.5 ? 'Avant · saisie manuelle' : 'Après · workflow n8n'}
+              {after ? 'Après · workflow n8n' : 'Avant · saisie manuelle'}
             </div>
           </motion.div>
 
-          {/* COPY + count-up pilotés par le scrub */}
+          {/* COPY + compteurs pilotés par le scrub */}
           <div>
             <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />La métamorphose
@@ -155,13 +194,13 @@ export const Metamorphose: React.FC = () => {
             <div className="mt-10 grid grid-cols-2 gap-6">
               <div>
                 <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
-                  {reduce ? <CountUp to={95000} suffix=" €" /> : `${eurosVal.toLocaleString('fr-FR')} €`}
+                  {reduce ? <CountUp to={95000} suffix=" €" /> : <span ref={eurosRef}>0 €</span>}
                 </div>
                 <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">économisés par an</div>
               </div>
               <div>
                 <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
-                  {reduce ? <CountUp to={80} suffix=" %" /> : `${pctVal} %`}
+                  {reduce ? <CountUp to={80} suffix=" %" /> : <span ref={pctRef}>0 %</span>}
                 </div>
                 <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">du temps de saisie en moins</div>
               </div>
