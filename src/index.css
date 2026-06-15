@@ -153,6 +153,16 @@ body {
   -webkit-text-fill-color: #7fb3ff !important;
   color: #7fb3ff !important;
 }
+/* TITRE DÉGRADÉ SIGNATURE (réplique du dégradé-titre morningside, cyan AXEM) :
+   linear-gradient(90deg,#EAF0FF,#38BDF8) clippé sur le texte. Fallback couleur
+   pleine #CDE3FF si background-clip:text indisponible (texte transparent illisible). */
+.title-grad {
+  background-image: linear-gradient(90deg, #eaf0ff 0%, #9fc6ff 45%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #cde3ff;
+}
 .outline-type {
   background: linear-gradient(100deg, #5b8cff, #38bdf8);
   -webkit-background-clip: text;
@@ -512,6 +522,24 @@ body {
 /* lien texte « Limitless » : transition couleur 0.25s cubic-bezier(.44,0,.56,1) */
 .link-limitless {
   transition: color 0.25s var(--ease-limitless);
+}
+
+/* LIENS FOOTER — remontée y:-5px au hover (réplique du hover liens footer
+   morningside) + transition transform. transform-only. */
+.footer-link {
+  transition: color 0.25s var(--ease-limitless), transform 0.28s var(--ease-out);
+  will-change: transform;
+}
+.footer-link:hover {
+  transform: translateY(-5px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-link {
+    transition: color 0.25s var(--ease-limitless) !important;
+  }
+  .footer-link:hover {
+    transform: none;
+  }
 }
 
 /* logo grayscale -> couleur au hover (bande confiance) */
