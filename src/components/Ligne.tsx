@@ -134,12 +134,17 @@ export const Ligne: React.FC = () => {
         vectorEffect="non-scaling-stroke"
         style={{ pathLength: drawn, stroke }}
       />
-      {/* la tête lumineuse à la pointe du tracé (cx/cy = motion values) */}
+      {/* la tête lumineuse à la pointe du tracé.
+          On translate via transform (x/y motion values) — composité GPU et
+          fiable sur SVG, plutôt que d'animer les attributs cx/cy. Le cercle est
+          ancré en (0,0) et translaté à la position échantillonnée. */}
       {!reduce && (
         <motion.circle
           className="ligne-head"
+          cx="0"
+          cy="0"
           r="2.6"
-          style={{ cx: headX, cy: headY, fill: stroke }}
+          style={{ x: headX, y: headY, fill: stroke }}
           vectorEffect="non-scaling-stroke"
         />
       )}

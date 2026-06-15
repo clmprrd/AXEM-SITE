@@ -28,17 +28,38 @@ export const LazySection: React.FC<{
       setShow(true);
       return;
     }
+
+    const mount = () => setShow(true);
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setShow(true);
+          mount();
           io.disconnect();
         }
       },
       { rootMargin },
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    // Fallback ceinture-et-bretelles : si l'IO ne se déclenche pas (contextes
+    // exotiques), un check au scroll par distance garantit le montage. Passif,
+    // se retire dès que monté. Marge généreuse (1.5 écran).
+    const check = () => {
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight * 2.5) {
+        mount();
+        cleanup();
+      }
+    };
+    const cleanup = () => {
+      io.disconnect();
+      window.removeEventListener('scroll', check);
+    };
+    window.addEventListener('scroll', check, { passive: true });
+    check(); // check immédiat (si déjà proche au montage)
+
+    return cleanup;
   }, [show, rootMargin]);
 
   return (

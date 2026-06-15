@@ -31,6 +31,9 @@ export const useLenis = () => {
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
     });
 
+    // exposé pour debug éventuel (anchors, mesures)
+    (window as any).__lenis = lenis;
+
     // boucle rAF unique — synchronise Lenis (et donc tous les scroll-linked)
     let raf = 0;
     const loop = (time: number) => {
@@ -55,6 +58,7 @@ export const useLenis = () => {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener('click', onAnchorClick);
+      delete (window as any).__lenis;
       lenis.destroy();
     };
   }, []);

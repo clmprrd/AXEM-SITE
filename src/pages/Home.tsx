@@ -423,8 +423,9 @@ const Resultats: React.FC = () => {
           {CASES.map((c, i) => (
             <motion.article key={c.sector} tabIndex={0}
               {...reveal((i % 2) * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
-              className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
+              whileHover={reduce ? undefined : { y: -6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="case-card group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
               <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
               <div className="space-y-3 text-[14.5px] leading-relaxed">
                 <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
