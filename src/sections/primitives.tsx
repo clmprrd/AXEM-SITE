@@ -33,8 +33,8 @@ export const PlaySlider: React.FC<{
   return (
     <div className="w-full select-none">
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <span className="text-[13px] font-medium text-cream-soft">{label}</span>
-        <span className="font-serif-display text-2xl leading-none text-cream tnum">
+        <span className="min-w-0 text-[13px] font-medium leading-snug text-cream-soft">{label}</span>
+        <span className="font-serif-display whitespace-nowrap text-2xl leading-none text-cream tnum">
           {format ? format(value) : value}
         </span>
       </div>
