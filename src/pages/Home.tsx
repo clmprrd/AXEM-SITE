@@ -4,162 +4,405 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
-import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount, revealWatermark } from '../ui/motion';
-import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
+import { Reveal, CountUp, EASE } from '../ui/motion';
+import { PrimaryButton, SecondaryButton } from '../ui/Button';
 
 // =====================================================================
-// AXEM IA — SITE COMPLET « LIMITLESS × NAVY »
-// Moteur d'animation RÉPLIQUÉ du template Framer « Limitless » :
-//   · spring unique 320/60/1 sur TOUTES les entrées (opacity 0.001→1, y 40→0)
-//   · cascade hero stagger 0.2s (watermark 0 · eyebrow .1 · H1 .3 · p .5 · CTA .7 · visuel .9)
-//   · nav scroll-glass (pas d'auto-hide) · marquee ticker (mask 25px + slow au hover)
-//   · footer-reveal rideau (footer fixe révélé en fin de scroll)
-// DA navy + hero serif + Grainient navy conservés. transform/opacity/SVG only.
-// MotionConfig reducedMotion="user" : reduced → opacity only, footer-reveal off.
+// AXEM IA — 🅱️ « LE MANIFESTE »
+// Une REVUE éditoriale premium publiée par deux auteurs (Clément & Alexis).
+// Typo serif éditoriale, mise en page de magazine, filets fins, folios.
+// Micro-interactions tactiles RETENUES : le mouvement est un luxe qu'on
+// dépense rarement. Le « wow » naît de la justesse typographique et de la
+// retenue — PAS de l'effet. Fond navy profond conservé.
+//
+// LA SEULE anim riche = la couverture (hero, révélé ligne par ligne par un
+// masque vertical). LE WOW = le filet vertical « A → Z » de la méthode, qui
+// s'encre du haut vers le bas, piloté au scroll (réversible, synchrone).
+//
+// transform/opacity/clip-path/SVG only. MotionConfig reducedMotion="user".
 // =====================================================================
 
 const ease = EASE;
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CALENDLY_EMBED = 'https://calendly.com/clem-pred/30min?hide_gdpr_banner=1';
 const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s-axem-IA-3255b500d85980858518f49e36968c32';
-const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
-const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
+const LI_CLEMENT = 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/';
+const LI_ALEXIS = 'https://www.linkedin.com/in/alexis-zeitoun/';
 
-// Grainient — variante navy « azur » (base plus profonde/cinématique)
+// Grainient — variante navy « azur », dépensée RAREMENT (couverture + colophon).
 const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#05080F' } as const;
-// navy de fond commun aux fondus / overlays cinématiques
 const NAVY = '#060912';
 
-// ---------------------------------------------------------------------
-// NAV — pilule flottante centrée. RÉPLIQUE LIMITLESS « scroll-glass » :
-// transparente en haut, devient verre frosted navy dès qu'on scrolle (>80px).
-// PAS d'auto-hide. useScroll + useMotionValueEvent pilotent data-scrolled.
-// ---------------------------------------------------------------------
+// =====================================================================
+// NAV — masthead réduit. Filet inférieur au scroll, pas de pilule, pas de
+// glow. Le minimum : wordmark serif + ancres en petites capitales + rendez-vous.
+// =====================================================================
 const NAV_LINKS: [string, string][] = [
-  ['Formation', '#formation'], ['Conseil', '#conseil'],
-  ['Résultats', '#resultats'], ['Méthode', '#methode'], ['Le duo', '#duo'],
+  ['Les auteurs', '#auteurs'],
+  ['Au sommaire', '#sommaire'],
+  ['Les cas', '#feature-1'],
+  ['La méthode', '#methode'],
 ];
 const Nav: React.FC = () => {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = React.useState(false);
   useMotionValueEvent(scrollY, 'change', (y) => {
-    const next = y > 80;
+    const next = y > 60;
     setScrolled((prev) => (prev === next ? prev : next));
   });
   return (
-    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6">
-      <nav
-        data-scrolled={scrolled ? 'true' : 'false'}
-        className="nav-pill flex w-full max-w-3xl items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2">
-        <a href="#top" className="link-limitless font-serif-display text-2xl leading-none tracking-tight text-cream hover:text-cream [touch-action:manipulation]">
-          AXEM<span className="aurora-text">.</span>
+    <header
+      data-scrolled={scrolled ? 'true' : 'false'}
+      className="fixed inset-x-0 top-0 z-50 transition-colors duration-500 [transition-timing-function:var(--ease-out)]"
+      style={{
+        backgroundColor: scrolled ? 'rgba(6,9,18,0.72)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(10px)' : 'none',
+        borderBottom: `1px solid ${scrolled ? 'var(--rule)' : 'transparent'}`,
+      }}>
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 md:px-8">
+        <a href="#top" className="font-serif-display text-2xl leading-none tracking-tight text-cream [touch-action:manipulation] md:text-[26px]">
+          AXEM
         </a>
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map(([l, h]) => (
             <a key={l} href={h}
-              className="group link-limitless relative text-[13px] font-medium text-cream-soft hover:text-cream [touch-action:manipulation]">
+              className="link-rule text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-soft hover:text-cream [touch-action:manipulation]">
               {l}
-              <span className="absolute -bottom-1 left-0 h-px w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-limitless)] group-hover:w-full" />
             </a>
           ))}
         </div>
-        <SecondaryButton href={CALENDLY} external size="sm" className="!py-2.5">Réserver un appel</SecondaryButton>
+        <SecondaryButton href={CALENDLY} external size="sm">Le rendez-vous</SecondaryButton>
       </nav>
     </header>
   );
 };
 
-// ---------------------------------------------------------------------
-// HERO — MOMENT VERRE #1. Fond Grainient navy plein cadre (le « glass »
-// récurrent Limitless) + watermark serif « de A à Z » en parallax léger,
-// fondu radial navy pour garder la lisibilité. Titre serif géant, double
-// CTA éditorial. Cascade spring (mount) conservée.
-// ---------------------------------------------------------------------
+// =====================================================================
+// HERO « LA COUVERTURE » — masthead + H1 serif fer à gauche révélé ligne par
+// ligne par un MASQUE VERTICAL (clip-path qui remonte, ~420ms, stagger 70ms).
+// Grainient navy dépensé ICI (le seul moment riche). Filet inférieur + 3 folios.
+// =====================================================================
+const CoverLine: React.FC<{ children: React.ReactNode; delay: number; reduce: boolean }> = ({ children, delay, reduce }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [shown, setShown] = React.useState(false);
+  React.useEffect(() => {
+    if (reduce) { setShown(true); return; }
+    const id = window.setTimeout(() => setShown(true), delay * 1000);
+    return () => window.clearTimeout(id);
+  }, [delay, reduce]);
+  return (
+    <span ref={ref} className={`cover-line ${shown ? 'is-in' : ''}`} style={{ transitionDelay: '0ms' }}>
+      <span>{children}</span>
+    </span>
+  );
+};
+
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
-  const wmYRaw = useTransform(scrollYProgress, [0, 1], ['0%', '-14%']);
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
   const y = reduce ? '0%' : yRaw;
-  const wmY = reduce ? '0%' : wmYRaw;
   return (
-    <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
-      {/* MOMENT VERRE plein cadre — Grainient navy en fond du hero */}
+    <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden px-5 pb-12 pt-28 md:px-8 md:pb-16">
+      {/* Grainient navy plein cadre — dépensé une seule fois, ici. */}
       <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
         <Grainient
           className="h-full w-full"
           color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.13} grainAmount={0.085} contrast={1.32}
-          saturation={1.0} zoom={1.05} warpStrength={1.15}
+          timeSpeed={reduce ? 0 : 0.11} grainAmount={0.085} contrast={1.34}
+          saturation={0.96} zoom={1.08} warpStrength={1.1}
         />
       </motion.div>
-      {/* fondu radial + bas : garde le centre lisible, fond noir profond aux bords */}
+      {/* fondu profond : la couverture reste lisible, le bas vire au navy plein. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(6,9,18,0.30) 0%, rgba(6,9,18,0.62) 58%, rgba(6,9,18,0.92) 100%)' }} />
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
-        style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
-      {/* watermark serif parallax — souffle cinématique derrière le titre */}
-      <motion.div aria-hidden style={{ y: wmY }}
-        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <motion.span
-          {...revealWatermark(0.2, !!reduce)}
-          className="serif-watermark font-serif-display text-cream/[0.05]"
-          style={{ fontSize: 'clamp(140px, 40vw, 600px)' }}>
-          A → Z
-        </motion.span>
-      </motion.div>
+        style={{ background: `linear-gradient(180deg, rgba(6,9,18,0.55) 0%, rgba(6,9,18,0.40) 28%, rgba(6,9,18,0.72) 72%, ${NAVY} 100%)` }} />
 
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
-        {/* CASCADE HERO (mount) stagger 0.2s — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
-        <motion.div
-          {...revealMount(0.1, !!reduce)}
-          className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
-          <span className="relative flex h-2 w-2">
-            {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+      <div className="relative z-10 mx-auto w-full max-w-6xl">
+        {/* MASTHEAD : AXEM serif large + édition à droite, petites capitales fines. */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <span className="font-serif-display text-[44px] leading-[0.85] tracking-[-0.02em] text-cream md:text-[64px]">AXEM</span>
+          <span className="kicker max-w-[15rem] text-cream-soft sm:text-right">
+            La revue de l'IA appliquée<br className="hidden sm:block" /> — Édition 01 · 2026
           </span>
-          <span className="eyebrow text-[11px] text-cream">
-            Agence d'IA <span className="text-cyan">×</span> Formation
-          </span>
-        </motion.div>
+        </div>
+        <hr className="rule mt-5" />
 
+        {/* H1 serif FER À GAUCHE, révélé ligne par ligne (masque vertical). */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[0.92] tracking-[-0.02em] text-cream"
-          style={{ fontSize: 'clamp(48px, 11vw, 120px)', transformPerspective: 1200 }}>
+          className="font-serif-display mt-10 max-w-4xl leading-[0.92] tracking-[-0.02em] text-cream md:mt-14"
+          style={{ fontSize: 'clamp(52px, 10vw, 132px)' }}>
           <span aria-hidden>
-            <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
-            <br />
-            <span className="aurora-solid italic inline-block">
-              <RiseWords text="de A à Z." delay={0.55} stagger={0.09} />
-            </span>
+            <CoverLine delay={0.15} reduce={!!reduce}>Votre partenaire IA,</CoverLine>
+            <CoverLine delay={0.22} reduce={!!reduce}>
+              <span className="aurora-solid italic">de A à Z.</span>
+            </CoverLine>
           </span>
         </h1>
 
-        <motion.p
-          {...revealMount(0.5, !!reduce)}
-          className="mt-8 max-w-2xl text-balance text-lg leading-relaxed text-cream-soft md:text-xl">
-          On forme vos équipes, on conseille votre stratégie, on déploie vos automatisations.
-          <span className="text-cream"> Et on reste.</span>
-        </motion.p>
+        <p className="serif-body mt-8 max-w-2xl text-cream-soft" style={{ fontSize: 'clamp(18px, 2.2vw, 23px)', lineHeight: 1.5 }}>
+          Nous enseignons ce que nous déployons. De l'audit à l'autonomie — un seul
+          interlocuteur, du premier diagnostic au jour où vous n'avez plus besoin de nous.
+        </p>
 
-        <motion.div
-          {...revealMount(0.7, !!reduce)}
-          className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-          <PrimaryButton href={CALENDLY} external size="lg">Réserver un appel</PrimaryButton>
-          <SecondaryButton href="#resultats" size="lg">Voir nos résultats</SecondaryButton>
-        </motion.div>
+        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <PrimaryButton href={CALENDLY} external>Prendre rendez-vous</PrimaryButton>
+          <a href="#edito" className="breathe inline-flex items-center gap-2 text-[13px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-soft hover:text-cream [touch-action:manipulation]">
+            <span aria-hidden>↓</span> Lire l'édito
+          </a>
+        </div>
+
+        {/* Filet inférieur pleine largeur + 3 folios. */}
+        <hr className="rule mt-12" />
+        <div className="mt-4 grid grid-cols-3 gap-4">
+          {[['I', 'Les auteurs'], ['II', 'Les cas'], ['III', 'La méthode']].map(([n, l]) => (
+            <div key={n} className="flex items-baseline gap-2.5">
+              <span className="folio">{n}</span>
+              <span className="text-[12px] font-satoshi font-medium text-cream-soft sm:text-[13px]">{l}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 };
 
-// ---------------------------------------------------------------------
-// BANDE CONFIANCE — clients EN COULEUR, sobre. Marquee lent (N&B → couleur
-// au hover via .logo-chip). Pas d'OF partenaire, pas de Qualiopi.
-// Interaction : défilement infini transform-only, se met en pause au hover.
-// ---------------------------------------------------------------------
+// =====================================================================
+// RUBRIQUE — en-tête de section réutilisé : folio « 0X » + titre serif fer
+// à gauche + filet. Fondu doux à l'entrée (retenu).
+// =====================================================================
+const Rubrique: React.FC<{ folio: string; title: React.ReactNode; size?: string }> = ({ folio, title, size = 'clamp(34px, 5vw, 62px)' }) => (
+  <div>
+    <Reveal>
+      <div className="flex items-center gap-4">
+        <span className="folio">{folio}</span>
+        <hr className="rule flex-1" />
+      </div>
+    </Reveal>
+    <Reveal delay={0.06}>
+      <h2 className="rubrique mt-5" style={{ fontSize: size }}>{title}</h2>
+    </Reveal>
+  </div>
+);
+
+// =====================================================================
+// 01 — L'ÉDITO. Paragraphe serif, signé en italique. Fondu doux au scroll.
+// =====================================================================
+const Edito: React.FC = () => (
+  <section id="edito" className="section-clip relative px-5 py-[clamp(96px,15vh,200px)] md:px-8">
+    <div className="mx-auto max-w-4xl">
+      <Rubrique folio="01" title="L'édito" />
+      <Reveal delay={0.1}>
+        <p className="serif-body mt-12 text-cream" style={{ fontSize: 'clamp(26px, 4vw, 46px)', lineHeight: 1.32, letterSpacing: '-0.005em' }}>
+          L'IA déçoit quand elle reste une démo. Nous la déployons jusqu'à ce qu'elle tienne.
+          Audit, conseil, automatisation, formation, suivi — un seul interlocuteur,
+          <span className="italic text-cream"> de A à Z.</span>
+        </p>
+      </Reveal>
+      <Reveal delay={0.16}>
+        <p className="serif-body mt-10 text-[20px] italic text-cream-soft md:text-[22px]">— C.P. &amp; A.Z.</p>
+      </Reveal>
+    </div>
+  </section>
+);
+
+// =====================================================================
+// 02 — LES AUTEURS. 2 colonnes. Hover : filet sous le nom s'étend (200ms),
+// bio gris → encre. Count-up des chiffres (une fois).
+// =====================================================================
+const AUTHORS = [
+  { name: 'Clément Predo', school: 'ESSEC', li: LI_CLEMENT,
+    bio: "Le stratège. Il traduit l'IA en résultats concrets et pilote les missions d'audit, de conseil et de formation." },
+  { name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris', li: LI_ALEXIS,
+    bio: "L'architecte. Il conçoit et déploie les systèmes : agents, automatisations, intégrations en production." },
+];
+const Auteurs: React.FC = () => (
+  <section id="auteurs" className="section-clip relative px-5 py-[clamp(96px,15vh,200px)] md:px-8">
+    <div className="mx-auto max-w-5xl">
+      <Rubrique folio="02" title="Les auteurs" />
+      <div className="mt-14 grid gap-px overflow-hidden md:grid-cols-2" style={{ background: 'var(--rule)' }}>
+        {AUTHORS.map((a, i) => (
+          <Reveal key={a.name} delay={i * 0.08}>
+            <a href={a.li} target="_blank" rel="noopener noreferrer"
+              className="author-block group flex h-full flex-col bg-ink p-7 outline-none md:p-10">
+              <span className="kicker text-cyan">{a.school}</span>
+              <h3 className="font-serif-display mt-3 text-[34px] leading-none text-cream md:text-[42px]">
+                <span className="author-name-rule">{a.name}</span>
+              </h3>
+              <p className="author-bio serif-body mt-5 text-[19px] leading-snug md:text-[21px]">{a.bio}</p>
+              <span className="mt-6 inline-flex items-center gap-2 text-[12px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim transition-colors group-hover:text-cream">
+                LinkedIn <span aria-hidden>↗</span>
+              </span>
+            </a>
+          </Reveal>
+        ))}
+      </div>
+      {/* Ligne de chiffres — count-up une fois. */}
+      <Reveal delay={0.12}>
+        <p className="mt-10 text-[15px] leading-relaxed text-cream-soft md:text-[17px]">
+          <span className="font-serif-display text-cream"><CountUp to={55000} suffix=" " /></span>abonnés
+          <span className="mx-2 text-cream-dim">·</span>
+          <span className="font-serif-display text-cream"><CountUp to={2.6} decimals={1} suffix=" M" /></span> d'impressions / mois
+          <span className="mx-2 text-cream-dim">·</span>
+          on enseigne ce qu'on déploie.
+        </p>
+      </Reveal>
+    </div>
+  </section>
+);
+
+// =====================================================================
+// 03 — LE SOMMAIRE. Liste numérotée romaine. Type table des matières :
+// titre à gauche, p.0X à droite, points de conduite. Hover : leader se
+// densifie, ligne décale 6px. VII en italique.
+// =====================================================================
+const SOMMAIRE: [string, string, string, boolean][] = [
+  ['I', 'Audit', '01', false],
+  ['II', 'Conseil', '02', false],
+  ['III', 'Déploiement & automatisation', '03', false],
+  ['IV', 'Formation', '04', false],
+  ['V', 'Coaching', '05', false],
+  ['VI', 'Production IA', '06', false],
+  ['VII', 'Suivi — on reste', '07', true],
+];
+const Sommaire: React.FC = () => (
+  <section id="sommaire" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(96px,15vh,200px)] md:px-8">
+    <div className="mx-auto max-w-4xl">
+      <Rubrique folio="03" title="Au sommaire de cette édition" size="clamp(30px, 4.4vw, 56px)" />
+      <ol className="mt-12">
+        {SOMMAIRE.map(([roman, label, page, italic], i) => (
+          <Reveal key={roman} delay={i * 0.04}>
+            <li className="toc-row">
+              <span className="flex items-baseline gap-4">
+                <span className="folio w-10 shrink-0">{roman}</span>
+                <span className={`font-serif-display text-[26px] leading-none text-cream md:text-[34px] ${italic ? 'italic' : ''}`}>
+                  {label}
+                </span>
+              </span>
+              <span className="toc-leader" aria-hidden />
+              <span className="folio whitespace-nowrap">p. {page}</span>
+            </li>
+          </Reveal>
+        ))}
+      </ol>
+    </div>
+  </section>
+);
+
+// =====================================================================
+// FEATURE — gabarit de presse réutilisable. Surtitre, titre serif, chapô,
+// chiffres-héros en colonne serif géante (count-up court au scroll). Filet de
+// marge qui se TRACE (jauge de lecture, scaleY lié au scroll de la section).
+// `mirror` : chiffre à droite. `wide` : pleine page, chiffre sticky léger.
+// =====================================================================
+const Feature: React.FC<{
+  id: string;
+  kicker: string;
+  title: React.ReactNode;
+  chapo: React.ReactNode;
+  stats: { val: React.ReactNode; label: string }[];
+  mirror?: boolean;
+  wide?: boolean;
+}> = ({ id, kicker, title, chapo, stats, mirror, wide }) => {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 75%'] });
+  const gauge = reduce ? 1 : scrollYProgress;
+
+  const Numbers = (
+    <div className={`flex flex-col gap-8 ${wide ? 'lg:sticky lg:top-28 lg:self-start' : ''}`}>
+      {stats.map((s, i) => (
+        <Reveal key={i} delay={i * 0.08}>
+          <div>
+            <div className="font-serif-display leading-[0.82] tracking-[-0.01em] text-cream"
+              style={{ fontSize: wide ? 'clamp(88px, 16vw, 220px)' : 'clamp(64px, 11vw, 140px)' }}>
+              {s.val}
+            </div>
+            <div className="mt-3 max-w-[15rem] text-[13.5px] font-medium leading-snug text-cream-soft">{s.label}</div>
+          </div>
+        </Reveal>
+      ))}
+    </div>
+  );
+
+  const Body = (
+    <div className="max-w-xl">
+      <Reveal><span className="kicker text-cyan">{kicker}</span></Reveal>
+      <Reveal delay={0.06}>
+        <h3 className="font-serif-display mt-5 leading-[1.02] tracking-[-0.01em] text-cream"
+          style={{ fontSize: 'clamp(30px, 4.4vw, 54px)' }}>{title}</h3>
+      </Reveal>
+      <Reveal delay={0.12}>
+        <p className="serif-body mt-6 text-[20px] leading-snug text-cream-soft md:text-[22px]">{chapo}</p>
+      </Reveal>
+    </div>
+  );
+
+  return (
+    <section id={id} ref={ref} className="section-clip relative px-5 py-[clamp(100px,16vh,220px)] md:px-8">
+      <div className="mx-auto max-w-6xl">
+        {/* en-tête de feature : filet plein largeur (séparation de rubrique). */}
+        <hr className="rule-strong mb-12" />
+        <div className="relative grid gap-12 lg:gap-16">
+          {/* JAUGE DE LECTURE — filet de marge qui se trace, à gauche (caché < lg). */}
+          <div aria-hidden className="absolute -left-8 top-0 hidden h-full w-px lg:block" style={{ background: 'var(--rule)' }}>
+            <motion.div className="feature-gauge h-full w-full" style={{ scaleY: gauge }} />
+          </div>
+          <div className={`grid items-start gap-10 lg:gap-16 ${wide ? 'lg:grid-cols-[1fr_1.1fr]' : mirror ? 'lg:grid-cols-[1fr_1fr]' : 'lg:grid-cols-[1fr_1fr]'}`}>
+            {mirror ? <>{Body}{Numbers}</> : <>{Numbers}{Body}</>}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =====================================================================
+// 07 — L'INDEX. Grille sobre de données. Stagger 60ms par cellule, filets
+// fins, AUCUN hover (c'est de la donnée).
+// =====================================================================
+const INDEX_CELLS: { val: React.ReactNode; label: string }[] = [
+  { val: <CountUp to={159} suffix=" %" />, label: 'ROI médian sur 12 mois' },
+  { val: <CountUp to={4} />, label: 'secteurs adressés' },
+  { val: <>20/<span className="text-cream-soft">80</span></>, label: 'Éditeur médico-social — règle de Pareto appliquée' },
+  { val: <CountUp to={1} prefix="" suffix="" />, label: 'seul interlocuteur, de A à Z' },
+];
+const IndexSection: React.FC = () => {
+  const reduce = useReducedMotion();
+  return (
+    <section id="index" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(96px,15vh,200px)] md:px-8">
+      <div className="mx-auto max-w-5xl">
+        <Rubrique folio="07" title="L'index" />
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4">
+          {INDEX_CELLS.map((c, i) => (
+            <motion.div key={i}
+              initial={reduce ? { opacity: 0.001 } : { opacity: 0.001, y: 18 }}
+              whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={reduce ? { duration: 0.3, delay: i * 0.06 } : { duration: 0.5, ease, delay: i * 0.06 }}
+              className="index-cell px-1 py-8 md:px-5">
+              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 6vw, 72px)' }}>
+                {c.val}
+              </div>
+              <div className="mt-4 max-w-[12rem] text-[12.5px] font-medium leading-snug text-cream-soft">{c.label}</div>
+            </motion.div>
+          ))}
+        </div>
+        <Reveal delay={0.1}>
+          <div className="mt-12">
+            <SecondaryButton href={CASES_URL} external arrow>Consulter tous les cas</SecondaryButton>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+// =====================================================================
+// 08 — ILS NOUS FONT CONFIANCE. Logos en niveaux de gris, marquee TRÈS LENT
+// (60s). Hover → pleine encre + pause. Pas de témoignage écrit.
+// =====================================================================
 const LOGOS: [string, string][] = [
   ['Carrefour', '/logos/carrefour.svg'],
   ['Blackfin', '/logos/blackfin.png'],
@@ -169,31 +412,31 @@ const LOGOS: [string, string][] = [
   ['Socos', '/logos/socos.png'],
   ['Gravotech', '/logos/gravotech.png'],
 ];
-const TICKER_DUR = 34; // durée normale (s)
-const TICKER_DUR_SLOW = 90; // ralenti au hover
 const TrustBar: React.FC = () => {
   const reduce = useReducedMotion();
-  const row = [...LOGOS, ...LOGOS]; // contenu DUPLIQUÉ pour boucle sans couture
-  const [dur, setDur] = React.useState(TICKER_DUR);
+  const row = [...LOGOS, ...LOGOS];
+  const [dur, setDur] = React.useState(60); // marquee très lent
   return (
-    <section aria-label="Ils nous font confiance" className="section-clip relative border-y border-green/10 py-14">
-      <Reveal>
-        <p className="eyebrow mb-8 text-center text-[11px] tracking-[0.3em] text-cream-dim">
-          Ils nous font confiance
-        </p>
-      </Reveal>
-      {/* TICKER fidèle Limitless : translateX [0, -50%], linear infinite, masque dégradé 25px */}
-      <div className="ticker-mask group relative overflow-hidden">
+    <section aria-label="Ils nous font confiance" className="section-clip relative px-5 py-[clamp(72px,11vh,140px)] md:px-8">
+      <div className="mx-auto max-w-6xl">
+        <Reveal>
+          <div className="flex items-center gap-4">
+            <span className="folio">08</span>
+            <span className="kicker text-cream-dim">Ils nous font confiance</span>
+            <hr className="rule flex-1" />
+          </div>
+        </Reveal>
+      </div>
+      <div className="ticker-mask group relative mt-12 overflow-hidden">
         <motion.div
-          className="flex w-max items-center gap-14 md:gap-20"
+          className="flex w-max items-center gap-16 md:gap-24"
           animate={reduce ? undefined : { x: ['0%', '-50%'] }}
           transition={reduce ? undefined : { duration: dur, ease: 'linear', repeat: Infinity }}
-          onMouseEnter={() => !reduce && setDur(TICKER_DUR_SLOW)}
-          onMouseLeave={() => !reduce && setDur(TICKER_DUR)}>
+          onMouseEnter={() => !reduce && setDur(100000)}
+          onMouseLeave={() => !reduce && setDur(60)}>
           {row.map(([name, src], i) => (
             <span key={name + i} className="logo-chip shrink-0" title={name}>
-              <img src={src} alt={name} loading="lazy"
-                className="h-7 w-auto max-w-[150px] object-contain md:h-9" />
+              <img src={src} alt={name} loading="lazy" className="h-7 w-auto max-w-[150px] object-contain md:h-9" />
             </span>
           ))}
         </motion.div>
@@ -202,780 +445,147 @@ const TrustBar: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------
-// SECTION A (gardée) — full-bleed Grainient navy + watermark serif parallax.
-// ---------------------------------------------------------------------
-const SectionA: React.FC = () => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
-  const y = reduce ? '0%' : yRaw;
-
-  return (
-    <section id="section-a" ref={ref}
-      className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.16} grainAmount={0.08} contrast={1.35}
-          saturation={1.05} zoom={0.95} warpStrength={1.2}
-        />
-      </div>
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(80% 80% at 50% 50%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.6) 60%, rgba(7,11,22,0.85) 100%)' }} />
-      {/* div externe : parallax scroll. span interne : entrée watermark y -150→0 (spring) */}
-      <motion.div aria-hidden style={{ y }}
-        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <motion.span
-          {...revealWatermark(0, !!reduce)}
-          className="serif-watermark font-serif-display text-cream/[0.07]"
-          style={{ fontSize: 'clamp(120px, 34vw, 520px)' }}>
-          autonomie
-        </motion.span>
-      </motion.div>
-
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-        <Reveal>
-          <p className="eyebrow text-[11px] tracking-[0.3em] text-cyan">Le parcours AXEM</p>
-        </Reveal>
-        <Reveal delay={0.08} perspective>
-          <p className="font-serif-display mt-5 leading-[0.98] tracking-[-0.01em] text-cream"
-            style={{ fontSize: 'clamp(40px, 7vw, 88px)' }}>
-            De l'audit à <span className="aurora-text italic">l'autonomie.</span>
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// MARQUEE CAPACITÉS — (= leur marquee de catégories Limitless). Défile en
-// continu nos capacités / outils. Deux rangées en sens opposés, masque bords,
-// ralentit au hover. transform-only, pause hors-vue (via animate conditionnel).
-// ---------------------------------------------------------------------
-const CAPS_A = ['Agents IA', 'Automatisation n8n', 'RAG', 'OCR', 'Formation sur-mesure', 'Claude Code', 'Make', 'Vision', 'Voix'];
-const CAPS_B = ['Audit IA', 'Assistants métier', 'Pipelines documentaires', 'Intégrations API', 'Scraping', 'Fine-tuning prompts', 'Tableaux de bord', 'Conformité', 'Support continu'];
-const CapRow: React.FC<{ items: string[]; reverse?: boolean; reduce: boolean }> = ({ items, reverse, reduce }) => {
-  const row = [...items, ...items];
-  const [dur, setDur] = React.useState(reverse ? 48 : 40);
-  const base = reverse ? 48 : 40;
-  return (
-    <div className="ticker-mask group relative overflow-hidden py-1">
-      <motion.div
-        className="flex w-max items-center gap-4 md:gap-6"
-        animate={reduce ? undefined : { x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
-        transition={reduce ? undefined : { duration: dur, ease: 'linear', repeat: Infinity }}
-        onMouseEnter={() => !reduce && setDur(base * 2.6)}
-        onMouseLeave={() => !reduce && setDur(base)}>
-        {row.map((c, i) => (
-          <span key={c + i}
-            className="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-full border border-green/14 bg-white/[0.02] px-5 py-2.5 text-[14px] text-cream-soft md:text-[15px]">
-            <span aria-hidden className="h-1 w-1 rounded-full bg-cyan/70" />
-            {c}
-          </span>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
-const CapabilitiesMarquee: React.FC = () => {
-  const reduce = useReducedMotion();
-  return (
-    <section id="capacites" aria-label="Nos capacités et outils"
-      className="section-clip relative overflow-hidden py-[clamp(80px,12vh,160px)]">
-      <div className="mx-auto mb-12 max-w-5xl px-5 text-center md:px-8">
-        <Reveal><div className="flex justify-center"><Eyebrow>La boîte à outils</Eyebrow></div></Reveal>
-        <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
-            Tout l'arsenal IA, <span className="aurora-text italic">au même endroit.</span>
-          </h2>
-        </Reveal>
-      </div>
-      <div className="flex flex-col gap-4">
-        <CapRow items={CAPS_A} reduce={!!reduce} />
-        <CapRow items={CAPS_B} reverse reduce={!!reduce} />
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// MANIFESTE (gardé) — grande phrase serif word-by-word + 3 cartes glass.
-// (Qualiopi/OPCO retirés du copy.)
-// ---------------------------------------------------------------------
-const CARDS: { k: string; t: string; d: string }[] = [
-  { k: '01', t: 'Formation', d: '70 % de pratique. Vos équipes opérationnelles dès J+1.' },
-  { k: '02', t: 'Conseil', d: "On cadre votre stratégie IA : audit, feuille de route, cas d'usage rentables." },
-  { k: '03', t: 'Déploiement', d: "On déploie vos automatisations en production. Et on reste pour les faire vivre." },
-];
-const Manifeste: React.FC = () => {
-  const reduce = useReducedMotion();
-  return (
-    <section id="manifeste" className="section-clip relative overflow-hidden px-5 py-[clamp(128px,20vh,260px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/3 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.18), transparent 65%)' }} />
-      <div className="mx-auto max-w-5xl text-center">
-        <h2 aria-label="On forme. On conseille. On déploie. Et on reste."
-          className="font-serif-display leading-[1.02] tracking-[-0.01em] text-cream"
-          style={{ fontSize: 'clamp(40px, 8vw, 104px)' }}>
-          <span aria-hidden>
-            <RiseWords text="On forme." onScroll stagger={0.09} />{' '}
-            <RiseWords text="On conseille." onScroll delay={0.12} stagger={0.09} />{' '}
-            <RiseWords text="On déploie." onScroll delay={0.26} stagger={0.09} />
-            <br />
-            <span className="aurora-text italic inline-block">
-              <RiseWords text="Et on reste." onScroll delay={0.42} stagger={0.09} />
-            </span>
-          </span>
-        </h2>
-
-        <div className="mt-20 grid gap-5 text-left md:grid-cols-3">
-          {CARDS.map((c, i) => (
-            <motion.div key={c.k}
-              {...reveal(i * 0.12, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
-              className="glass flex h-full flex-col gap-3 rounded-3xl p-7 md:p-8">
-              <span className="font-serif-display text-5xl text-green/40">{c.k}</span>
-              <h3 className="font-serif-display text-3xl leading-none text-cream">{c.t}</h3>
-              <p className="text-[15px] leading-relaxed text-cream-soft">{c.d}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// MOMENT VERRE #3 (interlude milieu) — Grainient navy plein cadre + watermark
-// serif parallax. Réutilisable : c'est le souffle cinématique récurrent qui
-// rythme la page entre deux blocs denses. Pause hors-vue (Grainient IO).
-// ---------------------------------------------------------------------
-const GlassInterlude: React.FC<{
-  id?: string; watermark: string; eyebrow: string;
-  title: React.ReactNode; zoom?: number;
-}> = ({ id, watermark, eyebrow, title, zoom = 1.0 }) => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['-10%', '14%']);
-  const y = reduce ? '0%' : yRaw;
-  return (
-    <section id={id} ref={ref}
-      className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.15} grainAmount={0.08} contrast={1.34}
-          saturation={1.02} zoom={zoom} warpStrength={1.18}
-        />
-      </div>
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(82% 82% at 50% 50%, rgba(6,9,18,0.34) 0%, rgba(6,9,18,0.62) 60%, rgba(6,9,18,0.88) 100%)' }} />
-      <motion.div aria-hidden style={{ y }}
-        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <motion.span
-          {...revealWatermark(0, !!reduce)}
-          className="serif-watermark font-serif-display text-cream/[0.06]"
-          style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
-          {watermark}
-        </motion.span>
-      </motion.div>
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-        <Reveal><div className="flex justify-center"><Eyebrow>{eyebrow}</Eyebrow></div></Reveal>
-        <Reveal delay={0.08} perspective>
-          <p className="font-serif-display mt-5 leading-[0.98] tracking-[-0.01em] text-cream"
-            style={{ fontSize: 'clamp(38px, 6.5vw, 84px)' }}>
-            {title}
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// SECTION HEADER — eyebrow + titre serif, réutilisé.
-// ---------------------------------------------------------------------
-const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-    <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
-  </div>
-);
-
-// ---------------------------------------------------------------------
-// FORMATION — « 70 % de pratique, opérationnel dès J+1 ».
-// Interaction : cartes phares qui révèlent leurs détails au hover/focus ;
-// « Voir les 10 formations » déplie F01–F10 avec AnimatePresence (popLayout).
-// Financement = budget entreprise (PAS Qualiopi/OPCO).
-// ---------------------------------------------------------------------
-const FORMATIONS_PHARES = [
-  { code: 'IA Essentielle', price: '300 €', level: 'Découverte',
-    pitch: "Comprendre l'IA générative et l'utiliser au quotidien.",
-    detail: '1 jour · ChatGPT, Claude, Gemini · prompting, rédaction, recherche, synthèse. Reparte avec vos premiers réflexes IA.' },
-  { code: 'Maîtriser Claude', price: '450 €', level: 'Intermédiaire',
-    pitch: "Exploiter Claude à fond : projets, artefacts, raisonnement.",
-    detail: '1 jour · Projects, fichiers, MCP, agents · cas métiers réels. Pour ceux qui veulent un copilote sérieux, pas un gadget.' },
-  { code: 'No-Code & Workflows', price: '800 €', level: 'Avancé',
-    pitch: 'Construire des automatisations qui tournent seules.',
-    detail: '2 jours · n8n, Make, Claude Code · vos premiers workflows en production. On part de vos process, on automatise pour de vrai.' },
-];
-const CATALOGUE = [
-  ['F01', 'IA Essentielle', 'Découverte', '300 €'],
-  ['F02', 'Prompting Pro', 'Découverte', '350 €'],
-  ['F03', 'Maîtriser Claude', 'Intermédiaire', '450 €'],
-  ['F04', 'IA & Bureautique', 'Découverte', '400 €'],
-  ['F05', 'IA pour Managers', 'Intermédiaire', '600 €'],
-  ['F06', 'Création de contenu IA', 'Intermédiaire', '550 €'],
-  ['F07', 'No-Code & Workflows', 'Avancé', '800 €'],
-  ['F08', 'Agents & MCP', 'Avancé', '950 €'],
-  ['F09', 'IA & Données', 'Avancé', '1 000 €'],
-  ['F10', 'Architecture IA sur-mesure', 'Avancé', '1 250 €'],
-] as const;
-const LEVEL_TINT: Record<string, string> = {
-  'Découverte': 'text-mint border-mint/30',
-  'Intermédiaire': 'text-cyan border-cyan/30',
-  'Avancé': 'text-green border-green/30',
-};
-const Formation: React.FC = () => {
-  const reduce = useReducedMotion();
-  const [open, setOpen] = React.useState(false);
-  return (
-    <section id="formation" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="max-w-3xl">
-          <Reveal><Eyebrow>Formation</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              70 % de pratique.<br /><span className="aurora-text italic">Opérationnel dès J+1.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              On ne forme pas pour cocher une case. On forme pour que vos équipes utilisent l'IA
-              le lendemain. Financement sur budget formation entreprise.
-            </p>
-          </Reveal>
-        </div>
-
-        {/* 3 formations phares — détails révélés au hover/focus */}
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {FORMATIONS_PHARES.map((f, i) => (
-            <motion.article key={f.code} tabIndex={0}
-              {...reveal(i * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
-              className="group glass relative flex flex-col rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-8">
-              <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[f.level]}`}>{f.level}</span>
-              <h3 className="font-serif-display mt-5 text-[28px] leading-[1.05] text-cream">{f.code}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-cream-soft">{f.pitch}</p>
-              {/* détail révélé : grid-rows 0fr → 1fr (height anim sans saut) */}
-              <div className="grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-400 [transition-timing-function:var(--ease-out)] group-hover:grid-rows-[1fr] group-hover:opacity-100 group-focus-within:grid-rows-[1fr] group-focus-within:opacity-100">
-                <div className="overflow-hidden">
-                  <p className="mt-4 border-t border-green/15 pt-4 text-[13.5px] leading-relaxed text-cream-soft">{f.detail}</p>
-                </div>
-              </div>
-              <div className="mt-auto flex items-end justify-between pt-6">
-                <span className="font-serif-display text-4xl text-cream">{f.price}</span>
-                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.1em] text-cream-dim">/ pers.</span>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-
-        {/* Déplier le catalogue complet F01–F10 */}
-        <div className="mt-10 flex flex-col items-center gap-8">
-          <SecondaryButton onClick={() => setOpen((v) => !v)} arrow
-            ariaLabel={open ? 'Replier le catalogue' : 'Voir les 10 formations'}
-            className={open ? '[&_.btn-arrow]:rotate-90' : ''}>
-            {open ? 'Replier le catalogue' : 'Voir les 10 formations'}
-          </SecondaryButton>
-
-          <AnimatePresence initial={false}>
-            {open && (
-              <motion.div
-                key="catalogue"
-                initial={reduce ? { opacity: 1, height: 'auto' } : { opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                transition={{ duration: 0.5, ease }}
-                className="w-full overflow-hidden">
-                <div className="glass overflow-hidden rounded-3xl">
-                  <div className="hidden grid-cols-[64px_1fr_140px_100px] gap-4 border-b border-green/12 px-6 py-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-dim md:grid">
-                    <span>Réf.</span><span>Formation</span><span>Niveau</span><span className="text-right">Prix</span>
-                  </div>
-                  <ul>
-                    {CATALOGUE.map(([code, title, level, price], i) => (
-                      <motion.li key={code}
-                        initial={reduce ? { opacity: 0.001 } : { opacity: 0.001, y: 12 }}
-                        animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                        transition={reduce ? { duration: 0.3, delay: 0.04 * i } : { ...SPRING, delay: 0.04 * i }}
-                        className="grid grid-cols-[48px_1fr_auto] items-center gap-3 border-b border-green/8 px-5 py-4 transition-colors [transition-timing-function:var(--ease-limitless)] last:border-0 hover:bg-white/[0.03] md:grid-cols-[64px_1fr_140px_100px] md:gap-4 md:px-6">
-                        <span className="font-serif-display text-lg text-green/60">{code}</span>
-                        <span className="text-[15px] text-cream">{title}</span>
-                        <span className={`hidden text-[12px] font-satoshi font-bold uppercase tracking-[0.1em] md:inline ${LEVEL_TINT[level].split(' ')[0]}`}>{level}</span>
-                        <span className="text-right text-[14px] font-semibold text-cream-soft md:text-cream">{price}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-                <p className="mt-4 text-center text-[13px] text-cream-dim">
-                  3 niveaux · 200 € – 1 250 € / personne · sur-mesure possible en intra-entreprise.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// CONSEIL & AGENCE — parcours en 5 étapes.
-// Interaction : ligne SVG verticale qui se TRACE au scroll (pathLength lié
-// à scrollYProgress) + nœuds qui s'allument quand le tracé les dépasse.
-// ---------------------------------------------------------------------
-const PARCOURS = [
-  { t: 'Audit IA', d: "On cartographie vos process, vos données, vos irritants. On identifie où l'IA crée vraiment de la valeur." },
-  { t: 'Conseil stratégique', d: 'Feuille de route priorisée : quoi faire, dans quel ordre, avec quels budgets et quels outils.' },
-  { t: 'Déploiement & automatisation', d: 'Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main.' },
-  { t: 'Production IA', d: "Assistants, agents, générateurs sur-mesure. Intégrés à vos outils, pas une démo isolée." },
-  { t: 'Suivi', d: 'Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations. Long terme.' },
-];
-const Conseil: React.FC = () => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 70%', 'end 60%'] });
-  const pathLength = reduce ? 1 : scrollYProgress;
-  // états on/off des nœuds suivant la progression
-  const [active, setActive] = React.useState<boolean[]>(() => PARCOURS.map(() => reduce));
-  useMotionValueEvent(scrollYProgress, 'change', (p) => {
-    if (reduce) return;
-    setActive(PARCOURS.map((_, i) => p >= (i + 0.5) / PARCOURS.length - 0.04));
-  });
-
-  return (
-    <section id="conseil" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="max-w-2xl">
-          <Reveal><Eyebrow>Conseil &amp; agence</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              Un seul parcours,<br /><span className="aurora-text italic">de bout en bout.</span>
-            </h2>
-          </Reveal>
-        </div>
-
-        <div ref={ref} className="relative mt-16 pl-10 md:pl-16">
-          {/* RAIL SVG — ligne qui se trace au scroll (pathLength) */}
-          <svg aria-hidden className="pointer-events-none absolute left-[14px] top-2 h-full w-2 md:left-[22px]"
-            viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-            <path d="M1 0 V100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-            <motion.path d="M1 0 V100"
-              stroke="url(#railGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke"
-              style={{ pathLength }} />
-            <defs>
-              <linearGradient id="railGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#5B8CFF" />
-                <stop offset="1" stopColor="#38BDF8" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          <ol className="space-y-10 md:space-y-14">
-            {PARCOURS.map((s, i) => (
-              <li key={s.t} className="relative">
-                {/* NŒUD qui s'allume */}
-                <span aria-hidden data-on={active[i] ? 'true' : 'false'}
-                  className="node-dot absolute -left-[34px] top-1.5 h-3.5 w-3.5 rounded-full border border-green/40 bg-ink md:-left-[46px]" />
-                <Reveal delay={0.04 * i}>
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-serif-display text-2xl text-green/50">0{i + 1}</span>
-                      <h3 className="font-serif-display text-[26px] leading-tight text-cream md:text-[34px]">{s.t}</h3>
-                    </div>
-                    <p className="max-w-2xl text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
-                  </div>
-                </Reveal>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// RÉSULTATS — KPI count-up au scroll + cas chiffrés (chiffre révélé au hover).
-// ---------------------------------------------------------------------
-const KPIS: { val: React.ReactNode; label: string }[] = [
-  { val: <><CountUp to={80} />%</>, label: 'de temps de saisie économisé' },
-  { val: <CountUp to={95} suffix=" k€" />, label: 'de coûts neutralisés / an' },
-  { val: <>×<CountUp to={4} /></>, label: 'plus rapide sur le traitement' },
-  { val: <CountUp to={317} suffix=" h" />, label: 'libérées par mois' },
-  { val: <>&gt;<CountUp to={98} />%</>, label: 'd\'anomalies détectées' },
-  { val: <CountUp to={159} suffix=" %" />, label: 'de ROI sur 12 mois' },
-];
-const CASES = [
-  { sector: 'BTP · Rénovation',
-    problem: 'Chiffrage manuel chronophage, devis lents, marges grignotées par les erreurs.',
-    solution: "Assistant de chiffrage IA branché sur leurs bordereaux et historiques.",
-    result: '80 %', resultLabel: 'de temps de saisie en moins · 95 k€/an neutralisés' },
-  { sector: 'Administration judiciaire',
-    problem: 'Traitement documentaire massif, saisie répétitive, risque d\'erreur élevé.',
-    solution: 'Pipeline OCR + double vérification IA sur les pièces entrantes.',
-    result: '×4', resultLabel: 'plus rapide · fiabilité 100 % par double contrôle' },
-  { sector: 'Adhésifs aéro / ferroviaire',
-    problem: 'Conformité ADV lourde, contrôles manuels, anomalies détectées trop tard.',
-    solution: 'Automatisation des contrôles documentaires et de conformité.',
-    result: '317 h', resultLabel: 'libérées / mois · anomalies détectées > 98 %' },
-  { sector: 'Éditeur médico-social',
-    problem: 'Support et rédaction de contenus métier saturés, délais qui s\'allongent.',
-    solution: 'Assistants IA spécialisés intégrés à leurs outils internes.',
-    result: '159 %', resultLabel: 'de ROI sur 12 mois' },
-];
-const Resultats: React.FC = () => {
-  const reduce = useReducedMotion();
-  return (
-    <section id="resultats" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
-          <div>
-            <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
-            <Reveal delay={0.06} perspective>
-              <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
-                Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
-              </h2>
-            </Reveal>
-          </div>
-          <Reveal delay={0.12}>
-            <p className="text-[16px] leading-relaxed text-cream-soft md:pb-3">
-              Des chiffres réels, issus de missions menées de bout en bout. Anonymisés à la demande des clients.
-            </p>
-          </Reveal>
-        </div>
-
-        {/* KPI count-up — layout asymétrique, gros chiffres serif */}
-        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
-          {KPIS.map((k, i) => (
-            <motion.div key={i}
-              {...reveal((i % 3) * 0.08, !!reduce)}
-              className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
-                {k.val}
-              </div>
-              <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CAS anonymisés — Problème → Solution → Résultat révélé au hover */}
-        <div className="mt-24 grid gap-5 md:grid-cols-2">
-          {CASES.map((c, i) => (
-            <motion.article key={c.sector} tabIndex={0}
-              {...reveal((i % 2) * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
-              className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
-              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
-              <div className="space-y-3 text-[14.5px] leading-relaxed">
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Solution · </span>{c.solution}</p>
-              </div>
-              {/* RÉSULTAT révélé au hover : chiffre serif qui apparaît */}
-              <div className="mt-auto flex items-end justify-between border-t border-green/12 pt-5">
-                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.12em] text-cream-dim">Résultat</span>
-                <span className="font-serif-display text-cream transition-[transform,color] duration-400 [transition-timing-function:var(--ease-out)] group-hover:text-green group-focus-within:text-green md:translate-y-1 md:opacity-70 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100"
-                  style={{ fontSize: 'clamp(40px, 6vw, 64px)' }}>
-                  {c.result}
-                </span>
-              </div>
-              <p className="text-[12.5px] leading-snug text-cream-dim">{c.resultLabel}</p>
-            </motion.article>
-          ))}
-        </div>
-
-        <Reveal delay={0.1}>
-          <div className="mt-12 flex justify-center">
-            <SecondaryButton href={CASES_URL} external arrow>Voir tous les cas clients</SecondaryButton>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-// ---------------------------------------------------------------------
-// MÉTHODE — « En 3 étapes. Pas une de plus. »
-// Interaction : timeline verticale qui se DESSINE au scroll + étapes qui
-// s'allument (réutilise pathLength + node-dot).
-// ---------------------------------------------------------------------
-const STEPS = [
-  { k: 'Diagnostic', meta: '30 min', d: "On comprend votre contexte, vos irritants, vos objectifs. Gratuit, sans engagement." },
-  { k: 'Proposition', meta: '48 h', d: 'On revient avec un plan clair : périmètre, livrables, budget. Pas de jargon, pas de flou.' },
-  { k: 'Exécution', meta: 'J+1', d: 'On démarre. Formation, conseil ou déploiement — vous avancez dès le lendemain.' },
+// =====================================================================
+// ⭐ 09 — LA MÉTHODE (LE WOW). Étapes en folios 01→07. Filet vertical à
+// gauche marqué « A » en haut et « Z » en bas qui S'ENCRE du haut vers le bas,
+// piloté au scroll (scaleY lié à scrollYProgress, réversible, synchrone au
+// geste). Chaque étape passe de gris à l'encre quand le trait l'atteint.
+// Au « Z », « Et puis on reste. » se révèle. reduced → trait plein, tout encré.
+// =====================================================================
+const METHODE = [
+  { k: 'Audit', d: "On cartographie process, données, irritants. On identifie où l'IA crée vraiment de la valeur — et où elle n'en a pas." },
+  { k: 'Conseil', d: 'Feuille de route priorisée : quoi faire, dans quel ordre, avec quels budgets et quels outils.' },
+  { k: 'Déploiement & automatisation', d: 'Des workflows qui tournent seuls, 7j/7. n8n, Make, Claude Code. Clé en main.' },
+  { k: 'Formation', d: '10 modules · 200 – 1 250 € · 70 % de pratique. Vos équipes opérationnelles dès le lendemain.' },
+  { k: 'Coaching', d: "On accompagne dans la durée : montée en compétence, nouveaux cas d'usage, ajustements." },
+  { k: 'Production IA', d: 'Assistants, agents, générateurs sur-mesure, intégrés à vos outils. Pas une démo isolée.' },
+  { k: 'Suivi', d: 'Une fois déployé, on reste. Maintenance, évolutions, nouvelles automatisations.' },
 ];
 const Methode: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 65%'] });
-  const pathLength = reduce ? 1 : scrollYProgress;
-  const [active, setActive] = React.useState<boolean[]>(() => STEPS.map(() => reduce));
+  // synchrone au geste : scaleY lié directement au scroll (réversible).
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 80%', 'end 70%'] });
+  const inkScale = reduce ? 1 : scrollYProgress;
+
+  const [active, setActive] = React.useState<boolean[]>(() => METHODE.map(() => !!reduce));
+  const [atZ, setAtZ] = React.useState<boolean>(!!reduce);
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     if (reduce) return;
-    setActive(STEPS.map((_, i) => p >= (i + 0.5) / STEPS.length - 0.05));
+    // une étape s'encre quand le trait l'atteint (son centre relatif).
+    setActive(METHODE.map((_, i) => p >= (i + 0.5) / METHODE.length - 0.02));
+    setAtZ(p >= 0.985);
   });
 
   return (
-    <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(91,140,255,0.18), transparent 65%)' }} />
-      <div className="mx-auto max-w-4xl text-center">
-        <Reveal><div className="flex justify-center"><Eyebrow>Méthode</Eyebrow></div></Reveal>
-        <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 80px)' }}>
-            En 3 étapes.<br /><span className="aurora-text italic">Pas une de plus.</span>
-          </h2>
-        </Reveal>
-      </div>
+    <section id="methode" className="section-clip relative px-5 py-[clamp(100px,16vh,220px)] md:px-8">
+      <div className="mx-auto max-w-4xl">
+        <Rubrique folio="09" title="La méthode, page par page" size="clamp(30px, 4.6vw, 58px)" />
 
-      <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
-        <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
-          viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-          <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
-          <defs>
-            <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#5B8CFF" />
-              <stop offset="1" stopColor="#38BDF8" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <ol className="space-y-12 md:space-y-16">
-          {STEPS.map((s, i) => (
-            <li key={s.k} className="relative">
-              <span aria-hidden data-on={active[i] ? 'true' : 'false'}
-                className="node-dot absolute -left-[38px] top-2 h-4 w-4 rounded-full border border-green/40 bg-ink md:-left-[50px]" />
-              <Reveal delay={0.05 * i}>
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <h3 className="font-serif-display text-[30px] leading-none text-cream md:text-[40px]">{s.k}</h3>
-                  <span className="rounded-full border border-green/30 px-3 py-1 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-green">{s.meta}</span>
+        <div ref={ref} className="relative mt-16 pl-12 md:pl-20">
+          {/* FILET A → Z. « A » en haut, « Z » en bas. Le trait gris est plein,
+              l'encre (gradient) se révèle par scaleY lié au scroll. */}
+          <div aria-hidden className="absolute left-[6px] top-0 flex h-full flex-col items-center md:left-[14px]">
+            <span className="folio mb-3 leading-none">A</span>
+            <div className="relative w-px flex-1 overflow-hidden">
+              <div className="az-rail absolute inset-0 w-px" />
+              <motion.div className="az-ink absolute inset-0 w-px" style={{ scaleY: inkScale }} />
+            </div>
+            <span className="folio mt-3 leading-none">Z</span>
+          </div>
+
+          <ol className="space-y-12 md:space-y-16">
+            {METHODE.map((s, i) => (
+              <li key={s.k} className="az-step" data-on={active[i] ? 'true' : 'false'}>
+                <div className="flex items-baseline gap-4">
+                  <span className="az-step-meta folio">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="font-serif-display text-[28px] leading-tight md:text-[38px]" style={{ color: 'inherit' }}>{s.k}</h3>
                 </div>
-                <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
+                <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream-soft md:text-[16px]">{s.d}</p>
+              </li>
+            ))}
+          </ol>
+
+          {/* Au « Z » : « Et puis on reste. » se révèle (fondu retenu). */}
+          <motion.p
+            initial={reduce ? { opacity: 1 } : { opacity: 0.001, y: 14 }}
+            animate={atZ ? { opacity: 1, y: 0 } : reduce ? { opacity: 1 } : { opacity: 0.001, y: 14 }}
+            transition={{ duration: 0.6, ease }}
+            className="font-serif-display mt-16 text-[34px] italic leading-tight text-cream md:text-[52px]">
+            Et puis on reste.
+          </motion.p>
+        </div>
       </div>
     </section>
   );
 };
 
-// ---------------------------------------------------------------------
-// LE DUO — Clément + Alexis. Interaction : portraits tilt/parallax léger au
-// hover (spring) + N&B → couleur. + 55 000 abonnés count-up.
-// ---------------------------------------------------------------------
-const FOUNDERS = [
-  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC',
-    role: 'Stratégie & Business IA',
-    desc: "Le stratège. Je traduis l'IA en résultats concrets et pilote les missions audit, conseil et formation.",
-    li: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/' },
-  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Télécom Paris · IP Paris',
-    role: 'Architecture IA, Tech & Déploiement',
-    desc: "L'architecte. Je conçois et déploie les systèmes : agents, automatisations, intégrations en production.",
-    li: 'https://www.linkedin.com/in/alexis-zeitoun/' },
+// =====================================================================
+// 10 — LA COLONNE DES AUTEURS. « Chaque semaine, dans nos colonnes. »
+// 3 extraits de colonne en cartes sobres (filet, titre serif, date).
+// Hover : filet du cadre +1px (pas d'ombre).
+// =====================================================================
+const COLUMNS = [
+  { title: 'Pourquoi vos automatisations cassent au bout de trois mois', date: '12 juin 2026', tag: 'Terrain' },
+  { title: "L'audit IA : ce qu'on regarde vraiment avant de proposer quoi que ce soit", date: '5 juin 2026', tag: 'Méthode' },
+  { title: 'Former, ce n\'est pas montrer ChatGPT. C\'est changer un réflexe.', date: '29 mai 2026', tag: 'Formation' },
 ];
-const TiltCard: React.FC<{ f: typeof FOUNDERS[number]; i: number }> = ({ f, i }) => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const [t, setT] = React.useState({ rx: 0, ry: 0 });
-  const onMove = (e: React.MouseEvent) => {
-    if (reduce || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    setT({ rx: -py * 6, ry: px * 8 });
-  };
-  const reset = () => setT({ rx: 0, ry: 0 });
-  return (
-    <motion.div
-      {...reveal(i * 0.12, !!reduce)}
-      style={{ perspective: 1000 }}>
-      <div ref={ref} onMouseMove={onMove} onMouseLeave={reset}
-        className="group glass relative overflow-hidden rounded-3xl transition-transform duration-200 [transform-style:preserve-3d] [transition-timing-function:var(--ease-out)]"
-        style={{ transform: `rotateX(${t.rx}deg) rotateY(${t.ry}deg)` }}>
-        <div className="relative overflow-hidden">
-          <img src={f.img} alt={f.name} loading="lazy"
-            className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
-          <div aria-hidden className="pointer-events-none absolute inset-0"
-            style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(7,11,22,0.85) 100%)' }} />
-          <a href={f.li} target="_blank" rel="noopener noreferrer"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
-            aria-label={`LinkedIn ${f.name}`}>
-            <span className="text-[15px] font-bold">in</span>
-          </a>
-        </div>
-        <div className="p-7 md:p-8">
-          <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
-          <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
-          <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
-          <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-const Duo: React.FC = () => (
-  <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-    <div className="mx-auto max-w-5xl">
-      <div className="max-w-2xl">
-        <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
-        <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-            Deux experts,<br /><span className="aurora-text italic">un seul interlocuteur.</span>
-          </h2>
-        </Reveal>
-        <Reveal delay={0.12}>
-          <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-            On enseigne ce qu'on déploie. Pas de théorie hors-sol : la stratégie et la technique
-            dans la même équipe.
-          </p>
-        </Reveal>
-      </div>
-
-      <div className="mt-14 grid gap-6 md:grid-cols-2">
-        {FOUNDERS.map((f, i) => <TiltCard key={f.name} f={f} i={i} />)}
-      </div>
-
-      {/* 55 000 abonnés count-up */}
+const Colonne: React.FC = () => (
+  <section id="colonne" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(96px,15vh,200px)] md:px-8">
+    <div className="mx-auto max-w-6xl">
+      <Rubrique folio="10" title="Chaque semaine, dans nos colonnes" size="clamp(28px, 4.2vw, 52px)" />
       <Reveal delay={0.1}>
-        <div className="mt-12 flex flex-col items-center gap-1 text-center">
-          <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
-            <CountUp to={55000} suffix=" +" />
-          </span>
-          <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">abonnés LinkedIn cumulés</span>
-        </div>
+        <p className="mt-8 max-w-2xl text-[16px] leading-relaxed text-cream-soft md:text-[18px]">
+          55 000 lecteurs nous suivent sur LinkedIn. 2,6 M d'impressions par mois.
+          On y publie ce qu'on apprend en mission.
+        </p>
       </Reveal>
-    </div>
-  </section>
-);
-
-// ---------------------------------------------------------------------
-// FAQ — accordéon spring (hauteur animée), question soulignée au hover.
-// ---------------------------------------------------------------------
-const FAQ_ITEMS = [
-  { q: 'Par où commencer ?', a: "Par un appel de 30 minutes, gratuit. On comprend votre contexte et on vous dit honnêtement si l'IA est pertinente — et par quoi commencer. Pas de vente forcée." },
-  { q: 'Comment financer une formation ?', a: 'Sur le budget formation de votre entreprise. On vous fournit programme, devis et attestation. Le financement passe simplement par votre poste formation interne.' },
-  { q: 'Quels sont les délais ?', a: 'Diagnostic en 30 minutes, proposition sous 48 h, démarrage dès J+1. On ne fait pas traîner : la vitesse fait partie du résultat.' },
-  { q: 'Garantissez-vous des résultats ?', a: "On s'engage sur des livrables concrets et mesurables, pas sur des slides. Chaque mission est cadrée avec des objectifs chiffrés — nos cas clients le montrent." },
-  { q: "C'est pour qui ?", a: 'PME, ETI, administrations, indépendants. Tout métier où des tâches répétitives, documentaires ou rédactionnelles pèsent sur le temps des équipes.' },
-];
-const FaqRow: React.FC<{ q: string; a: string; idx: number }> = ({ q, a, idx }) => {
-  const reduce = useReducedMotion();
-  const [open, setOpen] = React.useState(false);
-  return (
-    <div className="border-b border-green/12">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="group flex w-full items-center justify-between gap-4 py-6 text-left outline-none [touch-action:manipulation]">
-        <span className="relative font-serif-display text-[22px] leading-tight text-cream md:text-[28px]">
-          {q}
-          <span aria-hidden className="absolute -bottom-1 left-0 h-px w-0 bg-green/60 transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full group-focus-visible:w-full" />
-        </span>
-        <motion.span aria-hidden animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3, ease }}
-          className="shrink-0 text-2xl leading-none text-green">+</motion.span>
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={reduce ? { opacity: 1, height: 'auto' } : { height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            transition={{ type: reduce ? 'tween' : 'spring', stiffness: 220, damping: 30, opacity: { duration: 0.25 } }}
-            className="overflow-hidden">
-            <p className="max-w-2xl pb-6 text-[15px] leading-relaxed text-cream-soft">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-const Faq: React.FC = () => (
-  <section id="faq" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-    <div className="mx-auto max-w-3xl">
-      <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
-      <Reveal delay={0.06} perspective>
-        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
-          Tout ce qu'on <span className="aurora-text italic">nous demande.</span>
-        </h2>
-      </Reveal>
-      <div>
-        {FAQ_ITEMS.map((f, i) => <FaqRow key={f.q} q={f.q} a={f.a} idx={i} />)}
+      <div className="mt-14 grid gap-5 md:grid-cols-3">
+        {COLUMNS.map((c, i) => (
+          <Reveal key={c.title} delay={i * 0.08}>
+            <a href={LI_CLEMENT} target="_blank" rel="noopener noreferrer"
+              className="column-card flex h-full flex-col p-7 outline-none md:p-8">
+              <span className="kicker text-cyan">{c.tag}</span>
+              <h3 className="font-serif-display mt-4 text-[24px] leading-[1.08] text-cream md:text-[28px]">{c.title}</h3>
+              <span className="mt-auto pt-8 text-[12px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">{c.date}</span>
+            </a>
+          </Reveal>
+        ))}
       </div>
     </div>
   </section>
 );
 
-// ---------------------------------------------------------------------
-// CTA FINAL — moment Grainient navy + Calendly inline + bouton magnétique.
-// ---------------------------------------------------------------------
-const CtaFinal: React.FC = () => {
+// =====================================================================
+// 11 — LE RENDEZ-VOUS (CTA). « Prenons 30 minutes. » Calendly inline. Bouton
+// :active scale(0.98). Marges très généreuses (le vide = le luxe).
+// =====================================================================
+const Rendezvous: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-20%' });
+  const inView = useInView(ref, { once: true, margin: '-15%' });
   return (
-    <section id="contact" ref={ref}
-      className="section-clip relative isolate overflow-hidden bg-ink px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.14} grainAmount={0.08} contrast={1.3}
-          saturation={1.0} zoom={1.0} warpStrength={1.1}
-        />
-      </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(7,11,22,0.4) 0%, rgba(7,11,22,0.7) 65%, rgba(7,11,22,0.92) 100%)' }} />
-
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
-        <div className="text-center lg:text-left">
-          <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
-              Échangeons 30 minutes <span className="aurora-text italic">sur l'IA.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mx-auto mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft lg:mx-0">
-              On comprend votre contexte, on vous dit honnêtement où l'IA crée de la valeur chez vous.
-              Sans engagement.
-            </p>
-          </Reveal>
-          <Reveal delay={0.16}>
-            <div className="mt-8 flex justify-center lg:justify-start">
-              <MagneticPrimary href={CALENDLY} external>Réserver mon créneau</MagneticPrimary>
-            </div>
-          </Reveal>
-        </div>
-
-        {/* Calendly inline — conteneur responsive, pas de hauteur fixe agressive */}
+    <section id="rendezvous" ref={ref} className="section-clip relative px-5 py-[clamp(120px,20vh,280px)] md:px-8">
+      <div className="mx-auto max-w-5xl">
+        <Rubrique folio="11" title="Prenons 30 minutes." size="clamp(38px, 6vw, 84px)" />
         <Reveal delay={0.1}>
-          <div className="glass-strong overflow-hidden rounded-3xl p-1.5 md:p-2">
+          <p className="serif-body mt-8 max-w-2xl text-cream-soft" style={{ fontSize: 'clamp(20px, 2.6vw, 26px)', lineHeight: 1.42 }}>
+            Un échange, pas une démo. On regarde vos process, on vous dit franchement
+            où l'IA a du sens — et où elle n'en a pas.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.16}>
+          <div className="mt-14 overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--rule)' }}>
             {inView && (
               <iframe
                 title="Réserver un créneau de 30 minutes"
                 src={CALENDLY_EMBED}
                 loading="lazy"
-                className="h-[640px] w-full rounded-[20px] border-0 sm:h-[700px]"
+                className="h-[640px] w-full border-0 sm:h-[700px]"
               />
             )}
+            {!inView && <div className="h-[640px] w-full sm:h-[700px]" aria-hidden />}
           </div>
         </Reveal>
       </div>
@@ -983,100 +593,125 @@ const CtaFinal: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------
-// FOOTER — enrichi. Dispositif « footer-reveal » : rendu en position fixe
-// (.footer-fixed) DERRIÈRE le <main>, révélé par effet rideau en fin de scroll.
-// Fond Grainient navy subtil + radial pour rester dans la DA.
-// ---------------------------------------------------------------------
-const Footer: React.FC = () => {
+// =====================================================================
+// 12 — LE COLOPHON (footer). Quasi statique. Grainient navy très subtil
+// (le second et dernier moment riche). Nav + email + LinkedIn des 2. Phrase
+// finale serif. Liens : soulignement qui se dessine au hover.
+// =====================================================================
+const Colophon: React.FC = () => {
   const reduce = useReducedMotion();
   return (
-    <footer className="footer-fixed isolate border-t border-green/12 px-5 py-16 md:px-8">
+    <footer className="relative isolate overflow-hidden border-t px-5 py-20 md:px-8" style={{ borderColor: 'var(--rule)' }}>
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <Grainient
           className="h-full w-full"
           color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.1} grainAmount={0.07} contrast={1.25}
-          saturation={0.95} zoom={1.05} warpStrength={1.0}
+          timeSpeed={reduce ? 0 : 0.08} grainAmount={0.07} contrast={1.22}
+          saturation={0.9} zoom={1.1} warpStrength={0.95}
         />
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
+          style={{ background: 'linear-gradient(180deg, rgba(6,9,18,0.82) 0%, rgba(6,9,18,0.88) 60%, rgba(6,9,18,0.95) 100%)' }} />
       </div>
-      <div className="relative z-10 w-full">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <p className="kicker text-cream-soft">
+          AXEM IA · Agence IA &amp; formation · Édition 01 · 2026
+        </p>
+        <p className="font-serif-display mt-6 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
+          On enseigne ce qu'on déploie.
+        </p>
+        <hr className="rule my-12" />
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl">
-              AXEM<span className="aurora-text">.</span>
-            </a>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-soft">
-              Votre partenaire IA, de A à Z. Formation, conseil, audit, production &amp; automatisation IA.
-            </p>
-          </div>
-          <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
+            <span className="folio">Navigation</span>
+            <ul className="mt-4 space-y-2 text-[15px] text-cream-soft">
               {NAV_LINKS.map(([l, h]) => (
-                <li key={l}><a href={h} className="link-limitless hover:text-cream">{l}</a></li>
+                <li key={l}><a href={h} className="link-rule hover:text-cream">{l}</a></li>
               ))}
             </ul>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
-              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Réserver un appel</a></li>
-              <li><a href="mailto:contact@axem-ia.fr" className="link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
-              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Cas clients</a></li>
+            <span className="folio">Contact</span>
+            <ul className="mt-4 space-y-2 text-[15px] text-cream-soft">
+              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-rule hover:text-cream">Le rendez-vous</a></li>
+              <li><a href="mailto:contact@axem-ia.fr" className="link-rule hover:text-cream">contact@axem-ia.fr</a></li>
+              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="link-rule hover:text-cream">Les cas</a></li>
+            </ul>
+          </div>
+          <div>
+            <span className="folio">Les auteurs</span>
+            <ul className="mt-4 space-y-2 text-[15px] text-cream-soft">
+              <li><a href={LI_CLEMENT} target="_blank" rel="noopener noreferrer" className="link-rule hover:text-cream">Clément Predo ↗</a></li>
+              <li><a href={LI_ALEXIS} target="_blank" rel="noopener noreferrer" className="link-rule hover:text-cream">Alexis Zeitoun ↗</a></li>
             </ul>
           </div>
         </div>
-        <div className="mx-auto mt-12 max-w-5xl border-t border-green/8 pt-6 text-center text-xs text-cream-dim">
-          © 2026 AXEM IA — Paris, France.
-        </div>
+        <hr className="rule mt-12" />
+        <p className="mt-6 text-[12px] text-cream-dim">© 2026 AXEM IA — Paris, France.</p>
       </div>
     </footer>
   );
 };
 
-// ---------------------------------------------------------------------
-// PAGE
-// ---------------------------------------------------------------------
+// =====================================================================
+// PAGE — la revue, dans l'ordre des rubriques.
+// =====================================================================
 const Home: React.FC = () => {
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
-      {/* has-footer-reveal : wrapper du dispositif rideau. Footer fixe DERRIÈRE,
-          le <main>.reveal-main (fond navy opaque + margin-bottom = footer) glisse
-          vers le haut en fin de scroll et révèle le footer.
-          PAS d'overflow-x-hidden ici : ça transformerait le wrapper en scroller
-          interne (overflow-y→auto) et casserait le scroll fenêtre + le footer fixe.
-          Le clamp overflow-x est porté par <body> (index.css) + .section-clip. */}
-      <div className="has-footer-reveal min-h-screen text-cream">
+      <div className="min-h-screen bg-ink text-cream" style={{ overflowX: 'hidden' }}>
         <Nav />
-        <main id="contenu" className="reveal-main">
-          {/* Blueprint Limitless → AXEM :
-              Hero (verre #1) · Marquee logos · Process 3 étapes · INTERLUDE VERRE #2
-              · Benefits + preuve duo · Features (parcours) · Marquee capacités
-              · INTERLUDE VERRE #3 · Count-up résultats · Formation · FAQ · CTA (verre #4) */}
+        <main id="contenu">
           <Hero />
+          <Edito />
+          <Auteurs />
+          <Sommaire />
+
+          {/* 04 — FEATURE I — BTP */}
+          <Feature
+            id="feature-1"
+            kicker="Feature — Industrie"
+            title={<>Comment un acteur du BTP a rendu 80 % d'un process — et 95 000 € par an.</>}
+            chapo={<>Chiffrage manuel chronophage, devis lents, marges grignotées par les erreurs. Un assistant de chiffrage IA branché sur leurs bordereaux et leurs historiques a tout changé.</>}
+            stats={[
+              { val: <><CountUp to={80} />%</>, label: 'de temps de saisie en moins' },
+              { val: <CountUp to={95} suffix=" k€" />, label: 'neutralisés chaque année' },
+            ]}
+          />
+
+          {/* 05 — FEATURE II — ADMIN JUDICIAIRE (miroir) */}
+          <Feature
+            id="feature-2"
+            kicker="Feature — Secteur public"
+            title={<>×4 sur le traitement, 100 % de fiabilité, +5 h par semaine rendues.</>}
+            chapo={<>Traitement documentaire massif, saisie répétitive, risque d'erreur élevé. Un pipeline OCR doublé d'une vérification IA sur chaque pièce entrante a absorbé la charge.</>}
+            stats={[
+              { val: <>×<CountUp to={4} /></>, label: 'plus rapide sur le traitement' },
+              { val: <><CountUp to={100} />%</>, label: 'de fiabilité par double contrôle' },
+            ]}
+            mirror
+          />
+
+          {/* 06 — FEATURE III — ADHÉSIFS AÉRO/FERRO (pleine page, chiffre sticky) */}
+          <Feature
+            id="feature-3"
+            kicker="Feature — Production"
+            title={<>317 heures rendues chaque mois, plus de 98 % de fiabilité.</>}
+            chapo={<>Conformité ADV lourde, contrôles manuels, anomalies détectées trop tard. L'automatisation des contrôles documentaires et de conformité a libéré des journées entières.</>}
+            stats={[
+              { val: <CountUp to={317} suffix=" h" />, label: 'libérées chaque mois' },
+              { val: <>&gt;<CountUp to={98} />%</>, label: "d'anomalies détectées" },
+            ]}
+            wide
+          />
+
+          <IndexSection />
           <TrustBar />
           <Methode />
-          <SectionA />
-          <Manifeste />
-          <Duo />
-          <Conseil />
-          <CapabilitiesMarquee />
-          <GlassInterlude
-            id="interlude"
-            eyebrow="Notre promesse"
-            watermark="et on reste"
-            title={<>On ne livre pas. <span className="aurora-text italic">On accompagne.</span></>}
-          />
-          <Resultats />
-          <Formation />
-          <Faq />
-          <CtaFinal />
+          <Colonne />
+          <Rendezvous />
         </main>
-        <Footer />
+        <Colophon />
       </div>
     </MotionConfig>
   );

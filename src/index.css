@@ -531,3 +531,241 @@ body {
     transition: none !important;
   }
 }
+
+/* =====================================================================
+   🅱️ « LE MANIFESTE » — REVUE ÉDITORIALE PREMIUM
+   Typo serif éditoriale, filets fins, folios, mise en page de magazine.
+   Le mouvement est un luxe qu'on dépense rarement : tout est RETENU.
+   transform/opacity only. Aucune ombre portée diffuse, des filets.
+   ===================================================================== */
+
+/* Couleur d'encre/gris éditoriale — un cran plus chaud-froid que les tokens nav. */
+:root {
+  --ink-paper: #eef2fb;     /* « encre » : texte vif */
+  --ink-grey: #8a9bbd;      /* gris secondaire */
+  --ink-faint: #5c6b8c;     /* gris tertiaire / folios */
+  --rule: rgba(138, 155, 189, 0.22);  /* filet fin standard */
+  --rule-strong: rgba(138, 155, 189, 0.34);
+}
+
+/* FILET — hairline éditorial pleine largeur (plein, pas de dégradé : c'est une revue). */
+.rule {
+  border: 0;
+  height: 1px;
+  background: var(--rule);
+}
+.rule-strong { background: var(--rule-strong); }
+
+/* FOLIO — numéro de rubrique en marge, petites capitales Satoshi. */
+.folio {
+  font-family: 'Satoshi', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-feature-settings: 'tnum' 1;
+}
+
+/* SURTITRE de feature — « FEATURE — INDUSTRIE ». */
+.kicker {
+  font-family: 'Satoshi', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-grey);
+}
+
+/* TITRE de rubrique serif — « L'édito », « Les auteurs »… fer à gauche. */
+.rubrique {
+  font-family: 'Instrument Serif', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.96;
+  color: var(--ink-paper);
+}
+
+/* CORPS serif éditorial — paragraphes d'édito, chapôs. */
+.serif-body {
+  font-family: 'Instrument Serif', 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+
+/* LIEN ÉDITORIAL — soulignement qui SE DESSINE au hover (scaleX, origine gauche). */
+.link-rule {
+  position: relative;
+  color: var(--ink-paper);
+  transition: color 0.25s var(--ease-limitless);
+}
+.link-rule::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0.6;
+  transition: transform 0.28s var(--ease-out);
+}
+.link-rule:hover::after,
+.link-rule:focus-visible::after { transform: scaleX(1); }
+
+/* =====================================================================
+   HERO « la couverture » — révélation ligne par ligne par MASQUE VERTICAL.
+   clip-path qui remonte (inset bas → 0). La SEULE anim riche de la page.
+   reduced-motion : pas de masque (clip ouvert, opacity 1).
+   ===================================================================== */
+.cover-line {
+  display: block;
+  overflow: hidden;
+}
+.cover-line > span {
+  display: block;
+  clip-path: inset(110% 0 0 0);
+  transform: translateY(0.12em);
+  will-change: clip-path, transform;
+}
+.cover-line.is-in > span {
+  clip-path: inset(0 0 0 0);
+  transform: translateY(0);
+  transition: clip-path 0.42s var(--ease-out), transform 0.42s var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-line > span {
+    clip-path: inset(0 0 0 0) !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* « ↓ Lire l'édito » qui respire très lentement (opacity + 1px). */
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(2px); }
+}
+.breathe { animation: breathe 3.4s var(--ease-in-out) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .breathe { animation: none; opacity: 0.8; }
+}
+
+/* =====================================================================
+   SOMMAIRE — type « table des matières » : titre à gauche, p.0X à droite,
+   POINTS DE CONDUITE (leaders) au milieu qui se densifient au hover.
+   ===================================================================== */
+.toc-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--rule);
+  transition: transform 0.2s var(--ease-out);
+}
+.toc-leader {
+  align-self: end;
+  height: 1px;
+  margin-bottom: 0.32em;
+  background-image: radial-gradient(circle, var(--ink-faint) 0.8px, transparent 0.9px);
+  background-size: 7px 1px;
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  opacity: 0.55;
+  transition: opacity 0.25s var(--ease-out), background-size 0.25s var(--ease-out);
+}
+.toc-row:hover { transform: translateX(6px); }
+.toc-row:hover .toc-leader { opacity: 1; background-size: 5px 1px; }
+@media (prefers-reduced-motion: reduce) {
+  .toc-row, .toc-leader { transition: none !important; }
+  .toc-row:hover { transform: none; }
+}
+
+/* =====================================================================
+   AUTEURS — filet sous le nom qui S'ÉTEND au hover (scaleX 200ms),
+   bio gris → encre.
+   ===================================================================== */
+.author-name-rule {
+  position: relative;
+  display: inline-block;
+}
+.author-name-rule::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.12em;
+  height: 2px;
+  width: 100%;
+  background: var(--ink-paper);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s var(--ease-out);
+}
+.author-block:hover .author-name-rule::after,
+.author-block:focus-within .author-name-rule::after { transform: scaleX(1); }
+.author-bio {
+  color: var(--ink-grey);
+  transition: color 0.25s var(--ease-out);
+}
+.author-block:hover .author-bio,
+.author-block:focus-within .author-bio { color: var(--ink-paper); }
+@media (prefers-reduced-motion: reduce) {
+  .author-name-rule::after, .author-bio { transition: none !important; }
+}
+
+/* =====================================================================
+   FEATURE — filet de marge qui se TRACE (jauge de lecture verticale).
+   Piloté par scaleY lié au scroll en JS (style inline). Statique ici.
+   ===================================================================== */
+.feature-gauge {
+  transform-origin: top;
+  background: var(--rule-strong);
+}
+
+/* =====================================================================
+   ⭐ LA MÉTHODE — FILET VERTICAL « A → Z » qui s'encre du HAUT vers le BAS,
+   piloté au scroll (scaleY 0→1, origine haut, réversible & synchrone).
+   « A » en haut, « Z » en bas. En mobile : barre de progression latérale fine.
+   reduced-motion : trait déjà plein (scaleY 1).
+   ===================================================================== */
+.az-rail {
+  background: var(--rule);
+}
+.az-ink {
+  transform-origin: top;
+  background: linear-gradient(180deg, #5b8cff 0%, #38bdf8 100%);
+}
+.az-step {
+  color: var(--ink-faint);
+  transition: color 0.45s var(--ease-out);
+}
+.az-step[data-on='true'] { color: var(--ink-paper); }
+.az-step .az-step-meta {
+  color: var(--ink-faint);
+  transition: color 0.45s var(--ease-out);
+}
+.az-step[data-on='true'] .az-step-meta { color: var(--green, #5b8cff); }
+@media (prefers-reduced-motion: reduce) {
+  .az-ink { transform: scaleY(1) !important; }
+  .az-step { color: var(--ink-paper); }
+}
+
+/* CARTE de colonne (extraits LinkedIn) — filet du cadre +1px au hover (pas d'ombre). */
+.column-card {
+  border: 1px solid var(--rule);
+  transition: border-color 0.25s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.column-card:hover {
+  border-color: var(--rule-strong);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .column-card { transition: border-color 0.25s var(--ease-out); }
+  .column-card:hover { transform: none; }
+}
+
+/* Cellule d'index (donnée brute, aucun hover). */
+.index-cell { border-top: 1px solid var(--rule); }
