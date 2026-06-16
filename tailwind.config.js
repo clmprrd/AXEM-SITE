@@ -10,23 +10,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* BLEU NUIT / NAVY GLASS — base plus profonde/cinématique (Limitless black space), accents bleu électrique + cyan */
-        ink: '#060912',          /* fond navy de base (bleu nuit très sombre) */
-        'ink-2': '#0A0F1E',      /* surface navy (cartes) */
-        'ink-3': '#0C1322',      /* surface navy alternée */
-        'ink-4': '#182034',      /* gris-bleu (bordures / surfaces hautes) */
-        cream: '#EAF0FF',        /* texte principal (blanc cassé bleuté) */
-        'cream-soft': '#9FB0CE', /* texte secondaire (gris-bleu clair) */
-        'cream-dim': '#6E7FA0',  /* texte tertiaire */
-        green: '#5B8CFF',        /* accent principal (bleu électrique) */
-        'green-deep': '#3B6FE0', /* accent profond (bleu) */
-        cyan: '#38BDF8',         /* accent secondaire (cyan) */
-        mint: '#5EEAD4',         /* touche mint */
+        /* PEAU MORNINGSIDE — near-black #080808, sections sombres dark-green #0f1c1c,
+           accent vert signature #0cc481 (UNIQUE accent), ivory #edece4 pour le clair. */
+        ink: '#080808',          /* fond primaire near-black */
+        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
+        'ink-3': '#0b1413',      /* surface sombre alternée */
+        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
+        cream: '#ffffff',        /* texte principal (blanc) */
+        'cream-soft': '#cccccc', /* texte secondaire */
+        'cream-dim': '#888888',  /* texte tertiaire */
+        ivory: '#edece4',        /* clair secondaire (sections claires) */
+        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
+        'green-deep': '#0aa86e', /* vert profond (hover) */
+        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
+        mint: '#3fe0a8',         /* vert clair */
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Inter', 'sans-serif'],
-        satoshi: ['Satoshi', 'Inter', 'sans-serif'],
+        sans: ['Poppins', 'sans-serif'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+        satoshi: ['"Space Grotesk"', 'sans-serif'],
       },
     },
   },

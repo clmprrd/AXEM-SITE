@@ -10,30 +10,31 @@
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  /* easing « Limitless » pour les transitions de couleur (liens, hovers texte) */
+  /* easing pour les transitions de couleur (liens, hovers texte) */
   --ease-limitless: cubic-bezier(0.44, 0, 0.56, 1);
-  /* accent bleu profond maîtrisé pour les boutons (pas de néon) */
-  --btn: #2a4bd0;
-  --btn-hover: #3b6fe0;
-  --btn-ink: #f4f7ff;
+  /* PEAU MORNINGSIDE — bouton pilule vert signature */
+  --btn: #0cc481;
+  --btn-hover: #0aa86e;
+  --btn-ink: #061a12;
 }
 
 html {
   scroll-padding-top: 80px;
-  /* base un peu plus profonde/cinématique (Limitless-like black space) */
-  background-color: #060912;
+  /* PEAU MORNINGSIDE — fond near-black */
+  background-color: #080808;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #060912;
-  color: #eaf0ff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  background-color: #080808;
+  color: #ffffff;
   overflow-x: hidden;
 }
 
 /* Focus clavier visible (a11y) */
 :focus-visible {
-  outline: 2px solid #5b8cff;
+  outline: 2px solid #0cc481;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -55,9 +56,9 @@ body {
   left: 12px;
   top: 12px;
   z-index: 100;
-  background: #5b8cff;
-  color: #070b16;
-  font-weight: 800;
+  background: #0cc481;
+  color: #061a12;
+  font-weight: 700;
   padding: 10px 16px;
   border-radius: 10px;
   transform: translateY(-150%);
@@ -65,56 +66,60 @@ body {
 }
 .skip-link:focus {
   transform: translateY(0);
-  outline: 2px solid #eaf0ff;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 
 .font-display {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
-/* SATOSHI — eyebrows / labels / small-caps crisp (langage Limitless).
-   Fallback Inter si Fontshare indispo. Toujours appliqué aux .eyebrow / .label. */
+/* PEAU MORNINGSIDE — eyebrows / labels : Space Grotesk, caps, tracking large. */
 .font-satoshi,
 .eyebrow,
 .label-mono {
-  font-family: 'Satoshi', 'Inter', sans-serif;
-  font-feature-settings: 'ss01' 1;
+  font-family: 'Space Grotesk', sans-serif;
 }
 .eyebrow {
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.22em;
 }
 
-/* SERIF ÉDITORIAL — langage « Limitless » : titres display géants, leading serré */
+/* PEAU MORNINGSIDE — TITRES DISPLAY : Space Grotesk, souvent MAJUSCULES,
+   poids regular/medium, tracking ouvert (.06–.12em). Remplace Instrument Serif.
+   (le serif a disparu — morningside n'est PAS serif.) */
 .font-serif-display {
-  font-family: 'Instrument Serif', 'Times New Roman', serif;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
+/* l'ancien `.italic` sur les titres ne doit PAS pencher (Space Grotesk n'a pas
+   d'italique éditorial) : on neutralise l'inclinaison et on garde le dégradé. */
 .font-serif-display.italic {
-  font-style: italic;
+  font-style: normal;
 }
 
-/* WATERMARK serif — wordmark géant semi-transparent par-dessus le Grainient */
+/* WATERMARK — wordmark géant semi-transparent (Space Grotesk caps) */
 .serif-watermark {
-  font-family: 'Instrument Serif', 'Times New Roman', serif;
-  font-weight: 400;
-  line-height: 0.82;
-  letter-spacing: -0.03em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   -webkit-user-select: none;
   user-select: none;
 }
 
 ::selection {
-  background: #5b8cff;
-  color: #070b16;
+  background: #0cc481;
+  color: #061a12;
 }
 ::-moz-selection {
-  background: #5b8cff;
-  color: #070b16;
+  background: #0cc481;
+  color: #061a12;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -133,71 +138,69 @@ body {
   letter-spacing: -0.04em;
 }
 
-/* titres en dégradé navy (bleu électrique → cyan)
-   NB : couleur pleine #7fb3ff en FALLBACK — si background-clip:text ne s'applique
-   pas (texte transparent invisible sur navy), le titre reste lisible. */
+/* PEAU MORNINGSIDE — dégradé signature des titres : linear-gradient(90deg,#fff,#0cc481)
+   clippé sur le texte. Fallback couleur pleine vert clair si background-clip indispo. */
 .aurora-text {
-  background-image: linear-gradient(100deg, #5b8cff 0%, #3b6fe0 45%, #38bdf8 100%);
+  background-image: linear-gradient(90deg, #ffffff 0%, #0cc481 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #7fb3ff;
+  color: #0cc481;
 }
 /* HERO — la 2e ligne « de A à Z. » utilise le reveal mot-à-mot : ses glyphes
    vivent dans des <span> imbriqués (inline-block) où background-clip:text ne
-   se propage pas → texte invisible. On force donc une COULEUR PLEINE lisible
-   (pas de gradient-text transparent sur ce gros titre). */
+   se propage pas → texte invisible. On force donc une COULEUR PLEINE (vert
+   signature) lisible (pas de gradient-text transparent sur ce gros titre). */
 .aurora-solid,
 .aurora-solid * {
   background: none !important;
-  -webkit-text-fill-color: #7fb3ff !important;
-  color: #7fb3ff !important;
+  -webkit-text-fill-color: #0cc481 !important;
+  color: #0cc481 !important;
 }
-/* TITRE DÉGRADÉ SIGNATURE (réplique du dégradé-titre morningside, cyan AXEM) :
-   linear-gradient(90deg,#EAF0FF,#38BDF8) clippé sur le texte. Fallback couleur
-   pleine #CDE3FF si background-clip:text indisponible (texte transparent illisible). */
+/* TITRE DÉGRADÉ SIGNATURE morningside : linear-gradient(90deg,#fff,#0cc481)
+   clippé. Fallback couleur pleine vert clair si background-clip indisponible. */
 .title-grad {
-  background-image: linear-gradient(90deg, #eaf0ff 0%, #9fc6ff 45%, #38bdf8 100%);
+  background-image: linear-gradient(90deg, #ffffff 0%, #0cc481 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #cde3ff;
+  color: #6fe6bf;
 }
 .outline-type {
-  background: linear-gradient(100deg, #5b8cff, #38bdf8);
+  background: linear-gradient(90deg, #ffffff, #0cc481);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-stroke: 0;
 }
 .outline-green {
-  background: linear-gradient(100deg, #3b6fe0, #38bdf8);
+  background: linear-gradient(90deg, #0cc481, #0aa86e);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-stroke: 0;
 }
 
-/* GLASS — carte verre dépoli navy (teintée bleu nuit) */
+/* PEAU MORNINGSIDE — carte sur fond dark-green #0f1c1c, bord subtil vert. */
 .glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(120, 160, 255, 0.24);
-  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: rgba(15, 28, 28, 0.72);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(12, 196, 129, 0.16);
+  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 .glass-strong {
-  background: rgba(13, 21, 38, 0.78);
-  backdrop-filter: blur(22px) saturate(1.5);
-  -webkit-backdrop-filter: blur(22px) saturate(1.5);
-  border: 1px solid rgba(120, 160, 255, 0.3);
-  box-shadow: 0 12px 40px -14px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: rgba(15, 28, 28, 0.88);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(12, 196, 129, 0.22);
+  box-shadow: 0 12px 40px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* QUADRILLAGE — grille fine navy, fondue par un masque radial */
+/* QUADRILLAGE — grille fine vert subtil, fondue par un masque radial */
 .grid-overlay {
-  background-image: linear-gradient(rgba(120, 160, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 160, 255, 0.06) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(12, 196, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12, 196, 129, 0.05) 1px, transparent 1px);
   background-size: 48px 48px;
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
   mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
@@ -247,11 +250,11 @@ body {
     box-shadow 0.4s var(--ease-out);
 }
 .nav-pill[data-scrolled='true'] {
-  background: rgba(11, 16, 32, 0.5);
-  border-color: rgba(120, 160, 255, 0.18);
-  -webkit-backdrop-filter: blur(10px) saturate(1.4);
-  backdrop-filter: blur(10px) saturate(1.4);
-  box-shadow: 0 8px 30px -16px rgba(0, 0, 0, 0.6);
+  background: rgba(8, 8, 8, 0.6);
+  border-color: rgba(12, 196, 129, 0.16);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: 0 8px 30px -16px rgba(0, 0, 0, 0.7);
 }
 
 /* =====================================================================
@@ -282,8 +285,9 @@ body {
 .has-footer-reveal .reveal-main {
   position: relative;
   z-index: 1;
-  /* fond navy opaque : masque le footer fixe tant qu'on n'est pas en bas */
-  background: linear-gradient(180deg, #060912 0%, #0a0f1e 55%, #0c1322 100%);
+  /* PEAU MORNINGSIDE — fond near-black opaque, légère dérive dark-green, masque
+     le footer fixe tant qu'on n'est pas en bas. */
+  background: linear-gradient(180deg, #080808 0%, #0a1110 60%, #0f1c1c 100%);
 }
 .footer-fixed {
   position: fixed;
@@ -369,7 +373,7 @@ body {
   transform: scale(0.97);
 }
 .btn:focus-visible {
-  outline: 2px solid #7fb3ff;
+  outline: 2px solid #0cc481;
   outline-offset: 3px;
 }
 
@@ -378,15 +382,15 @@ body {
   padding: 0.95rem 1.6rem;
   color: var(--btn-ink);
   background-color: var(--btn);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.14) inset,
-    0 10px 22px -14px rgba(20, 40, 110, 0.9);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 10px 22px -14px rgba(12, 196, 129, 0.55);
 }
 .btn-primary:hover {
   background-color: var(--btn-hover);
-  /* hover « Limitless » : scale 1.03 (pas de glow néon) */
+  /* hover : scale 1.03 (pas de glow néon) */
   transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 16px 30px -16px rgba(30, 60, 150, 0.95);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 16px 30px -16px rgba(12, 196, 129, 0.6);
 }
 .btn-primary:active {
   transform: translateY(0) scale(0.97);
@@ -430,15 +434,15 @@ body {
    soulignement qui se révèle au hover. */
 .btn-secondary {
   padding: 0.95rem 1.5rem;
-  color: #c3d2f0;
+  color: #d7d7d2;
   background-color: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(120, 160, 255, 0.28);
+  border: 1px solid rgba(12, 196, 129, 0.30);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 .btn-secondary:hover {
-  color: #eaf0ff;
-  border-color: rgba(160, 190, 255, 0.55);
+  color: #ffffff;
+  border-color: rgba(12, 196, 129, 0.6);
   transform: translateY(-1px) scale(1.03);
 }
 .btn-secondary:active {
@@ -488,12 +492,12 @@ body {
    TIMELINE / PARCOURS — nœuds qui s'allument
    ===================================================================== */
 .node-dot {
-  box-shadow: 0 0 0 0 rgba(91, 140, 255, 0);
+  box-shadow: 0 0 0 0 rgba(12, 196, 129, 0);
   transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out);
 }
 .node-dot[data-on='true'] {
-  background-color: #5b8cff;
-  box-shadow: 0 0 0 5px rgba(91, 140, 255, 0.12);
+  background-color: #0cc481;
+  box-shadow: 0 0 0 5px rgba(12, 196, 129, 0.14);
 }
 
 /* watermark de section : ne jamais provoquer de scroll horizontal */
@@ -501,14 +505,15 @@ body {
   overflow-x: clip;
 }
 
-/* hairline divider réutilisable */
-.hairline {
+/* hairline divider réutilisable + gradient-line morningside (vert signature) */
+.hairline,
+.gradient-line {
   border: 0;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(120, 160, 255, 0.22) 50%,
+    rgba(12, 196, 129, 0.35) 50%,
     transparent
   );
 }
@@ -546,8 +551,8 @@ body {
 .logo-chip img {
   transition: filter 0.4s var(--ease-out), opacity 0.4s var(--ease-out),
     transform 0.4s var(--ease-out);
-  filter: grayscale(1) brightness(1.7) contrast(0.9);
-  opacity: 0.62;
+  filter: grayscale(1) brightness(1.9) contrast(0.95);
+  opacity: 0.6;
 }
 .logo-chip:hover img {
   filter: grayscale(0) brightness(1);
@@ -558,4 +563,36 @@ body {
   .logo-chip img {
     transition: none !important;
   }
+}
+
+/* =====================================================================
+   PEAU MORNINGSIDE — FOND EN POINTILLÉS « dashed » (réplique du bloc CTA
+   morningside). Quadrillage en traits pointillés vert très discret, fondu
+   par un masque radial pour concentrer le motif au centre.
+   ===================================================================== */
+.dashed {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(12, 196, 129, 0.14) 0,
+      rgba(12, 196, 129, 0.14) 6px,
+      transparent 6px,
+      transparent 14px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(12, 196, 129, 0.14) 0,
+      rgba(12, 196, 129, 0.14) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 100%);
+}
+
+/* GRAIN subtil global (overlay near-black, transform-free, n'altère pas le scroll) */
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
 }

@@ -30,9 +30,10 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// Grainient — variante navy « azur » (base profonde / cinématique)
-const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#05080F' } as const;
-const NAVY = '#060912';
+// PEAU MORNINGSIDE — Grainient : vert signature → dark-green → near-black.
+// (remplace l'ancienne palette navy « azur »)
+const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
+const NAVY = '#080808';
 
 // ---------------------------------------------------------------------
 // PRIMITIVE 3 — <Marquee> : boucle x:[0,'-50%'] linear infinite, contenu
@@ -129,7 +130,7 @@ const Hero: React.FC = () => {
         />
       </motion.div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(6,9,18,0.30) 0%, rgba(6,9,18,0.62) 58%, rgba(6,9,18,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
         style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
@@ -148,14 +149,14 @@ const Hero: React.FC = () => {
           </span>
         </motion.div>
 
-        {/* H1 EN DÉGRADÉ CLIPPÉ (signature) */}
+        {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert) */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[0.92] tracking-[-0.02em] text-cream"
-          style={{ fontSize: 'clamp(48px, 11vw, 120px)', transformPerspective: 1200 }}>
+          className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
+          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
-            <span className="aurora-solid italic inline-block">
+            <span className="aurora-solid inline-block">
               <RiseWords text="de A à Z." delay={0.55} stagger={0.09} />
             </span>
           </span>
@@ -243,7 +244,7 @@ const PinnedPhrase: React.FC<{
   return (
     <motion.p
       style={{ opacity, y: yMv }}
-      className={`font-serif-display absolute inset-x-0 mx-auto max-w-5xl px-6 text-center leading-[1.04] tracking-[-0.01em] text-cream ${phrase.big ? '' : ''}`}>
+      className={`font-serif-display absolute inset-x-0 mx-auto max-w-5xl px-6 text-center leading-[1.04] tracking-[0.02em] text-cream ${phrase.big ? '' : ''}`}>
       <span style={{ fontSize: phrase.big ? 'clamp(40px, 7.5vw, 96px)' : 'clamp(30px, 5vw, 64px)' }} className="block">
         {phrase.text}
       </span>
@@ -280,7 +281,7 @@ const PinnedSequence: React.FC = () => {
         <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
           {/* lueur radiale douce derrière la séquence */}
           <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[130px]"
-            style={{ background: 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.16), transparent 65%)' }} />
+            style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
           <div aria-hidden className="absolute left-1/2 top-10 -translate-x-1/2">
             <Eyebrow>Le constat</Eyebrow>
           </div>
@@ -368,7 +369,7 @@ const Parcours: React.FC = () => {
         <div className="max-w-3xl">
           <Reveal><Eyebrow>Le parcours AXEM</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
+            <h2 className="font-serif-display leading-[1.0] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
               Un parcours complet,<br /><span className="title-grad italic">pas une intervention isolée.</span>
             </h2>
           </Reveal>
@@ -383,7 +384,7 @@ const Parcours: React.FC = () => {
           {PARCOURS_CARDS.map((c, i) => (
             <motion.article key={c.n}
               {...reveal(i * 0.12, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(12,196,129,.14)' }}
               className="group glass flex h-full flex-col rounded-3xl p-7 md:p-8">
               <div className="flex items-center justify-between">
                 <span className="text-green transition-transform duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-110 group-hover:rotate-3">
@@ -444,9 +445,9 @@ const TiltCard: React.FC<{ f: typeof FOUNDERS[number]; i: number }> = ({ f, i })
           <img src={f.img} alt={f.name} loading="lazy"
             className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
           <div aria-hidden className="pointer-events-none absolute inset-0"
-            style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(7,11,22,0.85) 100%)' }} />
+            style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.88) 100%)' }} />
           <a href={f.li} target="_blank" rel="noopener noreferrer"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#061a12] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
             aria-label={`LinkedIn ${f.name}`}>
             <span className="text-[15px] font-bold">in</span>
           </a>
@@ -474,7 +475,7 @@ const Duo: React.FC = () => {
         <div className="max-w-2xl">
           <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
+            <h2 className="font-serif-display leading-[1.0] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
               Deux experts,<br /><span className="title-grad italic">un seul interlocuteur.</span>
             </h2>
           </Reveal>
@@ -559,7 +560,7 @@ const Cas: React.FC = () => {
           <div>
             <Reveal><Eyebrow>Cas clients</Eyebrow></Reveal>
             <Reveal delay={0.06} perspective>
-              <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
+              <h2 className="font-serif-display leading-[0.98] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
                 Des résultats.<br /><span className="title-grad italic">Pas des slides.</span>
               </h2>
             </Reveal>
@@ -575,7 +576,7 @@ const Cas: React.FC = () => {
           {CASES.map((c, i) => (
             <motion.article key={c.sector} tabIndex={0}
               {...reveal(i * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(12,196,129,.14)' }}
               className="group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-8">
               <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
               <div className="space-y-3 text-[14.5px] leading-relaxed">
@@ -645,7 +646,7 @@ const Formation: React.FC = () => {
         <div className="max-w-3xl">
           <Reveal><Eyebrow>Formation</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
+            <h2 className="font-serif-display leading-[1.0] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
               10 formations.<br /><span className="title-grad italic">70 % de pratique.</span>
             </h2>
           </Reveal>
@@ -661,7 +662,7 @@ const Formation: React.FC = () => {
           {FORMATIONS_PHARES.map((f, i) => (
             <motion.article key={f.code} tabIndex={0}
               {...reveal(i * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(91,140,255,.12)' }}
+              whileHover={reduce ? undefined : { y: -6, boxShadow: '0 20px 60px rgba(12,196,129,.14)' }}
               className="group glass relative flex flex-col rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-8">
               <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[f.level]}`}>{f.level}</span>
               <h3 className="font-serif-display mt-5 text-[28px] leading-[1.05] text-cream">{f.code}</h3>
@@ -773,7 +774,7 @@ const Faq: React.FC = () => (
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
       <Reveal delay={0.06} perspective>
-        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
+        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
           Tout ce qu'on <span className="title-grad italic">nous demande.</span>
         </h2>
       </Reveal>
@@ -804,13 +805,15 @@ const CtaFinal: React.FC = () => {
         />
       </div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(7,11,22,0.4) 0%, rgba(7,11,22,0.7) 65%, rgba(7,11,22,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.72) 65%, rgba(8,8,8,0.93) 100%)' }} />
+      {/* PEAU MORNINGSIDE — fond en pointillés « dashed » derrière le bloc CTA */}
+      <div aria-hidden className="dashed pointer-events-none absolute inset-0 z-[2]" />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
           <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
+            <h2 className="font-serif-display leading-[1.0] tracking-[0.02em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
               Échangeons 30 minutes <span className="title-grad italic">sur l'IA.</span>
             </h2>
           </Reveal>
@@ -860,7 +863,7 @@ const Footer: React.FC = () => {
           saturation={0.95} zoom={1.05} warpStrength={1.0}
         />
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
+          style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(8,8,8,0.35) 0%, rgba(8,8,8,0.58) 55%, rgba(8,8,8,0.85) 100%)' }} />
       </div>
       <div className="relative z-10 w-full">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
