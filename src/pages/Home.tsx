@@ -4,7 +4,7 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
-import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount, revealWatermark } from '../ui/motion';
+import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 import { Ligne } from '../components/Ligne';
 import { Metamorphose } from '../components/Metamorphose';
@@ -27,15 +27,17 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-const AZUR = { color1: '#5B8CFF', color2: '#1E40AF', color3: '#05080F' } as const;
-const NAVY = '#060912';
+// PEAU MORNINGSIDE — Grainient confiné au hero : vert signature → dark-green → near-black.
+const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
+const NAVY = '#080808';
 
 // ---------------------------------------------------------------------
 // NAV — pilule flottante scroll-glass.
 // ---------------------------------------------------------------------
+// NAV AXEM (morningside) — Parcours · Cas clients · Formation · Le duo · CTA.
 const NAV_LINKS: [string, string][] = [
-  ['Le duo', '#duo'], ['Métamorphose', '#metamorphose'],
-  ['Parcours', '#parcours'], ['Résultats', '#resultats'], ['Méthode', '#methode'],
+  ['Parcours', '#parcours'], ['Cas clients', '#resultats'],
+  ['Formation', '#formation'], ['Le duo', '#duo'],
 ];
 const Nav: React.FC = () => {
   const { scrollY } = useScroll();
@@ -83,12 +85,12 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 // Compteur discret « ROI médian → 159 % ».
 // ---------------------------------------------------------------------
 const TracedA: React.FC<{ reduce: boolean }> = ({ reduce }) => (
-  // le « A » qui se dessine — naissance de la ligne. SVG inline, glow navy.
+  // le « A » qui se dessine — naissance de la ligne. SVG inline, glow vert.
   <svg viewBox="0 0 120 120" className="ligne-head inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#7aa2ff" />
-        <stop offset="1" stopColor="#38bdf8" />
+        <stop offset="0" stopColor="#0cc481" />
+        <stop offset="1" stopColor="#3fe0a8" />
       </linearGradient>
     </defs>
     <motion.path
@@ -101,16 +103,21 @@ const TracedA: React.FC<{ reduce: boolean }> = ({ reduce }) => (
   </svg>
 );
 
+// =====================================================================
+// 0. HERO (REPRIS DE MORNINGSIDE-AXEM-V2) — caps Space Grotesk + dégradé
+// signature « DE A À Z. » (blanc → vert). Sous-titre « On forme vos équipes…
+// Et on reste. » Double bouton. Fond Grainient vert CONFINÉ au hero (pas fixed).
+// Le « A » se trace au load (naissance de la Ligne signature, recolorée vert).
+// =====================================================================
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
-  const wmYRaw = useTransform(scrollYProgress, [0, 1], ['0%', '-14%']);
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
   const y = reduce ? '0%' : yRaw;
-  const wmY = reduce ? '0%' : wmYRaw;
   return (
     <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
+      {/* Fond Grainient vert plein cadre — CONFINÉ au hero (z-0, pas fixed) */}
       <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
         <Grainient
           className="h-full w-full"
@@ -120,21 +127,13 @@ const Hero: React.FC = () => {
         />
       </motion.div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(6,9,18,0.30) 0%, rgba(6,9,18,0.62) 58%, rgba(6,9,18,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
         style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
-      <motion.div aria-hidden style={{ y: wmY }}
-        className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <motion.span
-          {...revealWatermark(0.2, !!reduce)}
-          className="serif-watermark font-serif-display text-cream/[0.05]"
-          style={{ fontSize: 'clamp(140px, 40vw, 600px)' }}>
-          A → Z
-        </motion.span>
-      </motion.div>
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
+        {/* CASCADE HERO (mount) — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
         <motion.div
           {...revealMount(0.1, !!reduce)}
           className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
@@ -147,15 +146,17 @@ const Hero: React.FC = () => {
           </span>
         </motion.div>
 
+        {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert).
+            Le « A » du « de A à Z. » se trace au load (naissance de la Ligne). */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[0.92] tracking-[-0.02em] text-cream"
-          style={{ fontSize: 'clamp(48px, 11vw, 120px)', transformPerspective: 1200 }}>
+          className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
+          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
-            <span className="aurora-solid italic inline-flex items-baseline gap-[0.12em]">
+            <span className="aurora-solid inline-flex items-baseline gap-[0.12em]">
               <RiseWords text="de" delay={0.55} stagger={0.09} />
-              {/* le A se trace — naissance de la ligne */}
+              {/* le A se trace — naissance de la ligne (recolorée vert) */}
               <TracedA reduce={!!reduce} />
               <RiseWords text="à Z." delay={0.7} stagger={0.09} />
             </span>
@@ -165,15 +166,15 @@ const Hero: React.FC = () => {
         <motion.p
           {...revealMount(0.5, !!reduce)}
           className="mt-8 max-w-2xl text-balance text-lg leading-relaxed text-cream-soft md:text-xl">
-          On audite, on déploie, on forme, on reste.
-          <span className="text-cream"> Un seul interlocuteur, du premier diagnostic à votre autonomie.</span>
+          On forme vos équipes, on conseille votre stratégie, on déploie vos automatisations.
+          <span className="text-cream"> Et on reste.</span>
         </motion.p>
 
         <motion.div
           {...revealMount(0.7, !!reduce)}
           className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <PrimaryButton href={CALENDLY} external size="lg">Réserver un appel</PrimaryButton>
-          <SecondaryButton href="#resultats" size="lg">Voir nos résultats</SecondaryButton>
+          <SecondaryButton href="#resultats" size="lg">Voir les cas clients</SecondaryButton>
         </motion.div>
 
         {/* compteur discret ROI médian */}
@@ -250,7 +251,7 @@ const DuoCard: React.FC<{ f: typeof FOUNDERS[number]; conv: any }> = ({ f, conv 
         <img src={f.img} alt={f.name} loading="lazy"
           className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
         <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(7,11,22,0.85) 100%)' }} />
+          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.85) 100%)' }} />
         <a href={f.li} target="_blank" rel="noopener noreferrer"
           className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
           aria-label={`LinkedIn ${f.name}`}>
@@ -584,7 +585,7 @@ const Methode: React.FC = () => {
   return (
     <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(91,140,255,0.18), transparent 65%)' }} />
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
         <Reveal delay={0.06} perspective>
@@ -597,12 +598,12 @@ const Methode: React.FC = () => {
       <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
           viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(120,160,255,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <path d="M1 0 V100" stroke="rgba(12,196,129,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
           <defs>
             <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#5B8CFF" />
-              <stop offset="1" stopColor="#38BDF8" />
+              <stop offset="0" stopColor="#0cc481" />
+              <stop offset="1" stopColor="#3fe0a8" />
             </linearGradient>
           </defs>
         </svg>
@@ -638,7 +639,7 @@ const Roi: React.FC = () => {
   return (
     <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.18), transparent 65%)' }} />
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
       <div ref={ref} className="relative z-10 flex flex-col items-center text-center">
         {/* la boucle SVG autour du chiffre — se trace au scroll */}
         <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
@@ -647,8 +648,8 @@ const Roi: React.FC = () => {
             style={{ pathLength: loop, rotate: -8 }} />
           <defs>
             <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#5b8cff" />
-              <stop offset="1" stopColor="#38bdf8" />
+              <stop offset="0" stopColor="#0cc481" />
+              <stop offset="1" stopColor="#3fe0a8" />
             </linearGradient>
           </defs>
         </svg>
@@ -728,8 +729,8 @@ const TracedZ: React.FC<{ reduce: boolean; inView: boolean }> = ({ reduce, inVie
   <svg viewBox="0 0 120 120" className="ligne-head inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#7aa2ff" />
-        <stop offset="1" stopColor="#38bdf8" />
+        <stop offset="0" stopColor="#0cc481" />
+        <stop offset="1" stopColor="#3fe0a8" />
       </linearGradient>
     </defs>
     <motion.path
@@ -757,7 +758,7 @@ const CtaFinal: React.FC = () => {
         />
       </div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(7,11,22,0.4) 0%, rgba(7,11,22,0.7) 65%, rgba(7,11,22,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.7) 65%, rgba(8,8,8,0.92) 100%)' }} />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
@@ -809,19 +810,18 @@ const CtaFinal: React.FC = () => {
 // 12. FOOTER — dispositif « footer-reveal » (rideau).
 // ---------------------------------------------------------------------
 const Footer: React.FC = () => {
-  const reduce = useReducedMotion();
   return (
     <footer className="footer-fixed isolate border-t border-green/12 px-5 py-16 md:px-8">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.1} grainAmount={0.07} contrast={1.25}
-          saturation={0.95} zoom={1.05} warpStrength={1.0}
-        />
-        <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(120% 120% at 50% 35%, rgba(7,11,22,0.35) 0%, rgba(7,11,22,0.55) 55%, rgba(7,11,22,0.82) 100%)' }} />
-      </div>
+      {/* SUPPRESSION DU FOND PERSISTANT — le footer est position:fixed (footer-reveal).
+          L'ancien <Grainient> WebGL animé vivait ici, DERRIÈRE tout le contenu, et
+          tournait en permanence pendant tout le scroll (fond persistant qui « bave »
+          sous toutes les sections). Remplacé par un fond near-black PROPRE, uni,
+          avec un halo dark-green STATIQUE confiné au footer (aucun grain/gradient
+          animé qui traîne). */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
+        style={{ background: '#080808' }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
+        style={{ background: 'radial-gradient(120% 120% at 50% 100%, rgba(12,196,129,0.10) 0%, rgba(15,28,28,0.45) 45%, #080808 100%)' }} />
       <div className="relative z-10 w-full">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>

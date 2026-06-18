@@ -39,9 +39,12 @@ const LINE_D =
   'C 51 822, 50 850, 50 878 ' +  // ROI — recentre
   'C 50 912, 50 952, 50 1002';   // CTA — file vers le Z
 
+// PEAU MORNINGSIDE — la ligne signature passe au vert. Les teintes « blueA »/
+// « cyan » sont remappées sur le vert signature ; le rouge narratif (problème)
+// est conservé comme tension dramatique avant la métamorphose.
 const COLOR_STOPS = {
-  blueA: '#5b8cff',
-  cyan: '#38bdf8',
+  blueA: '#0cc481',
+  cyan: '#3fe0a8',
   redTense: '#ff3b53',
   redDeep: '#b91c3a',
 } as const;
@@ -118,8 +121,8 @@ export const Ligne: React.FC = () => {
       fill="none">
       <defs>
         <linearGradient id="ligneGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#7aa2ff" />
-          <stop offset="1" stopColor="#38bdf8" />
+          <stop offset="0" stopColor="#0cc481" />
+          <stop offset="1" stopColor="#3fe0a8" />
         </linearGradient>
       </defs>
       {/* path de mesure invisible — sert UNIQUEMENT à échantillonner la LUT */}
