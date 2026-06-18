@@ -569,10 +569,15 @@ const Methode: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 65%'] });
   const pathLength = reduce ? 1 : scrollYProgress;
-  const [active, setActive] = React.useState<boolean[]>(() => STEPS.map(() => !!reduce));
+  // PERF — l'étape active n'est suivie que par un COMPTEUR (nb d'étapes allumées),
+  // mis à jour seulement au FRANCHISSEMENT de seuil — plus de `setState` avec un
+  // nouveau tableau à chaque frame de scroll (qui re-rendait toute la section).
+  const [activeCount, setActiveCount] = React.useState(reduce ? STEPS.length : 0);
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     if (reduce) return;
-    setActive(STEPS.map((_, i) => p >= (i + 0.5) / STEPS.length - 0.05));
+    let n = 0;
+    for (let i = 0; i < STEPS.length; i++) if (p >= (i + 0.5) / STEPS.length - 0.05) n++;
+    setActiveCount((prev) => (prev === n ? prev : n));
   });
 
   return (
@@ -603,7 +608,7 @@ const Methode: React.FC = () => {
         <ol className="space-y-12 md:space-y-16">
           {STEPS.map((s, i) => (
             <li key={s.k} className="relative">
-              <span aria-hidden data-on={active[i] ? 'true' : 'false'}
+              <span aria-hidden data-on={i < activeCount ? 'true' : 'false'}
                 className="ligne-node absolute -left-[38px] top-2 h-4 w-4 rounded-full border border-green/40 bg-ink md:-left-[50px]" />
               <Reveal delay={0.05 * i}>
                 <div className="flex flex-wrap items-baseline gap-3">
