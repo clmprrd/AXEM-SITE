@@ -7,8 +7,7 @@ import { CountUp } from '../ui/motion';
 // =====================================================================
 // 4. LA MÉTAMORPHOSE (LE WOW) ⭐ — section PINNÉE (refonte perf).
 // À gauche : un tableur chaotique se DÉSASSEMBLE et se RECOMPOSE en workflow
-// n8n propre (scrub lié au scroll), pendant que « 95 000 € » et « 80 % »
-// montent et que la ligne passe du rouge au bleu (géré par <Ligne>).
+// n8n propre (scrub lié au scroll), pendant que « 95 000 € » et « 80 % » montent.
 //
 // PERF — ce qui tue l'ancien lag :
 // • plus AUCUN setState au scroll. L'ancien `setM(v)` re-render­ait 30 cellules

@@ -488,18 +488,6 @@ body {
   }
 }
 
-/* =====================================================================
-   TIMELINE / PARCOURS — nœuds qui s'allument
-   ===================================================================== */
-.node-dot {
-  box-shadow: 0 0 0 0 rgba(12, 196, 129, 0);
-  transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out);
-}
-.node-dot[data-on='true'] {
-  background-color: #0cc481;
-  box-shadow: 0 0 0 5px rgba(12, 196, 129, 0.14);
-}
-
 /* carte « cas client » — élévation au hover : la bordure s'éclaire + une ombre
    teintée vert apparaît. box-shadow en TRANSITION CSS (pas animé par frame),
    le lift vertical reste géré par transform (GPU). */
@@ -580,55 +568,22 @@ body {
 }
 
 /* =====================================================================
-   🅰️ LA LIGNE — la signature. Une ligne lumineuse continue qui naît du
-   « A » du hero, traverse TOUT le site (longueur tracée = progression du
-   scroll global), change de teinte selon le récit, et ne se rompt jamais.
-   Le SVG est fixé en overlay plein écran, pointer-events:none.
+   ACCENTS VERTS — glyphes « A » / « Z » du hero & CTA, boucle ROI.
+   Petits SVG locaux (pas d'overlay fixe, pas de scroll-linking global) avec
+   un halo vert signature doux. Glow CONFINÉ à de petites surfaces → coût
+   compositing négligeable (rien à voir avec l'ancienne ligne fixe plein écran).
    ===================================================================== */
-.ligne-fixed {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100svh;
-  z-index: 5; /* au-dessus du contenu navy, sous la nav (z-50) et le footer-reveal main (z-1)… */
-  pointer-events: none;
-  overflow: visible;
+.accent-glyph {
+  filter: drop-shadow(0 0 5px rgba(12, 196, 129, 0.45));
 }
-/* le SVG doit flotter au-dessus du <main> opaque du footer-reveal */
-.has-footer-reveal .ligne-fixed {
-  z-index: 6;
-}
-/* le tracé de la ligne : glow doux + extrémité ronde. La couleur (stroke)
-   et la longueur (stroke-dashoffset / pathLength) sont pilotées en JS.
-   PEAU MORNINGSIDE — halo vert signature. */
-.ligne-path {
+.accent-stroke {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* glow plus discret, raffiné — un seul halo doux vert (pas de double néon criard) */
-  filter: drop-shadow(0 0 4px rgba(12, 196, 129, 0.5))
-    drop-shadow(0 0 12px rgba(12, 196, 129, 0.24));
-}
-.ligne-rail {
-  fill: none;
-  /* rail quasi-invisible : on devine le chemin sans qu'il salisse le fond */
-  stroke: rgba(12, 196, 129, 0.06);
-  stroke-linecap: round;
-}
-/* la « tête » lumineuse — petit point qui suit la pointe du tracé */
-.ligne-head {
-  filter: drop-shadow(0 0 6px rgba(12, 196, 129, 0.9))
-    drop-shadow(0 0 16px rgba(12, 196, 129, 0.45));
-}
-@media (prefers-reduced-motion: reduce) {
-  /* reduced motion : ligne statique, tracée pleine, pas de tête animée */
-  .ligne-head {
-    display: none;
-  }
+  filter: drop-shadow(0 0 4px rgba(12, 196, 129, 0.4));
 }
 
-/* nœud de section, posé sur la ligne, qui s'allume quand le tracé l'atteint */
+/* nœud de section (méthode, parcours) — petit point qui s'allume à l'approche */
 .ligne-node {
   transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out),
     border-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);

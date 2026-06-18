@@ -6,18 +6,16 @@ import {
 import Grainient from '../components/Grainient';
 import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
-import { Ligne } from '../components/Ligne';
 import { Metamorphose } from '../components/Metamorphose';
 import { Parcours } from '../components/Parcours';
 import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
-// AXEM IA — DIRECTION « 🅰️ LA LIGNE » — le parcours vivant.
-// Une ligne lumineuse unique naît du « A » du hero et traverse TOUT le site
-// sans jamais se rompre, reliant les étapes de l'offre. Le médium = le
-// message : la continuité prouve « un seul interlocuteur, de A à Z, on reste ».
-// DA navy conservée · moteur spring 320/60/1 · Grainient navy · boutons édito.
+// AXEM IA — peau morningside (vert/noir) sur la structure play-a.
+// Hero vert signature, sections narratives (duo, problème, métamorphose,
+// parcours, résultats, formation, méthode, ROI, FAQ, CTA), footer-reveal.
+// DA near-black/#0cc481 · moteur spring 320/60/1 · Grainient confiné · boutons édito.
 // =====================================================================
 
 const ease = EASE;
@@ -79,35 +77,30 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 // ---------------------------------------------------------------------
-// 0. HERO — H1 serif « Votre partenaire IA, de A à Z. »
-// Le « A » se trace au load via un SVG (pathLength 0→1) puis la ligne globale
-// prend le relais et file vers le bas. Léger pin au tout début (parallax).
-// Compteur discret « ROI médian → 159 % ».
+// 0. HERO — H1 « Votre partenaire IA, de A à Z. »
+// Léger parallax au scroll. Compteur discret « ROI médian → 159 % ».
 // ---------------------------------------------------------------------
-const TracedA: React.FC<{ reduce: boolean }> = ({ reduce }) => (
-  // le « A » qui se dessine — naissance de la ligne. SVG inline, glow vert.
-  <svg viewBox="0 0 120 120" className="ligne-head inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
+// Le « A » du « de A à Z. » — accent vert signature STATIQUE (glyphe dessiné,
+// pas d'animation de tracé). Glow vert doux pour l'ancrer comme accent de marque.
+const AccentA: React.FC = () => (
+  <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stopColor="#0cc481" />
         <stop offset="1" stopColor="#3fe0a8" />
       </linearGradient>
     </defs>
-    <motion.path
+    <path
       d="M16 108 L60 14 L104 108 M34 76 L86 76"
       stroke="url(#heroA)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
-      initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={reduce ? { duration: 0 } : { duration: 1.4, ease: EASE, delay: 0.5 }}
     />
   </svg>
 );
 
 // =====================================================================
-// 0. HERO (REPRIS DE MORNINGSIDE-AXEM-V2) — caps Space Grotesk + dégradé
-// signature « DE A À Z. » (blanc → vert). Sous-titre « On forme vos équipes…
-// Et on reste. » Double bouton. Fond Grainient vert CONFINÉ au hero (pas fixed).
-// Le « A » se trace au load (naissance de la Ligne signature, recolorée vert).
+// 0. HERO — caps Space Grotesk + dégradé signature « DE A À Z. » (blanc → vert).
+// Sous-titre « On forme vos équipes… Et on reste. » Double bouton.
+// Fond Grainient vert CONFINÉ au hero (pas fixed). Le « A » = accent vert statique.
 // =====================================================================
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
@@ -147,7 +140,7 @@ const Hero: React.FC = () => {
         </motion.div>
 
         {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert).
-            Le « A » du « de A à Z. » se trace au load (naissance de la Ligne). */}
+            Le « A » du « de A à Z. » = accent vert signature statique. */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
           className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
           style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
@@ -156,8 +149,8 @@ const Hero: React.FC = () => {
             <br />
             <span className="aurora-solid inline-flex items-baseline gap-[0.12em]">
               <RiseWords text="de" delay={0.55} stagger={0.09} />
-              {/* le A se trace — naissance de la ligne (recolorée vert) */}
-              <TracedA reduce={!!reduce} />
+              {/* le A — accent vert signature statique */}
+              <AccentA />
               <RiseWords text="à Z." delay={0.7} stagger={0.09} />
             </span>
           </span>
@@ -317,8 +310,8 @@ const Duo: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 3. LE PROBLÈME (before) — scène désaturée/lourde. La ligne devient rouge
-// sombre, tendue (géré globalement par <Ligne> selon la progression scroll).
+// 3. LE PROBLÈME (before) — scène désaturée/lourde, watermark « aujourd'hui »
+// rouge sourd, parallax doux. Tension narrative avant la métamorphose.
 // ---------------------------------------------------------------------
 const Probleme: React.FC = () => {
   const reduce = useReducedMotion();
@@ -628,8 +621,8 @@ const Methode: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 9. LE ROI EN UN CHIFFRE — « 159 % » plein écran serif. La ligne fait une
-// boucle autour du chiffre. Respiration max.
+// 9. LE ROI EN UN CHIFFRE — « 159 % » plein écran. Une boucle d'accent se
+// trace autour du chiffre au scroll. Respiration max.
 // ---------------------------------------------------------------------
 const Roi: React.FC = () => {
   const reduce = useReducedMotion();
@@ -644,7 +637,7 @@ const Roi: React.FC = () => {
         {/* la boucle SVG autour du chiffre — se trace au scroll */}
         <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
           <motion.ellipse cx="200" cy="200" rx="185" ry="120"
-            stroke="url(#roiGrad)" strokeWidth="2" strokeLinecap="round" className="ligne-path"
+            stroke="url(#roiGrad)" strokeWidth="2" strokeLinecap="round" className="accent-stroke"
             style={{ pathLength: loop, rotate: -8 }} />
           <defs>
             <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
@@ -723,22 +716,19 @@ const Faq: React.FC = () => (
 
 // ---------------------------------------------------------------------
 // 11. CTA FINAL — « Le parcours commence par une conversation. »
-// La ligne trace le « Z » (écho au A). Calendly inline. « De A… à Z. »
+// Le « Z » fait écho au « A » du hero (accent vert statique). Calendly inline.
 // ---------------------------------------------------------------------
-const TracedZ: React.FC<{ reduce: boolean; inView: boolean }> = ({ reduce, inView }) => (
-  <svg viewBox="0 0 120 120" className="ligne-head inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
+const AccentZ: React.FC = () => (
+  <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stopColor="#0cc481" />
         <stop offset="1" stopColor="#3fe0a8" />
       </linearGradient>
     </defs>
-    <motion.path
+    <path
       d="M22 18 L98 18 L22 102 L98 102"
       stroke="url(#ctaZ)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
-      initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
-      animate={reduce || inView ? { pathLength: 1 } : { pathLength: 0 }}
-      transition={reduce ? { duration: 0 } : { duration: 1.5, ease: EASE }}
     />
   </svg>
 );
@@ -774,12 +764,12 @@ const CtaFinal: React.FC = () => {
               Sans engagement.
             </p>
           </Reveal>
-          {/* écho A → Z : la ligne a tracé le A au début, elle trace le Z ici */}
+          {/* écho A → Z : accent vert signature, du A du hero au Z ici */}
           <Reveal delay={0.16}>
             <div className="mt-8 flex items-center justify-center gap-3 lg:justify-start">
               <span className="font-serif-display text-3xl italic text-cream-soft">De A…</span>
               <span className="font-serif-display text-3xl italic text-cream">à</span>
-              <TracedZ reduce={!!reduce} inView={inView} />
+              <AccentZ />
             </div>
           </Reveal>
           <Reveal delay={0.2}>
@@ -858,15 +848,13 @@ const Footer: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// PAGE — l'ordre des sections suit le récit « LA LIGNE ».
+// PAGE — l'ordre des sections suit le récit du parcours AXEM.
 // ---------------------------------------------------------------------
 const Home: React.FC = () => {
   useLenis();
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
-      {/* LA LIGNE — overlay global fixé, continu, scroll-linked. */}
-      <Ligne />
       <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">
