@@ -10,25 +10,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* PEAU MORNINGSIDE (vert/noir) — near-black #080808, sections sombres
-           dark-green #0f1c1c, accent vert signature #0cc481 (UNIQUE accent). */
-        ink: '#080808',          /* fond primaire near-black */
-        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
-        'ink-3': '#0b1413',      /* surface sombre alternée */
-        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
-        cream: '#ffffff',        /* texte principal (blanc) */
-        'cream-soft': '#cccccc', /* texte secondaire */
-        'cream-dim': '#888888',  /* texte tertiaire */
-        ivory: '#edece4',        /* clair secondaire */
-        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
-        'green-deep': '#0aa86e', /* vert profond (hover) */
-        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
-        mint: '#3fe0a8',         /* vert clair */
+        /* =================================================================
+           DA AUROS — abîme teal bioluminescent. Profondeur par TONS (jamais
+           d'ombres). Surfaces : abyss → trench → reef. Accent chaud RARE
+           lavande (bordure only). Anciens noms (ink/cream/green/cyan…)
+           re-mappés sur la palette Auros pour ne PAS casser les utilitaires
+           existants disséminés dans le JSX.
+           ================================================================= */
+        /* — surfaces (profondeur par tons) — */
+        abyss: '#012624',        /* canvas abyssal */
+        trench: '#011d1c',       /* cartes (plus sombre) */
+        reef: '#003734',         /* surface élevée */
+        ink: '#012624',          /* alias canvas (compat) */
+        'ink-2': '#011d1c',      /* alias cartes (compat) */
+        'ink-3': '#011817',      /* surface très basse */
+        'ink-4': '#003734',      /* surface haute (compat) */
+
+        /* — texte — */
+        cream: '#ffffff',        /* titres (blanc) */
+        highlight: '#edfffe',    /* highlights (blanc teal) */
+        'cream-soft': '#bbc7c6', /* corps */
+        'cream-dim': '#7e918f',  /* tertiaire */
+        ivory: '#edfffe',        /* clair secondaire */
+
+        /* — accents bioluminescents — */
+        green: '#00b3a7',        /* accent teal vif (ex-vert signature) */
+        'green-deep': '#00827c', /* teal profond (CTA start) */
+        cyan: '#67e8df',         /* cyan bioluminescent (eyebrows) */
+        mint: '#cbfffc',         /* cyan clair (CTA end) */
+        lavender: '#fde9ff',     /* accent chaud RARE — lavande (bordure only) */
+        aurora: '#fad1ff',       /* aurora warm (gradient ghost) */
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        satoshi: ['"Space Grotesk"', 'sans-serif'],
+        /* substitut Matter = Inter (poids 400/500 only, pas de bold). */
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        satoshi: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

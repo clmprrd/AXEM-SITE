@@ -4,6 +4,9 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
+import ConstellationField from '../components/ConstellationField';
+import { Constellate } from '../components/Constellate';
+import { DuoConstellation } from '../components/DuoConstellation';
 import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 import { Metamorphose } from '../components/Metamorphose';
@@ -12,22 +15,23 @@ import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
-// AXEM IA — peau morningside (vert/noir) sur la structure play-a.
-// Hero vert signature, sections narratives (duo, problème, métamorphose,
-// parcours, résultats, formation, méthode, ROI, FAQ, CTA), footer-reveal.
-// DA near-black/#0cc481 · moteur spring 320/60/1 · Grainient confiné · boutons édito.
+// AXEM IA — DA « AUROS » : abîme teal bioluminescent, constellations de
+// données. Un champ de particules dérive en fond ; au scroll, les contenus
+// (KPI, étapes) se matérialisent en constellations. Le duo = deux étoiles-
+// ancres reliées (personal branding riche : Clément ⟷ Alexis).
+// Hero CONSERVÉ (le client l'aime), accent harmonisé teal/cyan.
+// Profondeur par TONS (abyss → trench → reef), jamais d'ombres.
 // =====================================================================
 
 const ease = EASE;
 const CALENDLY = 'https://calendly.com/clem-pred/30min';
 const CALENDLY_EMBED = 'https://calendly.com/clem-pred/30min?hide_gdpr_banner=1';
 const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s-axem-IA-3255b500d85980858518f49e36968c32';
-const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
-const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// PEAU MORNINGSIDE — Grainient confiné au hero : vert signature → dark-green → near-black.
-const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
-const NAVY = '#080808';
+// DA AUROS — Grainient confiné au hero : teal bioluminescent → reef → abyss.
+// (harmonisation du hero conservé vers l'abîme teal/cyan Auros)
+const AZUR = { color1: '#00b3a7', color2: '#003734', color3: '#011817' } as const;
+const NAVY = '#012624';
 
 // ---------------------------------------------------------------------
 // NAV — pilule flottante scroll-glass.
@@ -70,9 +74,10 @@ const Nav: React.FC = () => {
 // ---------------------------------------------------------------------
 // SECTION HEADER — eyebrow réutilisé.
 // ---------------------------------------------------------------------
+// eyebrow Auros — point teal bioluminescent (lueur) + caps tracking large.
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-    <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
+    <span className="h-1.5 w-1.5 rounded-full bg-cyan shadow-[0_0_8px_rgba(103,232,223,0.9)]" />{children}
   </div>
 );
 
@@ -86,8 +91,8 @@ const AccentA: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#00b3a7" />
+        <stop offset="1" stopColor="#cbfffc" />
       </linearGradient>
     </defs>
     <path
@@ -120,7 +125,7 @@ const Hero: React.FC = () => {
         />
       </motion.div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
+        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(1,38,36,0.28) 0%, rgba(1,38,36,0.64) 58%, rgba(1,24,23,0.94) 100%)' }} />
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
         style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
@@ -223,91 +228,9 @@ const TrustBar: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 2. LE DUO — « Stratégie + Tech. 55 000 personnes nous suivent. »
-// Les 2 portraits CONVERGENT vers le centre au scroll, la ligne passe entre
-// eux. 2,6 M impressions/mois en count-up.
+// 2. LE DUO — déplacé dans DuoConstellation.tsx (étoiles-ancres, personal
+// branding riche : histoire, parcours, visages, chiffres du duo).
 // ---------------------------------------------------------------------
-const FOUNDERS = [
-  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC',
-    role: 'Stratégie & Business IA',
-    desc: "Le stratège. Je traduis l'IA en résultats concrets et pilote les missions audit, conseil et formation.",
-    li: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/' },
-  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris',
-    role: 'Architecture IA, Tech & Déploiement',
-    desc: "L'architecte. Je conçois et déploie les systèmes : agents, automatisations, intégrations en production.",
-    li: 'https://www.linkedin.com/in/alexis-zeitoun/' },
-];
-const DuoCard: React.FC<{ f: typeof FOUNDERS[number]; conv: any }> = ({ f, conv }) => (
-  <motion.div style={{ x: conv }}>
-    <div className="group glass relative overflow-hidden rounded-3xl">
-      <div className="relative overflow-hidden">
-        <img src={f.img} alt={f.name} loading="lazy"
-          className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
-        <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.85) 100%)' }} />
-        <a href={f.li} target="_blank" rel="noopener noreferrer"
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
-          aria-label={`LinkedIn ${f.name}`}>
-          <span className="text-[15px] font-bold">in</span>
-        </a>
-      </div>
-      <div className="p-7 md:p-8">
-        <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
-        <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
-        <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
-        <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
-      </div>
-    </div>
-  </motion.div>
-);
-const Duo: React.FC = () => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
-  // convergence vers le centre : les cartes partent écartées, se rapprochent
-  const leftRaw = useTransform(scrollYProgress, [0, 1], ['-7%', '0%']);
-  const rightRaw = useTransform(scrollYProgress, [0, 1], ['7%', '0%']);
-  const convL = reduce ? '0%' : leftRaw;
-  const convR = reduce ? '0%' : rightRaw;
-  return (
-    <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="max-w-2xl">
-          <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              Stratégie + Tech.<br /><span className="aurora-text italic">Un seul interlocuteur.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              On enseigne ce qu'on déploie. 55 000 personnes nous suivent — la stratégie et la
-              technique dans la même équipe, pas de théorie hors-sol.
-            </p>
-          </Reveal>
-        </div>
-
-        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-2">
-          {FOUNDERS.map((f, i) => (
-            <motion.div key={f.name} {...reveal(i * 0.12, !!reduce)}>
-              <DuoCard f={f} conv={i === 0 ? convL : convR} />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* impressions / mois en count-up */}
-        <Reveal delay={0.1}>
-          <div className="mt-12 flex flex-col items-center gap-1 text-center">
-            <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
-              <CountUp to={2.6} decimals={1} suffix=" M" />
-            </span>
-            <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">impressions LinkedIn / mois · 55 000 abonnés</span>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
 
 // ---------------------------------------------------------------------
 // 3. LE PROBLÈME (before) — scène désaturée/lourde, watermark « aujourd'hui »
@@ -322,9 +245,9 @@ const Probleme: React.FC = () => {
   return (
     <section id="probleme" ref={ref}
       className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      {/* fond désaturé, lourd — gris-bleu sourd, pas de Grainient lumineux ici */}
+      {/* fond désaturé, lourd — abîme sourd et froid, pas de bioluminescence ici */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #0b0e16 0%, #07090f 70%, #050709 100%)' }} />
+        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #021a19 0%, #011413 70%, #010f0e 100%)' }} />
       <motion.div aria-hidden style={{ y }}
         className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
         <span className="serif-watermark font-serif-display text-[#ff3b53]/[0.06]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
@@ -400,16 +323,16 @@ const Resultats: React.FC = () => {
           </Reveal>
         </div>
 
+        {/* KPI = constellations qui se matérialisent depuis les particules du fond */}
         <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
           {KPIS.map((k, i) => (
-            <motion.div key={i}
-              {...reveal((i % 3) * 0.08, !!reduce)}
+            <Constellate key={i} dots={6} spread={110} delay={(i % 3) * 0.06}
               className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
+              <div className="font-serif-display leading-[0.85] text-highlight" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
                 {k.val}
               </div>
               <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
-            </motion.div>
+            </Constellate>
           ))}
         </div>
 
@@ -582,8 +505,8 @@ const Methode: React.FC = () => {
 
   return (
     <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-40 blur-[120px]"
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(103,232,223,0.16), transparent 65%)' }} />
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
         <Reveal delay={0.06} perspective>
@@ -596,12 +519,12 @@ const Methode: React.FC = () => {
       <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
           viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(12,196,129,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <path d="M1 0 V100" stroke="rgba(103,232,223,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
           <defs>
             <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#00b3a7" />
+              <stop offset="1" stopColor="#cbfffc" />
             </linearGradient>
           </defs>
         </svg>
@@ -636,8 +559,8 @@ const Roi: React.FC = () => {
   const loop = reduce ? 1 : scrollYProgress;
   return (
     <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50 blur-[120px]"
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(103,232,223,0.16), transparent 65%)' }} />
       <div ref={ref} className="relative z-10 flex flex-col items-center text-center">
         {/* la boucle SVG autour du chiffre — se trace au scroll */}
         <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
@@ -646,8 +569,8 @@ const Roi: React.FC = () => {
             style={{ pathLength: loop, rotate: -8 }} />
           <defs>
             <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#00b3a7" />
+              <stop offset="1" stopColor="#cbfffc" />
             </linearGradient>
           </defs>
         </svg>
@@ -727,8 +650,8 @@ const AccentZ: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#00b3a7" />
+        <stop offset="1" stopColor="#cbfffc" />
       </linearGradient>
     </defs>
     <path
@@ -753,7 +676,7 @@ const CtaFinal: React.FC = () => {
         />
       </div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.7) 65%, rgba(8,8,8,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(1,38,36,0.4) 0%, rgba(1,29,28,0.72) 65%, rgba(1,24,23,0.93) 100%)' }} />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
@@ -863,12 +786,16 @@ const Home: React.FC = () => {
       <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">
-          {/* 0 Hero · 1 Preuve · 2 Duo · 3 Problème · 4 Métamorphose(WOW) ·
+          {/* CHAMP DE PARTICULES — fond bioluminescent partagé par tout le site
+              (un seul canvas, fixe, GPU, pausé hors-vue). Peint l'abîme opaque
+              + masque le footer-reveal. */}
+          <ConstellationField />
+          {/* 0 Hero · 1 Preuve · 2 Duo(étoiles-ancres) · 3 Problème · 4 Métamorphose ·
               5 Parcours 7 étapes · 6 Résultats · 7 Formation · 8 Méthode ·
               9 ROI · 10 FAQ · 11 CTA(Z) · 12 Footer */}
           <Hero />
           <TrustBar />
-          <Duo />
+          <DuoConstellation />
           <Probleme />
           {/* sections pinnées lourdes : montées seulement à l'approche du viewport */}
           <LazySection minHeight="300vh"><Metamorphose /></LazySection>
