@@ -142,10 +142,11 @@ export const DuoConstellation: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
   // convergence des 2 étoiles-ancres vers le centre (le fil se tend entre elles)
+  // hooks toujours appelés (Rules of Hooks) ; on neutralise via `reduce` au rendu.
   const leftRaw = useTransform(scrollYProgress, [0, 1], ['-6%', '0%']);
   const rightRaw = useTransform(scrollYProgress, [0, 1], ['6%', '0%']);
-  // le fil lumineux entre les deux étoiles se trace au scroll
-  const linkLen = reduce ? 1 : useTransform(scrollYProgress, [0.1, 0.9], [0, 1]);
+  const linkRaw = useTransform(scrollYProgress, [0.1, 0.9], [0, 1]);
+  const linkLen = reduce ? 1 : linkRaw;
   const convL = reduce ? '0%' : leftRaw;
   const convR = reduce ? '0%' : rightRaw;
 

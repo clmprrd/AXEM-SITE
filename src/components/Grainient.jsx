@@ -138,14 +138,25 @@ const Grainient = ({
     const container = containerRef.current;
     if (!container) return;
 
-    const renderer = new Renderer({
-      webgl: 2,
-      alpha: true,
-      antialias: false,
-      // dpr cappé à 1.5 : moins de pixels à shader chaque frame → GPU soulagé,
-      // imperceptible derrière l'overlay sombre + le grain.
-      dpr: Math.min(window.devicePixelRatio || 1, 1.5)
-    });
+    // GARDE-FOU WebGL — si le contexte ne peut PAS être créé (vieux GPU,
+    // blocklist navigateur, mode privacy, headless sans GPU…), `new Renderer`
+    // peut throw. Sans garde, l'exception remonterait et FERAIT BLANCHIR TOUT
+    // le site (l'arbre React entier se démonte). Ici on dégrade proprement :
+    // le conteneur reste vide, l'abîme teal du parent transparaît. Aucun crash.
+    let renderer;
+    try {
+      renderer = new Renderer({
+        webgl: 2,
+        alpha: true,
+        antialias: false,
+        // dpr cappé à 1.5 : moins de pixels à shader chaque frame → GPU soulagé,
+        // imperceptible derrière l'overlay sombre + le grain.
+        dpr: Math.min(window.devicePixelRatio || 1, 1.5)
+      });
+    } catch {
+      return; // pas de WebGL → fond statique (parent), pas d'erreur fatale
+    }
+    if (!renderer || !renderer.gl) return;
 
     const gl = renderer.gl;
     const canvas = gl.canvas;
