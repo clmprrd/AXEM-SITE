@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useSpring, useTransform, useReducedMotion, useMotionValueEvent } from 'framer-motion';
+import { NodeNetwork, NetNode, NetEdge } from './NodeNetwork';
 
 // =====================================================================
 // 5. LE PARCOURS — 7 ÉTAPES (refonte perf).
@@ -22,6 +23,26 @@ const STEPS = [
   { n: '05', t: 'Coaching', d: 'On accompagne la prise en main, on lève les blocages, on ancre les réflexes.' },
   { n: '06', t: 'Production IA', d: 'Assistants, agents, générateurs sur-mesure, intégrés à vos outils.' },
   { n: '07', t: 'Suivi — on reste', d: 'Une fois déployé, on reste. Maintenance, évolutions, long terme. La ligne ne s\'arrête pas ici.' },
+];
+
+// RÉSEAU VIVANT — le parcours en 7 étapes = un réseau qui se forme nœud par
+// nœud au scroll. Tracé en bandeau au-dessus du rail (subtil, signature Auros).
+// Positions relatives (0..1) ; `at` = seuil le long du scrub (les 7 nœuds se
+// répartissent sur la progression). Le dernier nœud essaime → « la ligne continue ».
+const NET_NODES: NetNode[] = [
+  { x: 0.06, y: 0.62, at: 0.0, r: 4 },
+  { x: 0.20, y: 0.34, at: 0.13, r: 4 },
+  { x: 0.34, y: 0.66, at: 0.27, r: 4 },
+  { x: 0.49, y: 0.30, at: 0.41, r: 4 },
+  { x: 0.63, y: 0.64, at: 0.55, r: 4 },
+  { x: 0.77, y: 0.36, at: 0.69, r: 4 },
+  { x: 0.90, y: 0.60, at: 0.83, r: 5 },
+  // essaim final : la ligne ne se referme pas, le réseau continue de se ramifier.
+  { x: 0.97, y: 0.40, at: 0.9, r: 2 },
+  { x: 0.99, y: 0.74, at: 0.94, r: 2 },
+];
+const NET_EDGES: NetEdge[] = [
+  [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [6, 8],
 ];
 
 export const Parcours: React.FC = () => {
@@ -78,6 +99,18 @@ export const Parcours: React.FC = () => {
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-cream-soft">
             Du premier diagnostic à votre autonomie. La ligne relie chaque étape — et ne se referme jamais à la dernière.
           </p>
+        </div>
+
+        {/* RÉSEAU VIVANT — le parcours se trace nœud par nœud au scroll, en bandeau
+            au-dessus du rail. Canvas léger (selfScroll : progression auto depuis la
+            position viewport), aucun re-render par frame, pausé hors-vue, figé en
+            reduced-motion. */}
+        <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
+          <NodeNetwork
+            nodes={NET_NODES} edges={NET_EDGES} selfScroll
+            className="h-16 w-full md:h-20"
+            reduce={reduce}
+          />
         </div>
 
         {/* RAIL horizontal — scrub au scroll (desktop) / empilé (mobile) */}
