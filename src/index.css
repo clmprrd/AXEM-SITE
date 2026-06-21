@@ -3,44 +3,51 @@
 @tailwind utilities;
 
 /* =====================================================================
-   AXEM IA — styles custom (migrés de l'inline <style> de index.html)
-   PEAU MORNINGSIDE (vert/noir) sur la structure « LA LIGNE » de play-a.
+   AXEM IA — DA « AUROS · L'OBSERVATOIRE ÉDITORIAL »
+   Interprétation la plus typographique & retenue d'Auros :
+   - Type display EXTRÊME (Inter poussé très gros et très serré).
+   - Profondeur par TONS PURS (zéro ombre) : canvas teal sombre, cartes plus
+     sombres, surfaces « élevées » par teal plus clair.
+   - Gradients teal→lavande ULTRA-rationnés (CTA, ghost-borders rares).
+   - Particules discrètes (drift léger en fond) + révélations typographiques.
    Tokens couleurs/fonts dans tailwind.config.js.
    ===================================================================== */
 
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  /* easing « Limitless » pour les transitions de couleur (liens, hovers texte) */
   --ease-limitless: cubic-bezier(0.44, 0, 0.56, 1);
-  /* PEAU MORNINGSIDE — bouton pilule vert signature */
-  --btn: #0cc481;
-  --btn-hover: #0aa86e;
-  --btn-ink: #061a12;
+  /* DA AUROS — CTA teal plein, hover teal profond, encre sombre sur le bouton */
+  --btn: #00827c;
+  --btn-hover: #016b66;
+  --btn-ink: #001a18;
+  /* tracking final des révélations typo (très négatif) */
+  --rt-track: -0.045em;
 }
 
 html {
   scroll-padding-top: 80px;
-  /* PEAU MORNINGSIDE — fond near-black */
-  background-color: #080808;
+  /* DA AUROS — canvas teal très sombre */
+  background-color: #012624;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  background-color: #080808;
-  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  background-color: #012624;
+  color: #edfffe;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Focus clavier visible (a11y) */
+/* Focus clavier visible (a11y) — teal */
 :focus-visible {
-  outline: 2px solid #0cc481;
+  outline: 2px solid #00827c;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Skip-link — caché sauf au focus clavier */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -57,176 +64,180 @@ body {
   left: 12px;
   top: 12px;
   z-index: 100;
-  background: #0cc481;
-  color: #061a12;
-  font-weight: 700;
+  background: #00827c;
+  color: #001a18;
+  font-weight: 600;
   padding: 10px 16px;
-  border-radius: 10px;
+  border-radius: 6px;
   transform: translateY(-150%);
   transition: transform 0.2s var(--ease-out);
 }
 .skip-link:focus {
   transform: translateY(0);
-  outline: 2px solid #ffffff;
+  outline: 2px solid #cbfffc;
   outline-offset: 2px;
 }
 
-.font-display {
-  font-family: 'Space Grotesk', sans-serif;
-}
-
-/* PEAU MORNINGSIDE — eyebrows / labels : Space Grotesk, caps, tracking large. */
-.font-satoshi,
-.eyebrow,
-.label-mono {
-  font-family: 'Space Grotesk', sans-serif;
-}
-.eyebrow {
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-}
-
-/* PEAU MORNINGSIDE — TITRES DISPLAY : Space Grotesk MAJUSCULES, poids medium,
-   tracking ouvert (~0.04em). Remplace l'Instrument Serif (le serif a disparu). */
+/* =====================================================================
+   TYPOGRAPHIE AUROS — Inter, 400/500 only. Display poussé à l'extrême :
+   très gros, très serré, line-height 1.0. Eyebrow 10px MAJ tracking large.
+   ===================================================================== */
+.font-display,
 .font-serif-display {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: none;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
 }
-/* l'ancien `.italic` sur les titres ne doit PAS pencher (Space Grotesk n'a pas
-   d'italique éditorial) : on neutralise l'inclinaison, on garde le dégradé. */
+/* l'ancien `.italic` éditorial → on neutralise l'inclinaison (Inter), garde le ton */
 .font-serif-display.italic {
   font-style: normal;
+  font-weight: 400;
 }
 
-/* WATERMARK — wordmark géant semi-transparent (Space Grotesk caps) */
-.serif-watermark {
-  font-family: 'Space Grotesk', sans-serif;
+.font-satoshi {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* EYEBROW — 10px MAJ, tracking +2.4px, point teal 6px (rendu inline côté JSX) */
+.eyebrow,
+.label-mono {
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 500;
+  font-size: 10px;
   text-transform: uppercase;
+  letter-spacing: 0.24em;
+}
+
+/* DISPLAY EXTRÊME — clamp très large, tracking très négatif, line-height 1.0.
+   À spread sur les grands titres et les chiffres KPI. */
+.display-xl {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(72px, 16vw, 240px);
+  line-height: 0.92;
+  letter-spacing: var(--rt-track);
+}
+.display-lg {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(48px, 10vw, 132px);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+.display-md {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(36px, 6.5vw, 88px);
+  line-height: 1.0;
+  letter-spacing: -0.035em;
+}
+
+/* WATERMARK — wordmark géant très désaturé (lecture en arrière-plan) */
+.serif-watermark {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  text-transform: none;
   line-height: 0.9;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.05em;
   white-space: nowrap;
   -webkit-user-select: none;
   user-select: none;
 }
 
 ::selection {
-  background: #0cc481;
-  color: #061a12;
+  background: #00827c;
+  color: #edfffe;
 }
 ::-moz-selection {
-  background: #0cc481;
-  color: #061a12;
+  background: #00827c;
+  color: #edfffe;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* huge type kills its own tracking */
-.tight {
-  letter-spacing: -0.03em;
-}
-.tighter {
-  letter-spacing: -0.04em;
-}
+.tight { letter-spacing: -0.05em; }
+.tighter { letter-spacing: -0.07em; }
 
-/* PEAU MORNINGSIDE — dégradé signature des titres : linear-gradient(90deg,#fff,#0cc481)
-   clippé sur le texte. Fallback couleur pleine vert clair si background-clip indispo. */
+/* =====================================================================
+   GRADIENTS RATIONNÉS — clippés sur le texte.
+   `aurora-text` : highlight → teal clair (titres signature, rare).
+   `aurora-solid` : teal clair plein (gros titre hero, glyphes imbriqués).
+   ===================================================================== */
 .aurora-text {
-  background-image: linear-gradient(90deg, #ffffff 0%, #0cc481 100%);
+  background-image: linear-gradient(92deg, #edfffe 0%, #cbfffc 55%, #7fe9e2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #6fe6bf;
+  color: #cbfffc;
 }
-/* HERO — la 2e ligne « de A à Z. » utilise le reveal mot-à-mot : ses glyphes
-   vivent dans des <span> imbriqués (inline-block) où background-clip:text ne
-   se propage pas → texte invisible. On force donc une COULEUR PLEINE (vert
-   signature) lisible (pas de gradient-text transparent sur ce gros titre). */
 .aurora-solid,
 .aurora-solid * {
   background: none !important;
-  -webkit-text-fill-color: #0cc481 !important;
-  color: #0cc481 !important;
+  -webkit-text-fill-color: #cbfffc !important;
+  color: #cbfffc !important;
 }
-/* TITRE DÉGRADÉ SIGNATURE morningside : linear-gradient(90deg,#fff,#0cc481) clippé. */
 .title-grad {
-  background-image: linear-gradient(90deg, #ffffff 0%, #0cc481 100%);
+  background-image: linear-gradient(92deg, #edfffe 0%, #cbfffc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #6fe6bf;
+  color: #cbfffc;
 }
 .outline-type {
-  background: linear-gradient(90deg, #ffffff, #0cc481);
+  background: linear-gradient(90deg, #edfffe, #cbfffc);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-stroke: 0;
 }
 .outline-green {
-  background: linear-gradient(90deg, #0cc481, #0aa86e);
+  background: linear-gradient(90deg, #00827c, #cbfffc);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-stroke: 0;
 }
 
-/* PEAU MORNINGSIDE — carte sur fond dark-green #0f1c1c, bord subtil vert. */
+/* =====================================================================
+   SURFACES — PROFONDEUR PAR TONS, ZÉRO OMBRE.
+   Les cartes sont des aplats teal plus sombres que le canvas ; l'élévation
+   se lit par un ton plus clair (#003734) et une hairline teal, jamais
+   par un box-shadow. Pas de blur lourd : surfaces opaques propres.
+   ===================================================================== */
 .glass {
-  background: rgba(15, 28, 28, 0.72);
-  backdrop-filter: blur(14px) saturate(1.1);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(12, 196, 129, 0.16);
-  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  background: #011d1c;
+  border: 1px solid rgba(0, 130, 124, 0.22);
+  border-radius: 16px;
 }
 .glass-strong {
-  background: rgba(15, 28, 28, 0.88);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border: 1px solid rgba(12, 196, 129, 0.22);
-  box-shadow: 0 12px 40px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: #003734;
+  border: 1px solid rgba(0, 130, 124, 0.34);
+  border-radius: 16px;
 }
 
-/* QUADRILLAGE — grille fine vert subtil, fondue par un masque radial */
+/* QUADRILLAGE — grille fine teal très subtile, fondue par un masque radial */
 .grid-overlay {
-  background-image: linear-gradient(rgba(12, 196, 129, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(12, 196, 129, 0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
-  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 35%, transparent 100%);
+  background-image: linear-gradient(rgba(0, 130, 124, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 130, 124, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 30%, transparent 100%);
 }
 
-/* AURORA BLOBS — dérive douce (transform/opacity only) */
-@keyframes drift1 {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33% { transform: translate3d(6%, 4%, 0) scale(1.08); }
-  66% { transform: translate3d(-4%, 7%, 0) scale(0.96); }
+/* ATMOSPHÈRE — twilight radial teal→lavande, ULTRA-rationné, statique.
+   Une seule respiration de couleur par section qui en a besoin. */
+.twilight {
+  background: radial-gradient(60% 55% at 50% 35%,
+    rgba(0, 130, 124, 0.16) 0%,
+    rgba(253, 233, 255, 0.05) 45%,
+    transparent 78%);
 }
-@keyframes drift2 {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33% { transform: translate3d(-7%, 5%, 0) scale(1.1); }
-  66% { transform: translate3d(5%, -5%, 0) scale(0.94); }
-}
-@keyframes drift3 {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(4%, -6%, 0) scale(1.12); }
-}
-.aurora-blob {
-  will-change: transform;
-  mix-blend-mode: screen;
-}
-.drift-1 { animation: drift1 22s ease-in-out infinite; }
-.drift-2 { animation: drift2 28s ease-in-out infinite; }
-.drift-3 { animation: drift3 25s ease-in-out infinite; }
 
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -234,42 +245,32 @@ body {
 }
 
 /* =====================================================================
-   NAV SCROLL-GLASS (réplique Limitless) — PAS d'auto-hide.
-   En haut : transparente, sans bordure, sans blur.
-   Au scroll (>80px) : pilule verre frosted navy.
+   NAV — pilule en TONS (pas d'ombre). Transparente en haut, teal sombre
+   au scroll avec hairline teal.
    ===================================================================== */
 .nav-pill {
   background: transparent;
   border: 1px solid transparent;
   -webkit-backdrop-filter: blur(0);
   backdrop-filter: blur(0);
-  box-shadow: none;
   transition: background-color 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
-    backdrop-filter 0.4s var(--ease-out), -webkit-backdrop-filter 0.4s var(--ease-out),
-    box-shadow 0.4s var(--ease-out);
+    backdrop-filter 0.4s var(--ease-out), -webkit-backdrop-filter 0.4s var(--ease-out);
 }
 .nav-pill[data-scrolled='true'] {
-  background: rgba(8, 8, 8, 0.6);
-  border-color: rgba(12, 196, 129, 0.16);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  backdrop-filter: blur(12px) saturate(1.2);
-  box-shadow: 0 8px 30px -16px rgba(0, 0, 0, 0.7);
+  background: rgba(1, 29, 28, 0.72);
+  border-color: rgba(0, 130, 124, 0.28);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
 }
 
-/* =====================================================================
-   MARQUEE / TICKER (réplique Limitless) — masque dégradé 25px sur les bords,
-   ralentit au hover (la durée vit dans --marquee-dur, modifiée au survol).
-   ===================================================================== */
+/* MARQUEE / TICKER — masque dégradé sur les bords */
 .ticker-mask {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 25px, #000 calc(100% - 25px), transparent);
   mask-image: linear-gradient(90deg, transparent, #000 25px, #000 calc(100% - 25px), transparent);
 }
 
 /* =====================================================================
-   FOOTER REVEAL signature (effet rideau).
-   Footer fixé en bas, DERRIÈRE le contenu. Le <main> a un fond navy opaque
-   + un margin-bottom = hauteur du footer → en fin de scroll, le contenu
-   glisse vers le haut et révèle le footer fixe en dessous.
+   FOOTER REVEAL signature (effet rideau) — fond en TONS purs.
    ===================================================================== */
 :root {
   --footer-h: 72vh;
@@ -277,17 +278,13 @@ body {
 .has-footer-reveal {
   position: relative;
   z-index: 0;
-  /* padding (PAS margin sur le main) : zone transparente en bas qui révèle le
-     footer fixe. Évite le margin-collapse qui rognait la hauteur scrollable. */
   padding-bottom: var(--footer-h);
 }
 .has-footer-reveal .reveal-main {
   position: relative;
   z-index: 1;
-  /* PEAU MORNINGSIDE — fond near-black opaque, PROPRE : masque le footer fixe
-     tant qu'on n'est pas en bas. Pas de gradient/grain persistant qui traîne
-     pendant le scroll — fond uni near-black, dérive imperceptible vers dark-green. */
-  background: linear-gradient(180deg, #080808 0%, #0a1110 60%, #0f1c1c 100%);
+  /* fond opaque PROPRE en tons purs : canvas → cartes → surface élevée */
+  background: linear-gradient(180deg, #012624 0%, #011d1c 62%, #003734 100%);
 }
 .footer-fixed {
   position: fixed;
@@ -297,24 +294,15 @@ body {
   z-index: 0;
   height: var(--footer-h);
   display: flex;
-  /* contenu ancré en bas : il vit dans la bande systématiquement révélée en fin
-     de scroll (le haut du footer peut rester sous le <main> selon les hauteurs). */
   align-items: flex-end;
   overflow: hidden;
 }
 @media (max-width: 768px) {
-  :root {
-    --footer-h: 60vh;
-  }
+  :root { --footer-h: 60vh; }
 }
-/* reduced-motion : footer en flux normal, pas de rideau */
 @media (prefers-reduced-motion: reduce) {
-  .has-footer-reveal {
-    padding-bottom: 0;
-  }
-  .has-footer-reveal .reveal-main {
-    z-index: 0;
-  }
+  .has-footer-reveal { padding-bottom: 0; }
+  .has-footer-reveal .reveal-main { z-index: 0; }
   .footer-fixed {
     position: relative;
     height: auto;
@@ -323,7 +311,7 @@ body {
   }
 }
 
-/* respect users who prefer reduced motion */
+/* respect reduced motion — coupe particules & animations CSS */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -331,21 +319,14 @@ body {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .aurora-blob {
-    animation: none !important;
-  }
 }
 
-/* Calendly inline widget — keep it from overflowing on mobile */
-.calendly-inline-widget {
-  max-width: 100%;
-}
+.calendly-inline-widget { max-width: 100%; }
 
 /* =====================================================================
-   BOUTONS ÉDITORIAUX — refonte anti « vibe-codé ».
-   Couleur pleine maîtrisée (bleu profond), PAS de dégradé néon ni d'outer-glow.
-   Micro-interaction intentionnelle : flèche qui glisse + fill-sweep discret.
-   Lettrage sans-serif soigné. :active scale · :focus-visible ring.
+   BOUTONS — DA AUROS. Primaire : CTA gradient teal→cyan (le SEUL gradient
+   « riche » du site, rationné). Secondaire : ghost en tons, hairline teal,
+   bordure lavande possible (rare). PAS d'ombre — profondeur par tons.
    ===================================================================== */
 .btn {
   position: relative;
@@ -353,10 +334,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
   font-size: 15px;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
   line-height: 1;
   border-radius: 9999px;
   cursor: pointer;
@@ -364,38 +345,29 @@ body {
   -webkit-user-select: none;
   touch-action: manipulation;
   white-space: nowrap;
-  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out),
+  transition: transform 0.22s var(--ease-out),
     background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out),
-    color 0.22s var(--ease-out);
+    color 0.22s var(--ease-out), filter 0.22s var(--ease-out);
   will-change: transform;
 }
-.btn:active {
-  transform: scale(0.97);
-}
+.btn:active { transform: scale(0.97); }
 .btn:focus-visible {
-  outline: 2px solid #0cc481;
+  outline: 2px solid #00827c;
   outline-offset: 3px;
 }
 
-/* PRIMAIRE — vert signature plein. Lift discret + ombre nette (pas de glow flou). */
+/* PRIMAIRE — gradient teal→cyan (rationné). Encre sombre, lift discret. */
 .btn-primary {
   padding: 0.95rem 1.6rem;
   color: var(--btn-ink);
+  background-image: linear-gradient(100deg, #00827c 0%, #cbfffc 140%);
   background-color: var(--btn);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 10px 22px -14px rgba(12, 196, 129, 0.55);
 }
 .btn-primary:hover {
-  background-color: var(--btn-hover);
-  /* hover : scale 1.03 (pas de glow néon) */
-  transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 16px 30px -16px rgba(12, 196, 129, 0.6);
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.06);
 }
-.btn-primary:active {
-  transform: translateY(0) scale(0.97);
-}
-/* fill-sweep discret : une bande claire balaie au hover (transform only) */
+.btn-primary:active { transform: translateY(0) scale(0.97); }
 .btn-primary .btn-sweep {
   position: absolute;
   inset: 0;
@@ -408,50 +380,33 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-101%);
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.16) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(100deg, transparent 0%, rgba(237, 255, 254, 0.28) 50%, transparent 100%);
   transition: transform 0.6s var(--ease-out);
 }
-.btn-primary:hover .btn-sweep::before {
-  transform: translateX(101%);
-}
-/* flèche qui glisse */
+.btn-primary:hover .btn-sweep::before { transform: translateX(101%); }
 .btn-arrow {
   display: inline-block;
   transition: transform 0.22s var(--ease-out);
 }
 .btn-primary:hover .btn-arrow,
-.btn-secondary:hover .btn-arrow {
-  /* flèche qui glisse +4px (réplique Limitless) */
-  transform: translateX(4px);
-}
+.btn-secondary:hover .btn-arrow { transform: translateX(4px); }
 
-/* SECONDAIRE — ghost/outline glass. Bordure + texte s'éclaircissent,
-   soulignement qui se révèle au hover. */
+/* SECONDAIRE — ghost en tons. Surface élevée légère, hairline teal qui
+   s'éclaire ; soulignement révélé au hover. */
 .btn-secondary {
   padding: 0.95rem 1.5rem;
-  color: #d7d7d2;
-  background-color: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(12, 196, 129, 0.30);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  color: #bbc7c6;
+  background-color: rgba(0, 55, 52, 0.4);
+  border: 1px solid rgba(0, 130, 124, 0.36);
 }
 .btn-secondary:hover {
-  color: #ffffff;
-  border-color: rgba(12, 196, 129, 0.6);
-  transform: translateY(-1px) scale(1.03);
+  color: #edfffe;
+  border-color: rgba(0, 130, 124, 0.68);
+  background-color: rgba(0, 55, 52, 0.62);
+  transform: translateY(-1px) scale(1.02);
 }
-.btn-secondary:active {
-  transform: translateY(0) scale(0.97);
-}
-/* soulignement révélé : un trait fin sous le label */
-.btn-underline {
-  position: relative;
-}
+.btn-secondary:active { transform: translateY(0) scale(0.97); }
+.btn-underline { position: relative; }
 .btn-underline::after {
   content: '';
   position: absolute;
@@ -465,157 +420,131 @@ body {
   opacity: 0.55;
   transition: transform 0.28s var(--ease-out);
 }
-.btn-secondary:hover .btn-underline::after {
-  transform: scaleX(1);
-}
+.btn-secondary:hover .btn-underline::after { transform: scaleX(1); }
 
-/* TAILLES */
-.btn-lg {
-  font-size: 16px;
-  padding: 1.05rem 1.9rem;
-}
-.btn-sm {
-  font-size: 13.5px;
-  padding: 0.65rem 1.15rem;
-}
+.btn-lg { font-size: 16px; padding: 1.05rem 1.9rem; }
+.btn-sm { font-size: 13.5px; padding: 0.65rem 1.15rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn,
-  .btn-arrow,
-  .btn-primary .btn-sweep::before,
-  .btn-underline::after {
+  .btn, .btn-arrow, .btn-primary .btn-sweep::before, .btn-underline::after {
     transition: none !important;
   }
 }
 
-/* carte « cas client » — élévation au hover : la bordure s'éclaire + une ombre
-   teintée vert apparaît. box-shadow en TRANSITION CSS (pas animé par frame),
-   le lift vertical reste géré par transform (GPU). */
+/* CARTE « cas client » — élévation par TON, pas par ombre : la surface passe
+   d'un teal sombre à un teal « élevé » (#003734) + hairline teal qui s'éclaire. */
 .case-card {
-  transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  transition: border-color 0.3s var(--ease-out), background-color 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
 }
 .case-card:hover,
 .case-card:focus-within {
-  border-color: rgba(12, 196, 129, 0.42);
-  box-shadow: 0 24px 60px -28px rgba(12, 196, 129, 0.45);
+  border-color: rgba(0, 130, 124, 0.5);
+  background-color: #003734;
 }
 @media (prefers-reduced-motion: reduce) {
-  .case-card { transition: none !important; }
+  .case-card { transition: border-color 0.3s var(--ease-out) !important; }
 }
 
-/* watermark de section : ne jamais provoquer de scroll horizontal */
-.section-clip {
-  overflow-x: clip;
-}
+.section-clip { overflow-x: clip; }
 
-/* hairline divider réutilisable + gradient-line morningside (vert signature) */
+/* hairline divider + gradient-line teal (rationné) */
 .hairline,
 .gradient-line {
   border: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(12, 196, 129, 0.35) 50%,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(0, 130, 124, 0.4) 50%, transparent);
 }
 
-/* chiffres tabulaires pour les count-up (pas de saut de largeur) */
 .tnum {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
 
-/* lien texte « Limitless » : transition couleur 0.25s cubic-bezier(.44,0,.56,1) */
-.link-limitless {
-  transition: color 0.25s var(--ease-limitless);
-}
+.link-limitless { transition: color 0.25s var(--ease-limitless); }
 
-/* LIENS FOOTER — remontée y:-5px au hover (réplique morningside), transform-only. */
 .footer-link {
   transition: color 0.25s var(--ease-limitless), transform 0.28s var(--ease-out);
   will-change: transform;
 }
-.footer-link:hover {
-  transform: translateY(-5px);
-}
+.footer-link:hover { transform: translateY(-5px); }
 @media (prefers-reduced-motion: reduce) {
-  .footer-link {
-    transition: color 0.25s var(--ease-limitless) !important;
-  }
-  .footer-link:hover {
-    transform: none;
-  }
+  .footer-link { transition: color 0.25s var(--ease-limitless) !important; }
+  .footer-link:hover { transform: none; }
 }
 
-/* logo grayscale -> couleur au hover (bande confiance) */
+/* logos — désaturés en tons, teal au hover */
 .logo-chip img {
-  transition: filter 0.4s var(--ease-out), opacity 0.4s var(--ease-out),
-    transform 0.4s var(--ease-out);
-  filter: grayscale(1) brightness(1.7) contrast(0.9);
-  opacity: 0.62;
+  transition: filter 0.4s var(--ease-out), opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+  filter: grayscale(1) brightness(1.5) contrast(0.9);
+  opacity: 0.5;
 }
 .logo-chip:hover img {
-  filter: grayscale(0) brightness(1);
-  opacity: 1;
+  filter: grayscale(0.2) brightness(1.05);
+  opacity: 0.92;
   transform: translateY(-1px);
 }
 @media (prefers-reduced-motion: reduce) {
-  .logo-chip img {
-    transition: none !important;
-  }
+  .logo-chip img { transition: none !important; }
 }
 
 /* =====================================================================
-   ACCENTS VERTS — glyphes « A » / « Z » du hero & CTA, boucle ROI.
-   Petits SVG locaux (pas d'overlay fixe, pas de scroll-linking global) avec
-   un halo vert signature doux. Glow CONFINÉ à de petites surfaces → coût
-   compositing négligeable (rien à voir avec l'ancienne ligne fixe plein écran).
+   ACCENTS TEAL — glyphes « A » / « Z » du hero & CTA, boucle ROI.
+   Pas de drop-shadow lourd (zéro ombre) : juste un léger halo teal très
+   discret accepté comme accent local minimal.
    ===================================================================== */
 .accent-glyph {
-  filter: drop-shadow(0 0 5px rgba(12, 196, 129, 0.45));
+  filter: drop-shadow(0 0 3px rgba(0, 130, 124, 0.4));
 }
 .accent-stroke {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 4px rgba(12, 196, 129, 0.4));
 }
 
-/* nœud de section (méthode, parcours) — petit point qui s'allume à l'approche */
+/* nœud de section (méthode, parcours) — point qui s'allume en TON (pas d'ombre énorme) */
 .ligne-node {
-  transition: box-shadow 0.5s var(--ease-out), background-color 0.5s var(--ease-out),
-    border-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  transition: background-color 0.5s var(--ease-out), border-color 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
 }
 .ligne-node[data-on='true'] {
-  background-color: #0cc481;
-  border-color: rgba(12, 196, 129, 0.9);
-  box-shadow: 0 0 0 5px rgba(12, 196, 129, 0.14), 0 0 18px rgba(12, 196, 129, 0.6);
+  background-color: #00827c;
+  border-color: rgba(0, 130, 124, 0.9);
+  box-shadow: 0 0 0 5px rgba(0, 130, 124, 0.12);
   transform: scale(1.12);
 }
 
 /* =====================================================================
-   MÉTAMORPHOSE (LE WOW) — section pinnée. Avant (chaos tableur) → après
-   (workflow n8n propre). On scrub le morph via une variable --morph 0→1.
-   Les cellules désaturées s'effacent, les nœuds workflow se composent.
+   PORTRAITS DU DUO — traitement éditorial « page auteurs » : N&B traité teal
+   (duotone via filtre), passe en teal vif au hover. Tons, pas d'ombre.
    ===================================================================== */
-.morph-stage {
-  position: relative;
+.portrait-treated {
+  filter: grayscale(1) contrast(1.06) brightness(0.92) sepia(0.35) hue-rotate(120deg) saturate(1.4);
+  transition: filter 0.6s var(--ease-out), transform 0.6s var(--ease-out);
 }
-/* faux tableur chaotique (avant) */
+.group:hover .portrait-treated {
+  filter: grayscale(0.4) contrast(1.04) brightness(1) sepia(0.1) hue-rotate(120deg) saturate(1.1);
+  transform: scale(1.03);
+}
+@media (prefers-reduced-motion: reduce) {
+  .portrait-treated { transition: filter 0.6s var(--ease-out) !important; }
+  .group:hover .portrait-treated { transform: none; }
+}
+
+/* =====================================================================
+   MÉTAMORPHOSE — section pinnée. Surfaces en tons (zéro ombre).
+   ===================================================================== */
+.morph-stage { position: relative; }
 .sheet-cell {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(12, 196, 129, 0.12);
-  color: #888888;
+  background: rgba(237, 255, 254, 0.02);
+  border: 1px solid rgba(0, 130, 124, 0.14);
+  color: #6c7d7c;
   font-variant-numeric: tabular-nums;
   will-change: transform, opacity;
 }
-/* nœud de workflow n8n (après) */
 .flow-node {
-  background: rgba(15, 28, 28, 0.78);
-  border: 1px solid rgba(12, 196, 129, 0.34);
-  box-shadow: 0 8px 30px -14px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(12, 196, 129, 0.06);
+  background: #003734;
+  border: 1px solid rgba(0, 130, 124, 0.4);
   will-change: transform, opacity;
 }
 .flow-wire {
@@ -626,24 +555,19 @@ body {
 }
 
 /* =====================================================================
-   PARCOURS 7 ÉTAPES — scrub horizontal pinné. Désactivé/empilé en mobile.
+   PARCOURS 7 ÉTAPES — scrub horizontal pinné. Élévation par TON.
    ===================================================================== */
-.steps-track {
-  will-change: transform;
-}
+.steps-track { will-change: transform; }
 .step-card {
-  transition: border-color 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out),
+  transition: border-color 0.5s var(--ease-out), background-color 0.5s var(--ease-out),
     transform 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
 }
 .step-card[data-active='true'] {
-  border-color: rgba(12, 196, 129, 0.6);
-  box-shadow: 0 20px 60px -20px rgba(12, 196, 129, 0.35), 0 0 0 1px rgba(12, 196, 129, 0.1);
+  border-color: rgba(0, 130, 124, 0.6);
+  background-color: #003734;
 }
 @media (max-width: 860px) {
-  /* mobile : pas de scrub horizontal, on empile */
-  .steps-pin {
-    height: auto !important;
-  }
+  .steps-pin { height: auto !important; }
   .steps-sticky {
     position: static !important;
     height: auto !important;
@@ -654,12 +578,10 @@ body {
     flex-direction: column;
     width: 100% !important;
   }
-  .step-card {
-    width: 100% !important;
-  }
+  .step-card { width: 100% !important; }
 }
 
-/* drag horizontal (galerie formation) — cache la scrollbar, snap doux */
+/* drag horizontal (galerie formation) */
 .drag-x {
   -ms-overflow-style: none;
   scrollbar-width: none;

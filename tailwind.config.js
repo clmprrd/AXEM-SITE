@@ -10,25 +10,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* PEAU MORNINGSIDE (vert/noir) — near-black #080808, sections sombres
-           dark-green #0f1c1c, accent vert signature #0cc481 (UNIQUE accent). */
-        ink: '#080808',          /* fond primaire near-black */
-        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
-        'ink-3': '#0b1413',      /* surface sombre alternée */
-        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
-        cream: '#ffffff',        /* texte principal (blanc) */
-        'cream-soft': '#cccccc', /* texte secondaire */
-        'cream-dim': '#888888',  /* texte tertiaire */
-        ivory: '#edece4',        /* clair secondaire */
-        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
-        'green-deep': '#0aa86e', /* vert profond (hover) */
-        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
-        mint: '#3fe0a8',         /* vert clair */
+        /* DA AUROS — profondeur par TONS PURS (zéro ombre). Canvas teal très sombre,
+           cartes plus sombres encore, surface « élevée » par teal plus clair.
+           Accent teal rationné, lavande = bordure rare. */
+        ink: '#012624',          /* canvas — teal très sombre */
+        'ink-2': '#011d1c',      /* cartes — plus sombre que le canvas */
+        'ink-3': '#011514',      /* surface la plus basse */
+        'ink-4': '#003734',      /* surface ÉLEVÉE (tons, pas ombres) */
+        cream: '#ffffff',        /* titres — blanc pur */
+        'cream-soft': '#bbc7c6', /* corps — teal-gris désaturé */
+        'cream-dim': '#7e918f',  /* texte tertiaire */
+        ivory: '#edfffe',        /* highlights */
+        highlight: '#edfffe',    /* highlights (alias explicite) */
+        green: '#00827c',        /* accent teal signature (rationné) */
+        'green-deep': '#016b66', /* teal profond (hover) */
+        cyan: '#cbfffc',         /* teal clair / fin de gradient CTA */
+        mint: '#7fe9e2',         /* teal clair intermédiaire */
+        lavender: '#fde9ff',     /* lavande — bordure/ghost rare */
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        satoshi: ['"Space Grotesk"', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        satoshi: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

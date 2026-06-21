@@ -158,8 +158,8 @@ export const Metamorphose: React.FC = () => {
               <svg viewBox="0 0 96 84" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full p-4">
                 <defs>
                   <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0" stopColor="#0cc481" />
-                    <stop offset="1" stopColor="#3fe0a8" />
+                    <stop offset="0" stopColor="#00827c" />
+                    <stop offset="1" stopColor="#cbfffc" />
                   </linearGradient>
                 </defs>
                 {WIRES.map((d, i) => (

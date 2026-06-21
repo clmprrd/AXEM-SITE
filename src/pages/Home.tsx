@@ -4,7 +4,8 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
-import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
+import ObservatoryDrift from '../components/ObservatoryDrift';
+import { RiseWords, Reveal, RevealType, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 import { Metamorphose } from '../components/Metamorphose';
 import { Parcours } from '../components/Parcours';
@@ -12,10 +13,13 @@ import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
-// AXEM IA — peau morningside (vert/noir) sur la structure play-a.
-// Hero vert signature, sections narratives (duo, problème, métamorphose,
-// parcours, résultats, formation, méthode, ROI, FAQ, CTA), footer-reveal.
-// DA near-black/#0cc481 · moteur spring 320/60/1 · Grainient confiné · boutons édito.
+// AXEM IA — DA « AUROS · L'OBSERVATOIRE ÉDITORIAL ».
+// L'interprétation la plus typographique & retenue d'Auros : type display
+// EXTRÊME (Inter très gros, très serré), profondeur par TONS PURS (zéro ombre),
+// gradients teal→lavande ultra-rationnés, particules discrètes (drift léger).
+// Le scroll = grandes révélations typographiques + dérive de particules subtile.
+// Le DUO est la pièce maîtresse (personal branding éditorial « page auteurs »).
+// Hero conservé (accent harmonisé vers teal/cyan).
 // =====================================================================
 
 const ease = EASE;
@@ -25,14 +29,14 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// PEAU MORNINGSIDE — Grainient confiné au hero : vert signature → dark-green → near-black.
-const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
-const NAVY = '#080808';
+// DA AUROS — Grainient confiné au hero : teal signature → teal sombre → canvas.
+const AZUR = { color1: '#00827c', color2: '#012a28', color3: '#011514' } as const;
+const NAVY = '#012624';
 
 // ---------------------------------------------------------------------
 // NAV — pilule flottante scroll-glass.
 // ---------------------------------------------------------------------
-// NAV AXEM (morningside) — Parcours · Cas clients · Formation · Le duo · CTA.
+// NAV AXEM (Auros) — Parcours · Cas clients · Formation · Le duo · CTA.
 const NAV_LINKS: [string, string][] = [
   ['Parcours', '#parcours'], ['Cas clients', '#resultats'],
   ['Formation', '#formation'], ['Le duo', '#duo'],
@@ -70,8 +74,9 @@ const Nav: React.FC = () => {
 // ---------------------------------------------------------------------
 // SECTION HEADER — eyebrow réutilisé.
 // ---------------------------------------------------------------------
+// EYEBROW AUROS — 10px MAJ tracking large + point teal 6px.
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
+  <div className="eyebrow mb-6 flex items-center gap-3 text-mint">
     <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
   </div>
 );
@@ -86,8 +91,8 @@ const AccentA: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#00827c" />
+        <stop offset="1" stopColor="#cbfffc" />
       </linearGradient>
     </defs>
     <path
@@ -98,9 +103,10 @@ const AccentA: React.FC = () => (
 );
 
 // =====================================================================
-// 0. HERO — caps Space Grotesk + dégradé signature « DE A À Z. » (blanc → vert).
-// Sous-titre « On forme vos équipes… Et on reste. » Double bouton.
-// Fond Grainient vert CONFINÉ au hero (pas fixed). Le « A » = accent vert statique.
+// 0. HERO (conservé) — Inter display extrême + dégradé signature « DE A À Z. »
+// (highlight → teal). Sous-titre « On forme vos équipes… Et on reste. » Double
+// bouton. Grainient teal CONFINÉ au hero (pas fixed) + particules discrètes.
+// Le « A » = accent teal statique.
 // =====================================================================
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
@@ -120,8 +126,12 @@ const Hero: React.FC = () => {
         />
       </motion.div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
+        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(1,38,36,0.28) 0%, rgba(1,38,36,0.66) 58%, rgba(1,38,36,0.94) 100%)' }} />
       <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
+      {/* particules « observatoire » — drift discret en fond du hero */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
+        <ObservatoryDrift density={32000} max={48} />
+      </div>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
         style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
 
@@ -139,8 +149,8 @@ const Hero: React.FC = () => {
           </span>
         </motion.div>
 
-        {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert).
-            Le « A » du « de A à Z. » = accent vert signature statique. */}
+        {/* H1 — Inter display extrême + dégradé signature Auros (highlight → teal).
+            Le « A » du « de A à Z. » = accent teal signature statique. */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
           className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
           style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
@@ -223,87 +233,113 @@ const TrustBar: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 2. LE DUO — « Stratégie + Tech. 55 000 personnes nous suivent. »
-// Les 2 portraits CONVERGENT vers le centre au scroll, la ligne passe entre
-// eux. 2,6 M impressions/mois en count-up.
+// 2. LE DUO — PIÈCE MAÎTRESSE. Traitement éditorial « page auteurs » d'une
+// revue d'observatoire : noms en DISPLAY EXTRÊME, bios en colonnes, visages
+// en N&B traités teal, chiffres personnels en display-xl. Personal branding
+// fort — Clément & Alexis au centre, comme des auteurs.
 // ---------------------------------------------------------------------
 const FOUNDERS = [
-  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC',
+  { img: CLEMENT_IMG, first: 'Clément', last: 'Predo', school: 'ESSEC Business School',
     role: 'Stratégie & Business IA',
-    desc: "Le stratège. Je traduis l'IA en résultats concrets et pilote les missions audit, conseil et formation.",
+    followers: '40 000', followersLabel: 'abonnés LinkedIn',
+    desc: "Le stratège. Trois ans de terrain IA. Je traduis la technologie en rentabilité pour PME, ETI et grands comptes — et je pilote les missions audit, conseil et formation.",
     li: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/' },
-  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris',
+  { img: ALEXIS_IMG, first: 'Alexis', last: 'Zeitoun', school: 'Polytechnique · Télécom Paris',
     role: 'Architecture IA, Tech & Déploiement',
-    desc: "L'architecte. Je conçois et déploie les systèmes : agents, automatisations, intégrations en production.",
+    followers: '20 000', followersLabel: 'abonnés LinkedIn',
+    desc: "L'architecte. Trois ans de terrain IA, secteur financier et Private Equity. Je conçois et déploie les systèmes en production : agents, automatisations, intégrations.",
     li: 'https://www.linkedin.com/in/alexis-zeitoun/' },
 ];
-const DuoCard: React.FC<{ f: typeof FOUNDERS[number]; conv: any }> = ({ f, conv }) => (
-  <motion.div style={{ x: conv }}>
-    <div className="group glass relative overflow-hidden rounded-3xl">
-      <div className="relative overflow-hidden">
-        <img src={f.img} alt={f.name} loading="lazy"
-          className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
+// ENTRÉE AUTEUR — bloc éditorial : numéro + portrait traité teal d'un côté,
+// nom en display extrême + métadonnées + bio + chiffre perso de l'autre.
+// Le sens de lecture alterne (auteur 2 inversé) façon double-page de revue.
+const AuthorEntry: React.FC<{ f: typeof FOUNDERS[number]; idx: number }> = ({ f, idx }) => {
+  const reduce = useReducedMotion();
+  const flip = idx === 1;
+  return (
+    <motion.article
+      {...reveal(0, !!reduce)}
+      className="group grid items-center gap-8 border-t border-green/15 py-[clamp(48px,8vh,96px)] md:grid-cols-[0.92fr_1.08fr] md:gap-14">
+      {/* PORTRAIT — N&B traité teal, surface en ton (zéro ombre) */}
+      <div className={`relative overflow-hidden rounded-2xl bg-ink-2 ${flip ? 'md:order-2' : ''}`}>
+        <span aria-hidden className="absolute left-4 top-3 z-10 font-display text-[13px] font-medium tracking-[0.04em] text-mint/70">
+          0{idx + 1}
+        </span>
+        <img src={f.img} alt={`${f.first} ${f.last}`} loading="lazy"
+          className="portrait-treated aspect-[4/5] w-full object-cover" />
         <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.85) 100%)' }} />
+          style={{ background: 'linear-gradient(180deg, transparent 55%, rgba(1,29,28,0.85) 100%)' }} />
         <a href={f.li} target="_blank" rel="noopener noreferrer"
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
-          aria-label={`LinkedIn ${f.name}`}>
-          <span className="text-[15px] font-bold">in</span>
+          className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-green/40 bg-ink/60 px-3.5 py-1.5 text-[12px] font-medium text-highlight transition-colors hover:border-green hover:bg-green hover:text-[#001a18]"
+          aria-label={`LinkedIn ${f.first} ${f.last}`}>
+          <span className="font-semibold">in</span> Suivre
         </a>
       </div>
-      <div className="p-7 md:p-8">
-        <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
-        <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
-        <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
-        <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
+
+      {/* COLONNE ÉDITORIALE */}
+      <div className={flip ? 'md:order-1' : ''}>
+        <p className="eyebrow text-mint">{f.school}</p>
+        {/* NOM EN DISPLAY EXTRÊME — révélation typo (clip + tracking qui se resserre) */}
+        <RevealType as="h3" className="display-lg mt-4 text-cream" fromTracking="0.12em">
+          {f.first}<br /><span className="aurora-text">{f.last}</span>
+        </RevealType>
+        <p className="mt-5 text-[12px] font-medium uppercase tracking-[0.16em] text-cream-soft">{f.role}</p>
+        <p className="mt-5 max-w-md text-[15.5px] leading-relaxed text-cream-soft">{f.desc}</p>
+
+        {/* CHIFFRE PERSO en display — l'« auteur » et son audience */}
+        <div className="mt-8 flex items-end gap-4">
+          <span className="display-md leading-[0.8] text-cream">
+            <CountUp to={parseInt(f.followers.replace(/\s/g, ''), 10)} separator=" " />
+          </span>
+          <span className="mb-1.5 max-w-[120px] text-[12px] font-medium uppercase leading-snug tracking-[0.12em] text-cream-dim">
+            {f.followersLabel}
+          </span>
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+    </motion.article>
+  );
+};
 const Duo: React.FC = () => {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
-  // convergence vers le centre : les cartes partent écartées, se rapprochent
-  const leftRaw = useTransform(scrollYProgress, [0, 1], ['-7%', '0%']);
-  const rightRaw = useTransform(scrollYProgress, [0, 1], ['7%', '0%']);
-  const convL = reduce ? '0%' : leftRaw;
-  const convR = reduce ? '0%' : rightRaw;
   return (
-    <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="max-w-2xl">
-          <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              Stratégie + Tech.<br /><span className="aurora-text italic">Un seul interlocuteur.</span>
-            </h2>
-          </Reveal>
+    <section id="duo" className="section-clip relative bg-ink-2 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
+      {/* particules discrètes — l'« observatoire », pas le spectacle */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-70">
+        <ObservatoryDrift density={30000} max={56} />
+      </div>
+      <div className="relative z-10 mx-auto max-w-5xl">
+        <div className="max-w-3xl">
+          <Reveal><Eyebrow>Les auteurs</Eyebrow></Reveal>
+          {/* STATEMENT TYPO EXTRÊME en ouverture de la « page auteurs » */}
+          <RevealType as="h2" className="display-md mt-2 text-cream">
+            On enseigne ce<br />qu'on <span className="aurora-text">déploie.</span>
+          </RevealType>
           <Reveal delay={0.12}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              On enseigne ce qu'on déploie. 55 000 personnes nous suivent — la stratégie et la
-              technique dans la même équipe, pas de théorie hors-sol.
+            <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-cream-soft">
+              Pas une agence sans visage. Deux fondateurs, deux écoles, une même
+              pratique de terrain — la stratégie et la technique dans la même équipe,
+              jamais de théorie hors-sol.
             </p>
           </Reveal>
         </div>
 
-        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-2">
+        {/* DOUBLE-PAGE AUTEURS */}
+        <div className="mt-[clamp(48px,7vh,88px)]">
           {FOUNDERS.map((f, i) => (
-            <motion.div key={f.name} {...reveal(i * 0.12, !!reduce)}>
-              <DuoCard f={f} conv={i === 0 ? convL : convR} />
-            </motion.div>
+            <AuthorEntry key={f.last} f={f} idx={i} />
           ))}
         </div>
 
-        {/* impressions / mois en count-up */}
-        <Reveal delay={0.1}>
-          <div className="mt-12 flex flex-col items-center gap-1 text-center">
-            <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
-              <CountUp to={2.6} decimals={1} suffix=" M" />
-            </span>
-            <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">impressions LinkedIn / mois · 55 000 abonnés</span>
-          </div>
-        </Reveal>
+        {/* CHIFFRE COMMUN — impressions/mois en DISPLAY XL (révélation typo) */}
+        <div className="mt-[clamp(56px,9vh,120px)] border-t border-green/15 pt-[clamp(40px,6vh,80px)] text-center">
+          <RevealType as="div" className="display-xl text-cream" fromTracking="0.08em">
+            <CountUp to={2.6} decimals={1} suffix=" M" />
+          </RevealType>
+          <Reveal delay={0.1}>
+            <p className="mt-4 text-[12px] font-medium uppercase tracking-[0.2em] text-cream-dim">
+              impressions LinkedIn par mois · 60 000 abonnés cumulés
+            </p>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -324,21 +360,19 @@ const Probleme: React.FC = () => {
       className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
       {/* fond désaturé, lourd — gris-bleu sourd, pas de Grainient lumineux ici */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #0b0e16 0%, #07090f 70%, #050709 100%)' }} />
+        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #021a18 0%, #011311 70%, #010c0b 100%)' }} />
       <motion.div aria-hidden style={{ y }}
         className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
-        <span className="serif-watermark font-serif-display text-[#ff3b53]/[0.06]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
+        <span className="serif-watermark font-serif-display text-lavender/[0.05]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
           aujourd'hui
         </span>
       </motion.div>
       <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <Reveal><div className="flex justify-center"><div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-[#ff5c70]"><span className="h-1.5 w-1.5 rounded-full bg-[#ff3b53]" />Le problème</div></div></Reveal>
-        <Reveal delay={0.08} perspective>
-          <p className="font-serif-display leading-[1.05] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 6vw, 76px)' }}>
-            La saisie manuelle. Les heures perdues.
-            <br /><span className="italic text-[#ff8a98]">L'IA qu'on teste sans jamais déployer.</span>
-          </p>
-        </Reveal>
+        <Reveal><div className="flex justify-center"><div className="eyebrow mb-6 flex items-center gap-3 text-lavender/80"><span className="h-1.5 w-1.5 rounded-full bg-lavender/70" />Le problème</div></div></Reveal>
+        <RevealType as="p" className="display-md text-cream">
+          La saisie manuelle. Les heures perdues.
+          <br /><span className="text-lavender/90">L'IA qu'on teste sans jamais déployer.</span>
+        </RevealType>
         <Reveal delay={0.16}>
           <p className="mx-auto mt-7 max-w-xl text-[16px] leading-relaxed text-cream-soft">
             Des outils empilés, des POC abandonnés, des équipes qui doutent. La promesse de
@@ -387,11 +421,9 @@ const Resultats: React.FC = () => {
         <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
           <div>
             <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
-            <Reveal delay={0.06} perspective>
-              <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
-                Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
-              </h2>
-            </Reveal>
+            <RevealType as="h2" className="display-md text-cream">
+              Des résultats.<br /><span className="aurora-text">Pas des slides.</span>
+            </RevealType>
           </div>
           <Reveal delay={0.12}>
             <p className="text-[16px] leading-relaxed text-cream-soft md:pb-3">
@@ -405,7 +437,7 @@ const Resultats: React.FC = () => {
             <motion.div key={i}
               {...reveal((i % 3) * 0.08, !!reduce)}
               className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
+              <div className="display-lg leading-[0.82] text-cream">
                 {k.val}
               </div>
               <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
@@ -494,11 +526,9 @@ const Formation: React.FC = () => {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="max-w-3xl">
           <Reveal><Eyebrow>La formation</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              On forme vos équipes<br /><span className="aurora-text italic">à faire sans nous.</span>
-            </h2>
-          </Reveal>
+          <RevealType as="h2" className="display-md text-cream">
+            On forme vos équipes<br /><span className="aurora-text">à faire sans nous.</span>
+          </RevealType>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
               10 modules · 3 niveaux · 200 à 1 250 € par personne. On ne forme pas pour cocher
@@ -583,25 +613,23 @@ const Methode: React.FC = () => {
   return (
     <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(0,130,124,0.20), transparent 65%)' }} />
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
-        <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 80px)' }}>
-            Quatre temps.<br /><span className="aurora-text italic">Une seule ligne.</span>
-          </h2>
-        </Reveal>
+        <RevealType as="h2" className="display-md text-cream">
+          Quatre temps.<br /><span className="aurora-text">Une seule ligne.</span>
+        </RevealType>
       </div>
 
       <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
           viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(12,196,129,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <path d="M1 0 V100" stroke="rgba(0,130,124,0.16)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
           <defs>
             <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#00827c" />
+              <stop offset="1" stopColor="#cbfffc" />
             </linearGradient>
           </defs>
         </svg>
@@ -636,8 +664,14 @@ const Roi: React.FC = () => {
   const loop = reduce ? 1 : scrollYProgress;
   return (
     <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
+      {/* atmosphère twilight teal→lavande, statique et rationnée */}
+      <div aria-hidden className="twilight pointer-events-none absolute inset-0 -z-[2]" />
+      {/* particules « observatoire » discrètes autour du grand chiffre */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-[1] opacity-80">
+        <ObservatoryDrift density={34000} max={44} />
+      </div>
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(0,130,124,0.20), transparent 65%)' }} />
       <div ref={ref} className="relative z-10 flex flex-col items-center text-center">
         {/* la boucle SVG autour du chiffre — se trace au scroll */}
         <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
@@ -646,15 +680,15 @@ const Roi: React.FC = () => {
             style={{ pathLength: loop, rotate: -8 }} />
           <defs>
             <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#00827c" />
+              <stop offset="1" stopColor="#cbfffc" />
             </linearGradient>
           </defs>
         </svg>
         <Reveal><Eyebrow>Le ROI en un chiffre</Eyebrow></Reveal>
-        <div className="font-serif-display leading-[0.8] text-cream" style={{ fontSize: 'clamp(120px, 28vw, 360px)' }}>
+        <RevealType as="div" className="display-xl leading-[0.8] text-cream" fromTracking="0.06em">
           <CountUp to={159} suffix=" %" />
-        </div>
+        </RevealType>
         <Reveal delay={0.1}>
           <p className="mt-4 text-[16px] text-cream-soft">Documenté, pas promis.</p>
         </Reveal>
@@ -707,11 +741,9 @@ const Faq: React.FC = () => (
   <section id="faq" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
-      <Reveal delay={0.06} perspective>
-        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
-          Tout ce qu'on <span className="aurora-text italic">nous demande.</span>
-        </h2>
-      </Reveal>
+      <RevealType as="h2" className="display-md mb-10 text-cream">
+        Tout ce qu'on <span className="aurora-text">nous demande.</span>
+      </RevealType>
       <div>
         {FAQ_ITEMS.map((f) => <FaqRow key={f.q} q={f.q} a={f.a} />)}
       </div>
@@ -727,8 +759,8 @@ const AccentZ: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#00827c" />
+        <stop offset="1" stopColor="#cbfffc" />
       </linearGradient>
     </defs>
     <path
@@ -753,16 +785,14 @@ const CtaFinal: React.FC = () => {
         />
       </div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.7) 65%, rgba(8,8,8,0.92) 100%)' }} />
+        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(1,38,36,0.40) 0%, rgba(1,38,36,0.72) 65%, rgba(1,38,36,0.94) 100%)' }} />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
           <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
-              Le parcours commence<br />par une <span className="aurora-text italic">conversation.</span>
-            </h2>
-          </Reveal>
+          <RevealType as="h2" className="display-md text-cream">
+            Le parcours commence<br />par une <span className="aurora-text">conversation.</span>
+          </RevealType>
           <Reveal delay={0.12}>
             <p className="mx-auto mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft lg:mx-0">
               On comprend votre contexte, on vous dit honnêtement où l'IA crée de la valeur chez vous.
@@ -814,9 +844,9 @@ const Footer: React.FC = () => {
           avec un halo dark-green STATIQUE confiné au footer (aucun grain/gradient
           animé qui traîne). */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: '#080808' }} />
+        style={{ background: '#011514' }} />
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'radial-gradient(120% 120% at 50% 100%, rgba(12,196,129,0.10) 0%, rgba(15,28,28,0.45) 45%, #080808 100%)' }} />
+        style={{ background: 'radial-gradient(120% 120% at 50% 100%, rgba(0,130,124,0.14) 0%, rgba(0,55,52,0.40) 45%, #011514 100%)' }} />
       <div className="relative z-10 w-full">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>

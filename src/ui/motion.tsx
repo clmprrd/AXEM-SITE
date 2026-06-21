@@ -122,6 +122,73 @@ export const Reveal: React.FC<{
 };
 
 // ---------------------------------------------------------------------
+// RevealType — RÉVÉLATION TYPOGRAPHIQUE signature « Auros Éditorial ».
+// Le titre entre (y-rise + opacité, pilotés par framer) ET son tracking se
+// RESSERRE pendant l'entrée (desserré → très serré, transition CSS native).
+// Sobriété : le mouvement sert le mot. reduced-motion → apparition directe,
+// tracking final. Filet de sécurité anti-invisibilité (cf. plus bas).
+// Usage : <RevealType as="h2" className="display-xl">…</RevealType>
+// ---------------------------------------------------------------------
+export const RevealType: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  as?: 'h1' | 'h2' | 'h3' | 'div' | 'span' | 'p';
+  delay?: number;
+  /** tracking de départ (desserré), en em — l'entrée le resserre */
+  fromTracking?: string;
+  /** tracking final (très serré, en em) — concret, pas de var() : framer-motion
+      ne sait pas interpoler vers une CSS custom-property. */
+  toTracking?: string;
+}> = ({ children, className = '', as = 'h2', delay = 0, fromTracking = '0.16em', toTracking = '-0.045em' }) => {
+  const reduce = useReducedMotion();
+  const C: any = (motion as any)[as] ?? motion.h2;
+  const ref = React.useRef<HTMLElement>(null);
+  const io = useInView(ref, { once: true, amount: 0.2, margin: '0px 0px -8% 0px' });
+  // FILET DE SÉCURITÉ — si l'IntersectionObserver ne se déclenche jamais
+  // (viewport dégénéré, navigateurs anciens, environnements headless), on
+  // révèle quand même au bout d'un court délai : le contenu n'est JAMAIS
+  // bloqué invisible. Annulé dès que l'observer répond.
+  const [forced, setForced] = React.useState(false);
+  React.useEffect(() => {
+    if (io) return;
+    const t = setTimeout(() => setForced(true), 1200);
+    return () => clearTimeout(t);
+  }, [io]);
+  const inView = io || forced;
+
+  if (reduce) {
+    return (
+      <C ref={ref} className={className} style={{ letterSpacing: toTracking }}>
+        {children}
+      </C>
+    );
+  }
+  // Révélation typographique : framer ne pilote QUE opacity + y (fiable).
+  // Le RESSERREMENT du tracking se fait par une transition CSS sur
+  // letter-spacing, déclenchée par useInView — l'interpolation d'unités `em`
+  // par le moteur de keyframes framer est peu fiable et gèle parfois le
+  // composant ; la transition CSS native, elle, ne gèle jamais.
+  return (
+    <C
+      ref={ref}
+      className={className}
+      style={{
+        willChange: 'letter-spacing, transform, opacity',
+        letterSpacing: inView ? toTracking : fromTracking,
+        transition: `letter-spacing 1.1s var(--ease-out) ${delay + 0.05}s`,
+      }}
+      initial={{ opacity: 0.001, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0.001, y: 32 }}
+      transition={{
+        y: { duration: 0.9, ease: EASE, delay },
+        opacity: { duration: 0.5, delay },
+      }}>
+      {children}
+    </C>
+  );
+};
+
+// ---------------------------------------------------------------------
 // CountUp — incrémente une valeur numérique quand visible (once).
 // Préserve prefix/suffix/décimales. Respecte reduced motion (valeur finale directe).
 // ---------------------------------------------------------------------

@@ -112,7 +112,7 @@ export const Parcours: React.FC = () => {
         {/* indicateur de progression du scrub (desktop) — scaleX, pas de re-render */}
         {!pinDisabled && (
           <div className="mx-auto mt-10 w-full max-w-6xl px-5 md:px-8">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(12,196,129,0.14)]">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(0,130,124,0.16)]">
               <motion.div
                 className="h-full origin-left rounded-full bg-gradient-to-r from-green to-cyan"
                 style={{ scaleX: barScaleX }}
