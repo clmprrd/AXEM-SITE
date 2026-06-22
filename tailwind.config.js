@@ -10,25 +10,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* PEAU MORNINGSIDE (vert/noir) — near-black #080808, sections sombres
-           dark-green #0f1c1c, accent vert signature #0cc481 (UNIQUE accent). */
-        ink: '#080808',          /* fond primaire near-black */
-        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
-        'ink-3': '#0b1413',      /* surface sombre alternée */
-        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
-        cream: '#ffffff',        /* texte principal (blanc) */
-        'cream-soft': '#cccccc', /* texte secondaire */
-        'cream-dim': '#888888',  /* texte tertiaire */
-        ivory: '#edece4',        /* clair secondaire */
-        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
-        'green-deep': '#0aa86e', /* vert profond (hover) */
-        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
-        mint: '#3fe0a8',         /* vert clair */
+        /* SYSTÈME « monopo saigon » — monochrome éditorial strict.
+           AUCUN accent chromatique. Le contraste blanc↔noir EST le rythme.
+           paper #ffffff · ink #181818 · carbon #181818 · ash #6d6d6d ·
+           smoke #9a9a9a · graphite #636363 (utilitaire only). */
+        paper: '#ffffff',        /* frames blanches éditoriales */
+        ink: '#000000',          /* noir pur (frames noires immersives) */
+        carbon: '#181818',       /* noir éditorial (texte sur blanc / surfaces) */
+        ash: '#6d6d6d',          /* gris secondaire */
+        smoke: '#9a9a9a',        /* gris tertiaire */
+        graphite: '#636363',     /* utilitaire (boutons utilitaires only) */
+
+        /* alias rétro-compat pour ne pas casser les classes héritées :
+           tout le vocabulaire « morningside » est remappé sur le monochrome. */
+        'ink-2': '#0a0a0a',
+        'ink-3': '#101010',
+        'ink-4': '#222222',
+        cream: '#ffffff',        /* (sur noir) blanc */
+        'cream-soft': '#cfcfcf',
+        'cream-dim': '#9a9a9a',
+        ivory: '#f4f4f4',
+        green: '#ffffff',        /* ex-accent → neutralisé en blanc */
+        'green-deep': '#cfcfcf',
+        cyan: '#9a9a9a',         /* ex-accent → gris */
+        mint: '#cfcfcf',
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        satoshi: ['"Space Grotesk"', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+        satoshi: ['Inter', 'sans-serif'],
       },
     },
   },

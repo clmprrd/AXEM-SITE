@@ -70,9 +70,9 @@ const FlowNode: React.FC<{ morph: any; n: typeof FLOW[number]; i: number; reduce
   const scale = useTransform(morph, [start, start + 0.15], [0.8, 1]);
   return (
     <motion.div
-      className="flow-node absolute -translate-x-1/2 -translate-y-1/2 rounded-xl px-3 py-2 text-[11px] font-semibold text-cream md:text-[13px]"
+      className="flow-node absolute -translate-x-1/2 -translate-y-1/2 px-3 py-2 text-[11px] font-medium text-white md:text-[13px]"
       style={{ left: `${n.x}%`, top: `${n.y}%`, ...(reduce ? {} : { opacity, scale }) }}>
-      <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'cyan' ? 'bg-cyan' : n.tone === 'green' ? 'bg-green' : 'bg-green-deep'}`} />
+      <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'green' ? 'bg-white' : 'bg-white/45'}`} />
       {n.label}
     </motion.div>
   );
@@ -129,16 +129,16 @@ export const Metamorphose: React.FC = () => {
     <section
       id="metamorphose"
       ref={ref}
-      className="section-clip relative bg-ink"
+      className="frame-dark section-clip relative"
       style={{ height: reduce ? 'auto' : '300vh' }}>
       {/* sticky stage — pinné le temps du scrub */}
       <div
         className="sticky top-0 flex min-h-[100svh] items-center overflow-hidden px-5 py-20 md:px-8"
         style={reduce ? { position: 'static' } : undefined}>
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* SCÈNE morph : tableur chaos → workflow n8n */}
+          {/* SCÈNE morph : tableur chaos → workflow n8n — cadre hairline blanc */}
           <motion.div
-            className="morph-stage relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-green/15 bg-ink-2/50"
+            className="morph-stage relative aspect-[4/3] w-full overflow-hidden border border-white/14 bg-[#0a0a0a]"
             style={{ scale: sceneScale }}>
             {/* AVANT — grille de cellules désaturées, lourdes */}
             <motion.div
@@ -158,8 +158,8 @@ export const Metamorphose: React.FC = () => {
               <svg viewBox="0 0 96 84" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full p-4">
                 <defs>
                   <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0" stopColor="#0cc481" />
-                    <stop offset="1" stopColor="#3fe0a8" />
+                    <stop offset="0" stopColor="#ffffff" stopOpacity="0.55" />
+                    <stop offset="1" stopColor="#ffffff" stopOpacity="0.55" />
                   </linearGradient>
                 </defs>
                 {WIRES.map((d, i) => (
@@ -171,37 +171,37 @@ export const Metamorphose: React.FC = () => {
               ))}
             </motion.div>
 
-            {/* étiquette d'état avant/après */}
-            <div className="absolute left-4 top-4 z-10 rounded-full border border-green/20 bg-ink/70 px-3 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-soft backdrop-blur">
+            {/* étiquette d'état avant/après — pilule hairline blanche */}
+            <div className="absolute left-4 top-4 z-10 rounded-full border border-white/20 bg-black/60 px-3.5 py-1 text-[10px] uppercase tracking-[0.16em] text-white/75 backdrop-blur">
               {after ? 'Après · workflow n8n' : 'Avant · saisie manuelle'}
             </div>
           </motion.div>
 
           {/* COPY + compteurs pilotés par le scrub */}
           <div>
-            <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-              <span className="h-1.5 w-1.5 rounded-full bg-green" />La métamorphose
+            <div className="eyebrow mb-6 flex items-center gap-3 text-white/55">
+              <span className="h-px w-7 bg-white/40" />La métamorphose
             </div>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
-              Le chaos devient<br /><span className="aurora-text italic">un flux qui tourne seul.</span>
+            <h2 className="font-serif-display text-white" style={{ fontSize: 'clamp(36px, 6vw, 84px)', lineHeight: 0.92, letterSpacing: '-0.03em' }}>
+              Le chaos devient<br /><span className="italic font-light text-white/65">un flux qui tourne seul.</span>
             </h2>
-            <p className="mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft">
+            <p className="mt-8 max-w-md text-[18px] font-light leading-[1.55] text-white/70">
               On part de vos fichiers, vos ressaisies, vos heures perdues. On en sort
               un workflow propre, en production, qui travaille pendant que vous dormez.
             </p>
 
-            <div className="mt-10 grid grid-cols-2 gap-6">
+            <div className="mt-12 grid grid-cols-2 gap-8">
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display text-white" style={{ fontSize: 'clamp(40px, 7vw, 84px)', lineHeight: 0.85, letterSpacing: '-0.04em' }}>
                   {reduce ? <CountUp to={95000} suffix=" €" /> : <span ref={eurosRef}>0 €</span>}
                 </div>
-                <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">économisés par an</div>
+                <div className="mt-3 text-[14px] font-light leading-snug text-white/60">économisés par an</div>
               </div>
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display text-white" style={{ fontSize: 'clamp(40px, 7vw, 84px)', lineHeight: 0.85, letterSpacing: '-0.04em' }}>
                   {reduce ? <CountUp to={80} suffix=" %" /> : <span ref={pctRef}>0 %</span>}
                 </div>
-                <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">du temps de saisie en moins</div>
+                <div className="mt-3 text-[14px] font-light leading-snug text-white/60">du temps de saisie en moins</div>
               </div>
             </div>
           </div>
