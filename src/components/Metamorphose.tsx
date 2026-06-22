@@ -58,7 +58,7 @@ const Cell: React.FC<{ morph: any; c: typeof CELLS[number]; reduce: boolean }> =
     <motion.div
       className="sheet-cell flex items-center justify-center rounded-[3px] text-[10px] md:text-[12px]"
       style={reduce ? undefined : { x, y, rotate }}>
-      <span className={c.bad ? 'text-[#ff6b7d]' : ''}>{c.v}</span>
+      <span className={c.bad ? 'text-cream/50' : ''}>{c.v}</span>
     </motion.div>
   );
 };
@@ -70,9 +70,9 @@ const FlowNode: React.FC<{ morph: any; n: typeof FLOW[number]; i: number; reduce
   const scale = useTransform(morph, [start, start + 0.15], [0.8, 1]);
   return (
     <motion.div
-      className="flow-node absolute -translate-x-1/2 -translate-y-1/2 rounded-xl px-3 py-2 text-[11px] font-semibold text-cream md:text-[13px]"
+      className="flow-node absolute -translate-x-1/2 -translate-y-1/2 rounded-lg px-3 py-2 text-[11px] text-cream md:text-[13px]"
       style={{ left: `${n.x}%`, top: `${n.y}%`, ...(reduce ? {} : { opacity, scale }) }}>
-      <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'cyan' ? 'bg-cyan' : n.tone === 'green' ? 'bg-green' : 'bg-green-deep'}`} />
+      <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${n.tone === 'green' ? 'bg-white' : 'bg-white/40'}`} />
       {n.label}
     </motion.div>
   );
@@ -138,7 +138,7 @@ export const Metamorphose: React.FC = () => {
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           {/* SCÈNE morph : tableur chaos → workflow n8n */}
           <motion.div
-            className="morph-stage relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-green/15 bg-ink-2/50"
+            className="morph-stage relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-hairline bg-ink"
             style={{ scale: sceneScale }}>
             {/* AVANT — grille de cellules désaturées, lourdes */}
             <motion.div
@@ -158,8 +158,8 @@ export const Metamorphose: React.FC = () => {
               <svg viewBox="0 0 96 84" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full p-4">
                 <defs>
                   <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0" stopColor="#0cc481" />
-                    <stop offset="1" stopColor="#3fe0a8" />
+                    <stop offset="0" stopColor="#ffffff" />
+                    <stop offset="1" stopColor="#97c4ff" />
                   </linearGradient>
                 </defs>
                 {WIRES.map((d, i) => (
@@ -172,18 +172,18 @@ export const Metamorphose: React.FC = () => {
             </motion.div>
 
             {/* étiquette d'état avant/après */}
-            <div className="absolute left-4 top-4 z-10 rounded-full border border-green/20 bg-ink/70 px-3 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-soft backdrop-blur">
+            <div className="absolute left-4 top-4 z-10 rounded-full border border-hairline bg-ink/80 px-3 py-1 font-satoshi text-[10px] uppercase tracking-[0.1em] text-cream-soft backdrop-blur">
               {after ? 'Après · workflow n8n' : 'Avant · saisie manuelle'}
             </div>
           </motion.div>
 
           {/* COPY + compteurs pilotés par le scrub */}
           <div>
-            <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-              <span className="h-1.5 w-1.5 rounded-full bg-green" />La métamorphose
+            <div className="eyebrow eyebrow-brackets mb-6 inline-block text-[11px] text-cream-soft">
+              La métamorphose
             </div>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
-              Le chaos devient<br /><span className="aurora-text italic">un flux qui tourne seul.</span>
+            <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 68px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+              Le chaos devient<br /><span className="aurora-text">un flux qui tourne seul.</span>
             </h2>
             <p className="mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft">
               On part de vos fichiers, vos ressaisies, vos heures perdues. On en sort
@@ -192,13 +192,13 @@ export const Metamorphose: React.FC = () => {
 
             <div className="mt-10 grid grid-cols-2 gap-6">
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)', letterSpacing: '-0.045em' }}>
                   {reduce ? <CountUp to={95000} suffix=" €" /> : <span ref={eurosRef}>0 €</span>}
                 </div>
                 <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">économisés par an</div>
               </div>
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)', letterSpacing: '-0.045em' }}>
                   {reduce ? <CountUp to={80} suffix=" %" /> : <span ref={pctRef}>0 %</span>}
                 </div>
                 <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">du temps de saisie en moins</div>

@@ -10,25 +10,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* PEAU MORNINGSIDE (vert/noir) — near-black #080808, sections sombres
-           dark-green #0f1c1c, accent vert signature #0cc481 (UNIQUE accent). */
-        ink: '#080808',          /* fond primaire near-black */
-        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
-        'ink-3': '#0b1413',      /* surface sombre alternée */
-        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
-        cream: '#ffffff',        /* texte principal (blanc) */
-        'cream-soft': '#cccccc', /* texte secondaire */
-        'cream-dim': '#888888',  /* texte tertiaire */
-        ivory: '#edece4',        /* clair secondaire */
-        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
-        'green-deep': '#0aa86e', /* vert profond (hover) */
-        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
-        mint: '#3fe0a8',         /* vert clair */
+        /* SYSTÈME « xAI » — cosmic void. UNE seule couleur de canvas (void
+           near-black #0c0c0b). Monochrome blancs/gris. Bleu signal #2563eb
+           UNIQUEMENT pour le focus des inputs. Lueur ambre→bleu en footer only. */
+        ink: '#0c0c0b',          /* void — UNIQUE fond de canvas */
+        'ink-2': '#0c0c0b',      /* alias void (pas de section alternée colorée) */
+        'ink-3': '#0c0c0b',      /* alias void */
+        'ink-4': '#1f2228',      /* hairline (rétro-compat) */
+        hairline: '#1f2228',     /* bordures hairline */
+        outline: '#474747',      /* outline boutons / cartes */
+        cream: '#ffffff',        /* texte principal (blanc absolu) */
+        'cream-soft': '#7d8187', /* texte muté */
+        'cream-dim': '#7d8187',  /* texte muté (alias) */
+        signal: '#2563eb',       /* bleu signal — focus inputs UNIQUEMENT */
+        ring: '#71717a',         /* ring focus 2px */
+        /* alias rétro-compat (mappés sur le monochrome void) — aucun accent chromatique */
+        green: '#ffffff',
+        'green-deep': '#7d8187',
+        cyan: '#7d8187',
+        mint: '#ffffff',
+        ivory: '#ffffff',
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        satoshi: ['"Space Grotesk"', 'sans-serif'],
+        /* universalSans → Inter (weight 400 PARTOUT). Eyebrows = JetBrains Mono. */
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        satoshi: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
+      letterSpacing: {
+        /* tracking serré universel xAI */
+        xai: '-0.025em',
       },
     },
   },

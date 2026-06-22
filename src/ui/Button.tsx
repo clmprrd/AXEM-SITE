@@ -2,10 +2,10 @@ import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 
 // =====================================================================
-// BOUTONS ÉDITORIAUX — anti « vibe-codé »
-// Primaire : bleu profond plein, fill-sweep discret + flèche qui glisse.
-// Secondaire : ghost glass, bordure qui s'éclaircit + soulignement révélé.
-// Pas de dégradé néon, pas d'outer-glow. Voir .btn-* dans index.css.
+// BOUTONS — SYSTÈME « xAI ». Ghost pill 9999px, 1px border, fond transparent.
+// Primaire : bordure blanche. Secondaire : bordure outline #474747 → blanc.
+// Flèche ↗ diagonale qui glisse. Zéro fill chromatique, zéro ombre. Voir
+// .btn-* dans index.css.
 // =====================================================================
 
 type Common = {
@@ -29,7 +29,7 @@ const Inner: React.FC<{ children: React.ReactNode; arrow?: boolean; sweep?: bool
     {underline ? <span className="btn-underline">{children}</span> : <span className="relative">{children}</span>}
     {arrow && (
       <span className="btn-arrow relative" aria-hidden>
-        →
+        ↗
       </span>
     )}
   </>

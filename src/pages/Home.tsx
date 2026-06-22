@@ -12,10 +12,12 @@ import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
-// AXEM IA — peau morningside (vert/noir) sur la structure play-a.
-// Hero vert signature, sections narratives (duo, problème, métamorphose,
-// parcours, résultats, formation, méthode, ROI, FAQ, CTA), footer-reveal.
-// DA near-black/#0cc481 · moteur spring 320/60/1 · Grainient confiné · boutons édito.
+// AXEM IA — SYSTÈME « xAI » (cosmic void, fil lumineux unique).
+// Void #0c0c0b = SEULE couleur de canvas. Un titre lumineux = seule source
+// de lumière. Inter weight 400 partout, eyebrows mono [crochets], ghost pills,
+// bloom blanc→bleu depuis le bord droit du hero, illustrations 1px hairline,
+// footer horizon ambre→bleu, duo en avant, hero « de A à Z » conservé.
+// moteur spring 320/60/1 · Grainient recoloré bleu très discret · perf soignée.
 // =====================================================================
 
 const ease = EASE;
@@ -25,9 +27,10 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// PEAU MORNINGSIDE — Grainient confiné au hero : vert signature → dark-green → near-black.
-const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
-const NAVY = '#080808';
+// SYSTÈME xAI — Grainient recoloré bleu TRÈS discret (bloom froid confiné),
+// presque entièrement absorbé par l'overlay void : blanc froid → bleu → void.
+const AZUR = { color1: '#97c4ff', color2: '#1a2336', color3: '#0c0c0b' } as const;
+const NAVY = '#0c0c0b';
 
 // ---------------------------------------------------------------------
 // NAV — pilule flottante scroll-glass.
@@ -52,16 +55,16 @@ const Nav: React.FC = () => {
         <a href="#top" className="link-limitless font-serif-display text-2xl leading-none tracking-tight text-cream hover:text-cream [touch-action:manipulation]">
           AXEM<span className="aurora-text">.</span>
         </a>
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map(([l, h]) => (
             <a key={l} href={h}
-              className="group link-limitless relative text-[13px] font-medium text-cream-soft hover:text-cream [touch-action:manipulation]">
+              className="group link-limitless relative text-[13px] text-cream-soft hover:text-cream [touch-action:manipulation]">
               {l}
-              <span className="absolute -bottom-1 left-0 h-px w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-limitless)] group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-white/60 transition-[width] duration-300 [transition-timing-function:var(--ease-limitless)] group-hover:w-full" />
             </a>
           ))}
         </div>
-        <SecondaryButton href={CALENDLY} external size="sm" className="!py-2.5">Réserver un appel</SecondaryButton>
+        <PrimaryButton href={CALENDLY} external size="sm" arrow className="!py-2.5">Réserver un appel</PrimaryButton>
       </nav>
     </header>
   );
@@ -70,9 +73,10 @@ const Nav: React.FC = () => {
 // ---------------------------------------------------------------------
 // SECTION HEADER — eyebrow réutilisé.
 // ---------------------------------------------------------------------
+// EYEBROW — JetBrains Mono MAJUSCULES entre crochets [ PARCOURS ], muté.
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-    <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
+  <div className="eyebrow eyebrow-brackets mb-6 inline-block text-[11px] text-cream-soft">
+    {children}
   </div>
 );
 
@@ -86,13 +90,13 @@ const AccentA: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="1" stopColor="#97c4ff" />
       </linearGradient>
     </defs>
     <path
       d="M16 108 L60 14 L104 108 M34 76 L86 76"
-      stroke="url(#heroA)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
+      stroke="url(#heroA)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"
     />
   </svg>
 );
@@ -110,46 +114,45 @@ const Hero: React.FC = () => {
   const y = reduce ? '0%' : yRaw;
   return (
     <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
-      {/* Fond Grainient vert plein cadre — CONFINÉ au hero (z-0, pas fixed) */}
-      <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
+      {/* Fond void uni — base du cosmic void */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0" style={{ background: NAVY }} />
+      {/* BLOOM — lumière radiale blanc→bleu depuis le bord DROIT du hero.
+          Grainient bleu TRÈS discret par-dessus, presque absorbé par l'overlay. */}
+      <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-[1] opacity-[0.55]">
         <Grainient
           className="h-full w-full"
           color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.13} grainAmount={0.085} contrast={1.32}
-          saturation={1.0} zoom={1.05} warpStrength={1.15}
+          timeSpeed={reduce ? 0 : 0.09} grainAmount={0.05} contrast={1.18}
+          saturation={0.7} zoom={1.15} warpStrength={1.0}
+          centerX={0.34}
         />
       </motion.div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
+      <div aria-hidden className="hero-bloom pointer-events-none absolute inset-0 z-[2]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]"
+        style={{ background: 'radial-gradient(120% 100% at 50% 42%, rgba(12,12,11,0.45) 0%, rgba(12,12,11,0.74) 60%, rgba(12,12,11,0.96) 100%)' }} />
+      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[2]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[30%]"
         style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
         {/* CASCADE HERO (mount) — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
         <motion.div
           {...revealMount(0.1, !!reduce)}
-          className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
-          <span className="relative flex h-2 w-2">
-            {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
-          </span>
-          <span className="eyebrow text-[11px] text-cream">
-            Agence d'IA <span className="text-cyan">×</span> Formation
-          </span>
+          className="eyebrow eyebrow-brackets inline-block text-[11px] text-cream-soft">
+          Agence d'IA × Formation
         </motion.div>
 
-        {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert).
-            Le « A » du « de A à Z. » = accent vert signature statique. */}
+        {/* H1 — Inter 400, ~80px, tracking -2px, line-height 1.0. C'est LE mot
+            lumineux = seule source de lumière. Le « A » de « de A à Z » = glyphe. */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
-          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
+          className="font-serif-display mt-7 text-cream"
+          style={{ fontSize: 'clamp(48px, 9vw, 96px)', lineHeight: 1.0, letterSpacing: '-0.04em', transformPerspective: 1200 }}>
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
-            <span className="aurora-solid inline-flex items-baseline gap-[0.12em]">
+            <span className="aurora-solid inline-flex items-baseline gap-[0.1em]">
               <RiseWords text="de" delay={0.55} stagger={0.09} />
-              {/* le A — accent vert signature statique */}
+              {/* le A — glyphe lumineux statique */}
               <AccentA />
               <RiseWords text="à Z." delay={0.7} stagger={0.09} />
             </span>
@@ -158,25 +161,33 @@ const Hero: React.FC = () => {
 
         <motion.p
           {...revealMount(0.5, !!reduce)}
-          className="mt-8 max-w-2xl text-balance text-lg leading-relaxed text-cream-soft md:text-xl">
-          On forme vos équipes, on conseille votre stratégie, on déploie vos automatisations.
+          className="mt-8 max-w-xl text-balance text-base leading-relaxed text-cream-soft md:text-lg">
+          On forme, on conseille, on déploie.
           <span className="text-cream"> Et on reste.</span>
         </motion.p>
 
         <motion.div
           {...revealMount(0.7, !!reduce)}
           className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-          <PrimaryButton href={CALENDLY} external size="lg">Réserver un appel</PrimaryButton>
-          <SecondaryButton href="#resultats" size="lg">Voir les cas clients</SecondaryButton>
+          <PrimaryButton href={CALENDLY} external size="lg" arrow>Réserver un appel</PrimaryButton>
+          <SecondaryButton href="#resultats" size="lg" arrow>Voir les cas clients</SecondaryButton>
         </motion.div>
 
-        {/* compteur discret ROI médian */}
-        <motion.div {...revealMount(0.9, !!reduce)} className="mt-12 flex items-center gap-3 text-[13px] text-cream-dim">
-          <span className="font-satoshi font-bold uppercase tracking-[0.18em]">ROI médian</span>
-          <span className="h-px w-8 bg-gradient-to-r from-green to-cyan" />
+        {/* compteur discret ROI médian — mono eyebrow + chiffre lumineux */}
+        <motion.div {...revealMount(0.9, !!reduce)} className="mt-14 flex items-center gap-3 text-[13px] text-cream-dim">
+          <span className="font-satoshi uppercase tracking-[0.14em]">ROI médian</span>
+          <span className="h-px w-8 bg-white/30" />
           <span className="font-serif-display text-2xl text-cream"><CountUp to={159} suffix=" %" /></span>
         </motion.div>
       </div>
+
+      {/* bandeau d'annonce bas — hairline, mono */}
+      <motion.div {...revealMount(1.05, !!reduce)}
+        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex max-w-md items-center justify-center gap-3 px-5 text-center">
+        <span className="font-satoshi text-[10.5px] uppercase tracking-[0.14em] text-cream-dim">
+          55 000 abonnés · 2,6 M impressions / mois
+        </span>
+      </motion.div>
     </section>
   );
 };
@@ -202,9 +213,9 @@ const TrustBar: React.FC = () => {
   const x = reduce ? '0%' : xRaw;
   const row = [...LOGOS, ...LOGOS];
   return (
-    <section ref={ref} aria-label="Ils nous ont confié leur IA" className="section-clip relative border-y border-green/10 py-14">
+    <section ref={ref} aria-label="Ils nous ont confié leur IA" className="section-clip relative border-y border-hairline py-14">
       <Reveal>
-        <p className="eyebrow mb-8 text-center text-[11px] tracking-[0.3em] text-cream-dim">
+        <p className="eyebrow eyebrow-brackets mb-8 inline-block w-full text-center text-[11px] text-cream-dim">
           Ils nous ont confié leur IA
         </p>
       </Reveal>
@@ -228,34 +239,36 @@ const TrustBar: React.FC = () => {
 // eux. 2,6 M impressions/mois en count-up.
 // ---------------------------------------------------------------------
 const FOUNDERS = [
-  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC',
+  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC', reach: '~40k',
     role: 'Stratégie & Business IA',
     desc: "Le stratège. Je traduis l'IA en résultats concrets et pilote les missions audit, conseil et formation.",
     li: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/' },
-  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris',
+  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris', reach: '~15k',
     role: 'Architecture IA, Tech & Déploiement',
     desc: "L'architecte. Je conçois et déploie les systèmes : agents, automatisations, intégrations en production.",
     li: 'https://www.linkedin.com/in/alexis-zeitoun/' },
 ];
+// DUO en avant — colonne typographique. Photo grayscale (seules photos du site),
+// AUCUN fond ni bordure de carte : le gap et la hairline-top portent la structure.
 const DuoCard: React.FC<{ f: typeof FOUNDERS[number]; conv: any }> = ({ f, conv }) => (
   <motion.div style={{ x: conv }}>
-    <div className="group glass relative overflow-hidden rounded-3xl">
-      <div className="relative overflow-hidden">
+    <div className="group relative">
+      <div className="relative overflow-hidden rounded-2xl border border-hairline">
         <img src={f.img} alt={f.name} loading="lazy"
-          className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
+          className="aspect-[5/4] w-full object-cover grayscale transition-transform duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.03]" />
         <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.85) 100%)' }} />
+          style={{ background: 'linear-gradient(180deg, transparent 50%, rgba(12,12,11,0.9) 100%)' }} />
         <a href={f.li} target="_blank" rel="noopener noreferrer"
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-transparent text-cream transition-colors [transition-timing-function:var(--ease-out)] hover:bg-white/10"
           aria-label={`LinkedIn ${f.name}`}>
-          <span className="text-[15px] font-bold">in</span>
+          <span className="text-[13px]">in</span>
         </a>
       </div>
-      <div className="p-7 md:p-8">
-        <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
-        <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
-        <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
-        <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
+      <div className="pt-6">
+        <p className="font-satoshi text-[11px] uppercase tracking-[0.1em] text-cream-soft">{f.school} · {f.reach} abonnés</p>
+        <h3 className="font-serif-display mt-2 text-[34px] leading-none text-cream" style={{ letterSpacing: '-0.03em' }}>{f.name}</h3>
+        <p className="mt-2 text-[13px] uppercase tracking-[0.04em] text-cream-soft">{f.role}</p>
+        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
       </div>
     </div>
   </motion.div>
@@ -270,13 +283,13 @@ const Duo: React.FC = () => {
   const convL = reduce ? '0%' : leftRaw;
   const convR = reduce ? '0%' : rightRaw;
   return (
-    <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
+    <section id="duo" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="max-w-2xl">
           <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              Stratégie + Tech.<br /><span className="aurora-text italic">Un seul interlocuteur.</span>
+            <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+              Stratégie + Tech.<br /><span className="aurora-text">Un seul interlocuteur.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
@@ -287,7 +300,7 @@ const Duo: React.FC = () => {
           </Reveal>
         </div>
 
-        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-2">
+        <div ref={ref} className="mt-16 grid gap-10 md:grid-cols-2 md:gap-12">
           {FOUNDERS.map((f, i) => (
             <motion.div key={f.name} {...reveal(i * 0.12, !!reduce)}>
               <DuoCard f={f} conv={i === 0 ? convL : convR} />
@@ -295,13 +308,21 @@ const Duo: React.FC = () => {
           ))}
         </div>
 
-        {/* impressions / mois en count-up */}
+        {/* chiffres cumulés en display — colonnes typographiques séparées par le gap */}
         <Reveal delay={0.1}>
-          <div className="mt-12 flex flex-col items-center gap-1 text-center">
-            <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
-              <CountUp to={2.6} decimals={1} suffix=" M" />
-            </span>
-            <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">impressions LinkedIn / mois · 55 000 abonnés</span>
+          <div className="mt-20 grid grid-cols-2 gap-x-6 gap-y-12 border-t border-hairline pt-12 sm:grid-cols-3">
+            {[
+              { v: <>55<span className="text-cream-soft">k</span></>, l: 'abonnés cumulés' },
+              { v: <CountUp to={2.6} decimals={1} suffix=" M" />, l: 'impressions LinkedIn / mois' },
+              { v: <>A<span className="text-cream-soft">→</span>Z</>, l: 'on enseigne ce qu’on déploie' },
+            ].map((s, i) => (
+              <div key={i}>
+                <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(44px, 7vw, 80px)', letterSpacing: '-0.04em' }}>
+                  {s.v}
+                </div>
+                <div className="mt-3 max-w-[180px] font-satoshi text-[11px] uppercase tracking-[0.08em] text-cream-soft">{s.l}</div>
+              </div>
+            ))}
           </div>
         </Reveal>
       </div>
@@ -322,21 +343,21 @@ const Probleme: React.FC = () => {
   return (
     <section id="probleme" ref={ref}
       className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      {/* fond désaturé, lourd — gris-bleu sourd, pas de Grainient lumineux ici */}
+      {/* fond void uni — pas de bloom ici (section sombre, tension) */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #0b0e16 0%, #07090f 70%, #050709 100%)' }} />
+        style={{ background: '#0c0c0b' }} />
       <motion.div aria-hidden style={{ y }}
         className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
-        <span className="serif-watermark font-serif-display text-[#ff3b53]/[0.06]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
+        <span className="serif-watermark font-serif-display text-white/[0.035]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
           aujourd'hui
         </span>
       </motion.div>
       <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <Reveal><div className="flex justify-center"><div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-[#ff5c70]"><span className="h-1.5 w-1.5 rounded-full bg-[#ff3b53]" />Le problème</div></div></Reveal>
+        <Reveal><div className="flex justify-center"><Eyebrow>Le problème</Eyebrow></div></Reveal>
         <Reveal delay={0.08} perspective>
-          <p className="font-serif-display leading-[1.05] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 6vw, 76px)' }}>
+          <p className="font-serif-display text-cream" style={{ fontSize: 'clamp(34px, 6vw, 72px)', lineHeight: 1.06, letterSpacing: '-0.035em' }}>
             La saisie manuelle. Les heures perdues.
-            <br /><span className="italic text-[#ff8a98]">L'IA qu'on teste sans jamais déployer.</span>
+            <br /><span className="text-cream-soft">L'IA qu'on teste sans jamais déployer.</span>
           </p>
         </Reveal>
         <Reveal delay={0.16}>
@@ -379,6 +400,23 @@ const CASES = [
     solution: 'Assistants IA spécialisés + montée en compétence des équipes internes.',
     result: '159 %', resultLabel: 'de ROI sur 12 mois · 20 ambassadeurs / 80 devs' },
 ];
+// ILLUSTRATIONS 1px — iconographie géométrique mono (#1f2228) par cas client :
+// arc de comète, cadre terminal, rectangles empilés, boucle. PAS d'illustration figurative.
+const CaseIllu: React.FC<{ i: number }> = ({ i }) => {
+  const paths = [
+    // arc de comète
+    <g key="a"><path className="illu-1px" d="M4 56 C 20 40, 44 18, 76 14" /><circle className="illu-1px illu-1px--bright" cx="76" cy="14" r="3.5" /><path className="illu-1px" d="M10 56 L4 56 L4 50" /></g>,
+    // cadre terminal
+    <g key="b"><rect className="illu-1px" x="6" y="12" width="68" height="44" rx="4" /><path className="illu-1px" d="M6 22 L74 22" /><circle className="illu-1px" cx="13" cy="17" r="1.4" /><path className="illu-1px illu-1px--bright" d="M16 34 L24 39 L16 44" /><path className="illu-1px" d="M30 42 L46 42" /></g>,
+    // rectangles empilés
+    <g key="c"><rect className="illu-1px" x="10" y="14" width="60" height="12" rx="2" /><rect className="illu-1px" x="10" y="30" width="60" height="12" rx="2" /><rect className="illu-1px illu-1px--bright" x="10" y="46" width="38" height="12" rx="2" /></g>,
+    // boucle
+    <g key="d"><ellipse className="illu-1px" cx="40" cy="34" rx="32" ry="20" /><path className="illu-1px illu-1px--bright" d="M62 22 L70 14 L70 24" /></g>,
+  ];
+  return (
+    <svg viewBox="0 0 80 68" className="h-14 w-20" aria-hidden>{paths[i % paths.length]}</svg>
+  );
+};
 const Resultats: React.FC = () => {
   const reduce = useReducedMotion();
   return (
@@ -388,8 +426,8 @@ const Resultats: React.FC = () => {
           <div>
             <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
             <Reveal delay={0.06} perspective>
-              <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
-                Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
+              <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(38px, 7vw, 80px)', lineHeight: 0.98, letterSpacing: '-0.04em' }}>
+                Des résultats.<br /><span className="aurora-text">Pas des slides.</span>
               </h2>
             </Reveal>
           </div>
@@ -405,30 +443,33 @@ const Resultats: React.FC = () => {
             <motion.div key={i}
               {...reveal((i % 3) * 0.08, !!reduce)}
               className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
+              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 100px)', letterSpacing: '-0.045em' }}>
                 {k.val}
               </div>
-              <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
+              <div className="mt-3 max-w-[200px] text-[13px] leading-snug text-cream-soft">{k.label}</div>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-24 grid gap-5 md:grid-cols-2">
+        {/* cartes = colonnes typographiques, AUCUN fond, hairline-top révélée +
+            illustration 1px mono. Séparation par le gap & la bordure-haute only. */}
+        <div className="mt-24 grid gap-x-12 gap-y-14 md:grid-cols-2">
           {CASES.map((c, i) => (
             <motion.article key={c.sector} tabIndex={0}
               {...reveal((i % 2) * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="case-card group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
-              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
-              <div className="space-y-3 text-[14.5px] leading-relaxed">
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Solution · </span>{c.solution}</p>
+              className="case-card group relative flex flex-col gap-5 border-t border-hairline pt-7 outline-none">
+              <div className="flex items-start justify-between gap-4">
+                <span className="font-satoshi text-[11px] uppercase tracking-[0.12em] text-cream-soft">{c.sector}</span>
+                <CaseIllu i={i} />
               </div>
-              <div className="mt-auto flex items-end justify-between border-t border-green/12 pt-5">
-                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.12em] text-cream-dim">Résultat</span>
-                <span className="font-serif-display text-cream transition-[transform,color] duration-400 [transition-timing-function:var(--ease-out)] group-hover:text-green group-focus-within:text-green md:translate-y-1 md:opacity-70 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100"
-                  style={{ fontSize: 'clamp(40px, 6vw, 64px)' }}>
+              <div className="space-y-3 text-[14.5px] leading-relaxed">
+                <p className="text-cream-soft"><span className="text-cream">Problème · </span>{c.problem}</p>
+                <p className="text-cream-soft"><span className="text-cream">Solution · </span>{c.solution}</p>
+              </div>
+              <div className="mt-2 flex items-end justify-between">
+                <span className="font-satoshi text-[11px] uppercase tracking-[0.1em] text-cream-dim">Résultat</span>
+                <span className="font-serif-display text-cream"
+                  style={{ fontSize: 'clamp(40px, 6vw, 64px)', letterSpacing: '-0.04em' }}>
                   {c.result}
                 </span>
               </div>
@@ -465,9 +506,9 @@ const CATALOGUE = [
   ['F10', 'Architecture IA sur-mesure', 'Avancé', '1 250 €'],
 ] as const;
 const LEVEL_TINT: Record<string, string> = {
-  'Découverte': 'text-mint border-mint/30',
-  'Intermédiaire': 'text-cyan border-cyan/30',
-  'Avancé': 'text-green border-green/30',
+  'Découverte': 'text-cream-soft border-hairline',
+  'Intermédiaire': 'text-cream-soft border-outline',
+  'Avancé': 'text-cream border-white/40',
 };
 const Formation: React.FC = () => {
   const reduce = useReducedMotion();
@@ -495,8 +536,8 @@ const Formation: React.FC = () => {
         <div className="max-w-3xl">
           <Reveal><Eyebrow>La formation</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              On forme vos équipes<br /><span className="aurora-text italic">à faire sans nous.</span>
+            <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+              On forme vos équipes<br /><span className="aurora-text">à faire sans nous.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
@@ -509,12 +550,12 @@ const Formation: React.FC = () => {
           {/* barre 70 % pratique qui se remplit */}
           <div ref={barRef} className="mt-8 max-w-md">
             <div className="mb-2 flex items-baseline justify-between">
-              <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-dim">Part de pratique</span>
+              <span className="font-satoshi text-[11px] uppercase tracking-[0.1em] text-cream-dim">Part de pratique</span>
               <span className="font-serif-display text-3xl text-cream">{inView ? <CountUp to={70} suffix=" %" /> : '0 %'}</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.05]">
+            <div className="h-px w-full overflow-hidden bg-hairline">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-green to-cyan"
+                className="h-full origin-left bg-white/80"
                 initial={{ width: '0%' }}
                 animate={inView ? { width: '70%' } : { width: '0%' }}
                 transition={reduce ? { duration: 0 } : { duration: 1.4, ease: EASE }}
@@ -536,13 +577,13 @@ const Formation: React.FC = () => {
           <motion.article
             key={code}
             {...reveal(Math.min(i, 4) * 0.06, !!reduce)}
-            className="glass flex w-[78vw] max-w-[320px] shrink-0 select-none flex-col rounded-3xl p-7 md:w-[300px]">
-            <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[level]}`}>{level}</span>
-            <span className="font-serif-display mt-5 text-lg text-green/50">{code}</span>
-            <h3 className="font-serif-display mt-1 text-[26px] leading-[1.05] text-cream">{title}</h3>
+            className="flex w-[78vw] max-w-[320px] shrink-0 select-none flex-col rounded-2xl border border-hairline p-7 transition-colors duration-300 [transition-timing-function:var(--ease-out)] hover:border-outline md:w-[300px]">
+            <span className={`self-start rounded-full border px-2.5 py-1 font-satoshi text-[10px] uppercase tracking-[0.1em] ${LEVEL_TINT[level]}`}>{level}</span>
+            <span className="font-satoshi mt-5 text-sm text-cream-dim">{code}</span>
+            <h3 className="font-serif-display mt-1.5 text-[26px] leading-[1.05] text-cream" style={{ letterSpacing: '-0.03em' }}>{title}</h3>
             <div className="mt-auto flex items-end justify-between pt-8">
-              <span className="font-serif-display text-4xl text-cream">{price}</span>
-              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.1em] text-cream-dim">/ pers.</span>
+              <span className="font-serif-display text-4xl text-cream" style={{ letterSpacing: '-0.04em' }}>{price}</span>
+              <span className="font-satoshi text-[11px] uppercase tracking-[0.08em] text-cream-dim">/ pers.</span>
             </div>
           </motion.article>
         ))}
@@ -582,13 +623,12 @@ const Methode: React.FC = () => {
 
   return (
     <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+      <div aria-hidden className="section-bloom pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[55vh] w-[55vh] -translate-x-1/2 rounded-full opacity-60 blur-[100px]" />
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
         <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 80px)' }}>
-            Quatre temps.<br /><span className="aurora-text italic">Une seule ligne.</span>
+          <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 76px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+            Quatre temps.<br /><span className="aurora-text">Une seule ligne.</span>
           </h2>
         </Reveal>
       </div>
@@ -596,12 +636,12 @@ const Methode: React.FC = () => {
       <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
           viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(12,196,129,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-          <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
+          <path d="M1 0 V100" stroke="#1f2228" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
           <defs>
             <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="1" stopColor="#97c4ff" />
             </linearGradient>
           </defs>
         </svg>
@@ -609,11 +649,11 @@ const Methode: React.FC = () => {
           {STEPS.map((s, i) => (
             <li key={s.k} className="relative">
               <span aria-hidden data-on={i < activeCount ? 'true' : 'false'}
-                className="ligne-node absolute -left-[38px] top-2 h-4 w-4 rounded-full border border-green/40 bg-ink md:-left-[50px]" />
+                className="ligne-node absolute -left-[38px] top-2 h-4 w-4 rounded-full border border-hairline bg-ink md:-left-[50px]" />
               <Reveal delay={0.05 * i}>
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <h3 className="font-serif-display text-[30px] leading-none text-cream md:text-[40px]">{s.k}</h3>
-                  <span className="rounded-full border border-green/30 px-3 py-1 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-green">{s.meta}</span>
+                  <h3 className="font-serif-display text-[30px] leading-none text-cream md:text-[40px]" style={{ letterSpacing: '-0.035em' }}>{s.k}</h3>
+                  <span className="rounded-full border border-outline px-3 py-1 font-satoshi text-[11px] uppercase tracking-[0.1em] text-cream-soft">{s.meta}</span>
                 </div>
                 <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
               </Reveal>
@@ -636,23 +676,22 @@ const Roi: React.FC = () => {
   const loop = reduce ? 1 : scrollYProgress;
   return (
     <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+      <div aria-hidden className="section-bloom pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[65vh] w-[65vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-70 blur-[100px]" />
       <div ref={ref} className="relative z-10 flex flex-col items-center text-center">
-        {/* la boucle SVG autour du chiffre — se trace au scroll */}
+        {/* la boucle SVG autour du chiffre — se trace au scroll (fil blanc→bleu) */}
         <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
           <motion.ellipse cx="200" cy="200" rx="185" ry="120"
-            stroke="url(#roiGrad)" strokeWidth="2" strokeLinecap="round" className="accent-stroke"
+            stroke="url(#roiGrad)" strokeWidth="1.5" strokeLinecap="round" className="accent-stroke"
             style={{ pathLength: loop, rotate: -8 }} />
           <defs>
             <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="1" stopColor="#97c4ff" />
             </linearGradient>
           </defs>
         </svg>
         <Reveal><Eyebrow>Le ROI en un chiffre</Eyebrow></Reveal>
-        <div className="font-serif-display leading-[0.8] text-cream" style={{ fontSize: 'clamp(120px, 28vw, 360px)' }}>
+        <div className="font-serif-display leading-[0.8] text-cream aurora-text" style={{ fontSize: 'clamp(120px, 28vw, 340px)', letterSpacing: '-0.05em' }}>
           <CountUp to={159} suffix=" %" />
         </div>
         <Reveal delay={0.1}>
@@ -676,17 +715,17 @@ const FaqRow: React.FC<{ q: string; a: string }> = ({ q, a }) => {
   const reduce = useReducedMotion();
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="border-b border-green/12">
+    <div className="border-b border-hairline">
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className="group flex w-full items-center justify-between gap-4 py-6 text-left outline-none [touch-action:manipulation]">
-        <span className="relative font-serif-display text-[22px] leading-tight text-cream md:text-[28px]">
+        <span className="relative font-serif-display text-[22px] leading-tight text-cream md:text-[28px]" style={{ letterSpacing: '-0.03em' }}>
           {q}
-          <span aria-hidden className="absolute -bottom-1 left-0 h-px w-0 bg-green/60 transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full group-focus-visible:w-full" />
+          <span aria-hidden className="absolute -bottom-1 left-0 h-px w-0 bg-white/50 transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full group-focus-visible:w-full" />
         </span>
         <motion.span aria-hidden animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3, ease }}
-          className="shrink-0 text-2xl leading-none text-green">+</motion.span>
+          className="shrink-0 text-2xl leading-none text-cream-soft">+</motion.span>
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -708,8 +747,8 @@ const Faq: React.FC = () => (
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
       <Reveal delay={0.06} perspective>
-        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
-          Tout ce qu'on <span className="aurora-text italic">nous demande.</span>
+        <h2 className="font-serif-display mb-10 text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 60px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+          Tout ce qu'on <span className="aurora-text">nous demande.</span>
         </h2>
       </Reveal>
       <div>
@@ -727,13 +766,13 @@ const AccentZ: React.FC = () => (
   <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
     <defs>
       <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="1" stopColor="#97c4ff" />
       </linearGradient>
     </defs>
     <path
       d="M22 18 L98 18 L22 102 L98 102"
-      stroke="url(#ctaZ)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
+      stroke="url(#ctaZ)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"
     />
   </svg>
 );
@@ -744,23 +783,25 @@ const CtaFinal: React.FC = () => {
   return (
     <section id="contact" ref={ref}
       className="section-clip relative isolate overflow-hidden bg-ink px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0" style={{ background: NAVY }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] opacity-[0.5]">
         <Grainient
           className="h-full w-full"
           color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.14} grainAmount={0.08} contrast={1.3}
-          saturation={1.0} zoom={1.0} warpStrength={1.1}
+          timeSpeed={reduce ? 0 : 0.09} grainAmount={0.05} contrast={1.15}
+          saturation={0.7} zoom={1.1} warpStrength={1.0}
         />
       </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.7) 65%, rgba(8,8,8,0.92) 100%)' }} />
+      <div aria-hidden className="section-bloom pointer-events-none absolute inset-0 z-[1]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]"
+        style={{ background: 'radial-gradient(110% 100% at 50% 40%, rgba(12,12,11,0.55) 0%, rgba(12,12,11,0.8) 65%, rgba(12,12,11,0.96) 100%)' }} />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
         <div className="text-center lg:text-left">
           <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
-              Le parcours commence<br />par une <span className="aurora-text italic">conversation.</span>
+            <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 76px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+              Le parcours commence<br />par une <span className="aurora-text">conversation.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
@@ -769,11 +810,11 @@ const CtaFinal: React.FC = () => {
               Sans engagement.
             </p>
           </Reveal>
-          {/* écho A → Z : accent vert signature, du A du hero au Z ici */}
+          {/* écho A → Z : fil lumineux, du A du hero au Z ici */}
           <Reveal delay={0.16}>
             <div className="mt-8 flex items-center justify-center gap-3 lg:justify-start">
-              <span className="font-serif-display text-3xl italic text-cream-soft">De A…</span>
-              <span className="font-serif-display text-3xl italic text-cream">à</span>
+              <span className="font-serif-display text-3xl text-cream-soft">De A…</span>
+              <span className="font-serif-display text-3xl text-cream">à</span>
               <AccentZ />
             </div>
           </Reveal>
@@ -785,7 +826,7 @@ const CtaFinal: React.FC = () => {
         </div>
 
         <Reveal delay={0.1}>
-          <div className="glass-strong overflow-hidden rounded-3xl p-1.5 md:p-2">
+          <div className="panel-hairline overflow-hidden rounded-3xl p-1.5 md:p-2">
             {inView && (
               <iframe
                 title="Réserver un créneau de 30 minutes"
@@ -806,21 +847,16 @@ const CtaFinal: React.FC = () => {
 // ---------------------------------------------------------------------
 const Footer: React.FC = () => {
   return (
-    <footer className="footer-fixed isolate border-t border-green/12 px-5 py-16 md:px-8">
-      {/* SUPPRESSION DU FOND PERSISTANT — le footer est position:fixed (footer-reveal).
-          L'ancien <Grainient> WebGL animé vivait ici, DERRIÈRE tout le contenu, et
-          tournait en permanence pendant tout le scroll (fond persistant qui « bave »
-          sous toutes les sections). Remplacé par un fond near-black PROPRE, uni,
-          avec un halo dark-green STATIQUE confiné au footer (aucun grain/gradient
-          animé qui traîne). */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: '#080808' }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'radial-gradient(120% 120% at 50% 100%, rgba(12,196,129,0.10) 0%, rgba(15,28,28,0.45) 45%, #080808 100%)' }} />
+    <footer className="footer-fixed isolate px-5 py-16 md:px-8">
+      {/* FOOTER ATMOSPHÉRIQUE — clôture du cosmic void. Fond void uni + HORIZON
+          ambre→bleu pleine largeur (la SEULE lueur chromatique du site, footer only). */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ background: '#0c0c0b' }} />
+      <div aria-hidden className="footer-horizon pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[55%]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-hairline" />
       <div className="relative z-10 w-full">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr]">
           <div>
-            <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl">
+            <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl" style={{ letterSpacing: '-0.04em' }}>
               AXEM<span className="aurora-text">.</span>
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-soft">
@@ -828,24 +864,40 @@ const Footer: React.FC = () => {
             </p>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
-              {NAV_LINKS.map(([l, h]) => (
-                <li key={l}><a href={h} className="link-limitless hover:text-cream">{l}</a></li>
-              ))}
+            <div className="mb-4 font-satoshi text-[11px] uppercase tracking-[0.12em] text-cream-dim">Parcours</div>
+            <ul className="space-y-2.5 text-sm text-cream-soft">
+              <li><a href="#parcours" className="footer-link inline-block link-limitless hover:text-cream">Les 7 étapes</a></li>
+              <li><a href="#methode" className="footer-link inline-block link-limitless hover:text-cream">La méthode</a></li>
+              <li><a href="#resultats" className="footer-link inline-block link-limitless hover:text-cream">Résultats</a></li>
             </ul>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
-              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Réserver un appel</a></li>
-              <li><a href="mailto:contact@axem-ia.fr" className="link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
-              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Cas clients</a></li>
+            <div className="mb-4 font-satoshi text-[11px] uppercase tracking-[0.12em] text-cream-dim">Offre</div>
+            <ul className="space-y-2.5 text-sm text-cream-soft">
+              <li><a href="#formation" className="footer-link inline-block link-limitless hover:text-cream">Formation</a></li>
+              <li><a href="#duo" className="footer-link inline-block link-limitless hover:text-cream">Le duo</a></li>
+              <li><a href="#roi" className="footer-link inline-block link-limitless hover:text-cream">ROI</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="mb-4 font-satoshi text-[11px] uppercase tracking-[0.12em] text-cream-dim">Contact</div>
+            <ul className="space-y-2.5 text-sm text-cream-soft">
+              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="footer-link inline-block link-limitless hover:text-cream">Réserver un appel</a></li>
+              <li><a href="mailto:contact@axem-ia.fr" className="footer-link inline-block link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
+              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="footer-link inline-block link-limitless hover:text-cream">Cas clients</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="mb-4 font-satoshi text-[11px] uppercase tracking-[0.12em] text-cream-dim">Réseaux</div>
+            <ul className="space-y-2.5 text-sm text-cream-soft">
+              <li><a href={FOUNDERS[0].li} target="_blank" rel="noopener noreferrer" className="footer-link inline-block link-limitless hover:text-cream">Clément · LinkedIn</a></li>
+              <li><a href={FOUNDERS[1].li} target="_blank" rel="noopener noreferrer" className="footer-link inline-block link-limitless hover:text-cream">Alexis · LinkedIn</a></li>
             </ul>
           </div>
         </div>
-        <div className="mx-auto mt-12 max-w-5xl border-t border-green/8 pt-6 text-center text-xs text-cream-dim">
-          © 2026 AXEM IA — Paris, France.
+        <div className="mx-auto mt-12 flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-hairline pt-6 text-xs text-cream-dim sm:flex-row">
+          <span>© 2026 AXEM IA — Paris, France.</span>
+          <span className="font-satoshi uppercase tracking-[0.1em]">de A à Z</span>
         </div>
       </div>
     </footer>

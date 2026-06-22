@@ -63,17 +63,17 @@ export const Parcours: React.FC = () => {
     <section
       id="parcours"
       ref={ref}
-      className="steps-pin section-clip relative bg-ink-2/40"
+      className="steps-pin section-clip relative bg-ink"
       style={{ height: pinDisabled ? 'auto' : '420vh' }}>
       <div
         className="steps-sticky sticky top-0 flex min-h-[100svh] flex-col justify-center overflow-hidden py-20"
         style={pinDisabled ? { position: 'static' } : undefined}>
         <div className="mx-auto mb-12 w-full max-w-6xl px-5 md:px-8">
-          <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-            <span className="h-1.5 w-1.5 rounded-full bg-green" />Le parcours
+          <div className="eyebrow eyebrow-brackets mb-6 inline-block text-[11px] text-cream-soft">
+            Le parcours
           </div>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
-            Sept étapes, <span className="aurora-text italic">une seule ligne.</span>
+          <h2 className="font-serif-display text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 68px)', lineHeight: 1.02, letterSpacing: '-0.035em' }}>
+            Sept étapes, <span className="aurora-text">une seule ligne.</span>
           </h2>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-cream-soft">
             Du premier diagnostic à votre autonomie. La ligne relie chaque étape — et ne se referme jamais à la dernière.
@@ -89,19 +89,19 @@ export const Parcours: React.FC = () => {
               <article
                 key={s.n}
                 data-active={i <= activeIdx ? 'true' : 'false'}
-                className="step-card glass relative flex w-[80vw] max-w-[420px] shrink-0 flex-col rounded-3xl p-7 md:w-[34vw] md:p-9">
+                className="step-card relative flex w-[80vw] max-w-[420px] shrink-0 flex-col rounded-2xl border border-hairline bg-ink p-7 md:w-[34vw] md:p-9">
                 {/* nœud d'étape allumé */}
                 <span
                   aria-hidden
                   data-on={i <= activeIdx ? 'true' : 'false'}
-                  className="ligne-node absolute right-6 top-6 h-3 w-3 rounded-full border border-green/40 bg-ink"
+                  className="ligne-node absolute right-6 top-6 h-3 w-3 rounded-full border border-hairline bg-ink"
                 />
-                <span className="font-serif-display text-5xl text-green/40">{s.n}</span>
-                <h3 className="font-serif-display mt-3 text-[26px] leading-[1.05] text-cream md:text-[30px]">{s.t}</h3>
+                <span className="font-serif-display text-5xl text-cream-dim" style={{ letterSpacing: '-0.04em' }}>{s.n}</span>
+                <h3 className="font-serif-display mt-3 text-[26px] leading-[1.05] text-cream md:text-[30px]" style={{ letterSpacing: '-0.03em' }}>{s.t}</h3>
                 <p className="mt-3 text-[14.5px] leading-relaxed text-cream-soft">{s.d}</p>
                 {i === STEPS.length - 1 && (
-                  <span className="mt-5 inline-flex items-center gap-2 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-cyan">
-                    <span className="h-px w-8 bg-gradient-to-r from-green to-cyan" />la ligne continue
+                  <span className="mt-5 inline-flex items-center gap-2 font-satoshi text-[11px] uppercase tracking-[0.1em] text-cream-soft">
+                    <span className="h-px w-8 bg-white/40" />la ligne continue
                   </span>
                 )}
               </article>
@@ -112,9 +112,9 @@ export const Parcours: React.FC = () => {
         {/* indicateur de progression du scrub (desktop) — scaleX, pas de re-render */}
         {!pinDisabled && (
           <div className="mx-auto mt-10 w-full max-w-6xl px-5 md:px-8">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(12,196,129,0.14)]">
+            <div className="h-px w-full overflow-hidden bg-hairline">
               <motion.div
-                className="h-full origin-left rounded-full bg-gradient-to-r from-green to-cyan"
+                className="h-full origin-left bg-white/70"
                 style={{ scaleX: barScaleX }}
               />
             </div>
