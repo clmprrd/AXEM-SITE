@@ -10,25 +10,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* PEAU MORNINGSIDE (vert/noir) — near-black #080808, sections sombres
-           dark-green #0f1c1c, accent vert signature #0cc481 (UNIQUE accent). */
-        ink: '#080808',          /* fond primaire near-black */
-        'ink-2': '#0f1c1c',      /* section sombre alternée (dark-green) */
-        'ink-3': '#0b1413',      /* surface sombre alternée */
-        'ink-4': '#222222',      /* neutre (bordures / surfaces hautes) */
-        cream: '#ffffff',        /* texte principal (blanc) */
-        'cream-soft': '#cccccc', /* texte secondaire */
-        'cream-dim': '#888888',  /* texte tertiaire */
-        ivory: '#edece4',        /* clair secondaire */
-        green: '#0cc481',        /* accent vert signature (UNIQUE accent) */
-        'green-deep': '#0aa86e', /* vert profond (hover) */
-        cyan: '#0cc481',         /* alias vert (ex-cyan remappé sur l'accent unique) */
-        mint: '#3fe0a8',         /* vert clair */
+        /* =====================================================================
+           SYSTÈME « VIVID+CO » — darkroom editorial spread.
+           6 tokens, RIEN d'autre. Canvas slate UNIQUE sur toute la page.
+           ===================================================================== */
+        canvas: '#495764',      /* slate — canvas UNIQUE, toute la page */
+        offwhite: '#fffdf9',    /* texte off-white (JAMAIS blanc pur) */
+        carbon: '#101010',      /* recess rare */
+        obsidian: '#000000',    /* prismes */
+        graphite: '#403f3f',    /* filets rares */
+        gunmetal: '#6f879c',    /* accent UNIQUE — hairlines, ghost btn, états actifs */
+
+        /* alias rétro-compat pour les composants existants (tous remappés
+           sur les 6 tokens Vivid+Co — aucune nouvelle teinte introduite) */
+        ink: '#495764',
+        'ink-2': '#495764',
+        'ink-3': '#495764',
+        'ink-4': '#403f3f',
+        cream: '#fffdf9',
+        'cream-soft': '#fffdf9',
+        'cream-dim': '#6f879c',
+        ivory: '#fffdf9',
+        green: '#6f879c',
+        'green-deep': '#6f879c',
+        cyan: '#6f879c',
+        mint: '#6f879c',
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        satoshi: ['"Space Grotesk"', 'sans-serif'],
+        /* Neue Montreal → Inter. Display & body partagent Inter. */
+        sans: ['Inter', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+        satoshi: ['Inter', 'sans-serif'],
       },
     },
   },

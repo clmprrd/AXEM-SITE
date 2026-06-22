@@ -136,9 +136,9 @@ export const Metamorphose: React.FC = () => {
         className="sticky top-0 flex min-h-[100svh] items-center overflow-hidden px-5 py-20 md:px-8"
         style={reduce ? { position: 'static' } : undefined}>
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* SCÈNE morph : tableur chaos → workflow n8n */}
+          {/* SCÈNE morph : tableur chaos → workflow n8n — filet gunmetal, zéro carte. */}
           <motion.div
-            className="morph-stage relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-green/15 bg-ink-2/50"
+            className="morph-stage relative aspect-[4/3] w-full overflow-hidden border border-gunmetal/25"
             style={{ scale: sceneScale }}>
             {/* AVANT — grille de cellules désaturées, lourdes */}
             <motion.div
@@ -172,36 +172,36 @@ export const Metamorphose: React.FC = () => {
             </motion.div>
 
             {/* étiquette d'état avant/après */}
-            <div className="absolute left-4 top-4 z-10 rounded-full border border-green/20 bg-ink/70 px-3 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-soft backdrop-blur">
+            <div className="eyebrow absolute left-4 top-4 z-10 border border-gunmetal/30 px-3 py-1.5">
               {after ? 'Après · workflow n8n' : 'Avant · saisie manuelle'}
             </div>
           </motion.div>
 
           {/* COPY + compteurs pilotés par le scrub */}
           <div>
-            <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-              <span className="h-1.5 w-1.5 rounded-full bg-green" />La métamorphose
+            <div className="eyebrow mb-7 flex items-center gap-3">
+              <span className="h-px w-9 bg-gunmetal/60" />La métamorphose
             </div>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
-              Le chaos devient<br /><span className="aurora-text italic">un flux qui tourne seul.</span>
+            <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(40px, 7vw, 96px)' }}>
+              Le chaos devient<br /><span className="emph">un flux qui tourne seul.</span>
             </h2>
-            <p className="mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft">
+            <p className="mt-7 max-w-md text-[17px] leading-relaxed text-offwhite/70">
               On part de vos fichiers, vos ressaisies, vos heures perdues. On en sort
               un workflow propre, en production, qui travaille pendant que vous dormez.
             </p>
 
-            <div className="mt-10 grid grid-cols-2 gap-6">
+            <div className="mt-12 grid grid-cols-2 gap-8">
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display leading-[0.82] text-offwhite" style={{ fontSize: 'clamp(44px, 8vw, 104px)' }}>
                   {reduce ? <CountUp to={95000} suffix=" €" /> : <span ref={eurosRef}>0 €</span>}
                 </div>
-                <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">économisés par an</div>
+                <div className="mt-3 text-[14px] leading-snug text-offwhite/65">économisés par an</div>
               </div>
               <div>
-                <div className="tnum font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(40px, 7vw, 80px)' }}>
+                <div className="tnum font-serif-display leading-[0.82] text-offwhite" style={{ fontSize: 'clamp(44px, 8vw, 104px)' }}>
                   {reduce ? <CountUp to={80} suffix=" %" /> : <span ref={pctRef}>0 %</span>}
                 </div>
-                <div className="mt-2 text-[13px] font-medium leading-snug text-cream-soft">du temps de saisie en moins</div>
+                <div className="mt-3 text-[14px] leading-snug text-offwhite/65">du temps de saisie en moins</div>
               </div>
             </div>
           </div>

@@ -68,14 +68,14 @@ export const Parcours: React.FC = () => {
       <div
         className="steps-sticky sticky top-0 flex min-h-[100svh] flex-col justify-center overflow-hidden py-20"
         style={pinDisabled ? { position: 'static' } : undefined}>
-        <div className="mx-auto mb-12 w-full max-w-6xl px-5 md:px-8">
-          <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-            <span className="h-1.5 w-1.5 rounded-full bg-green" />Le parcours
+        <div className="mx-auto mb-14 w-full max-w-[1200px] px-5 md:px-8">
+          <div className="eyebrow mb-7 flex items-center gap-3">
+            <span className="h-px w-9 bg-gunmetal/60" />Le parcours
           </div>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 72px)' }}>
-            Sept étapes, <span className="aurora-text italic">une seule ligne.</span>
+          <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(40px, 8vw, 104px)' }}>
+            Sept étapes, <span className="emph">une seule ligne.</span>
           </h2>
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-cream-soft">
+          <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-offwhite/70">
             Du premier diagnostic à votre autonomie. La ligne relie chaque étape — et ne se referme jamais à la dernière.
           </p>
         </div>
@@ -89,19 +89,19 @@ export const Parcours: React.FC = () => {
               <article
                 key={s.n}
                 data-active={i <= activeIdx ? 'true' : 'false'}
-                className="step-card glass relative flex w-[80vw] max-w-[420px] shrink-0 flex-col rounded-3xl p-7 md:w-[34vw] md:p-9">
+                className="step-card relative flex w-[80vw] max-w-[420px] shrink-0 flex-col border-l border-gunmetal/25 px-7 md:w-[34vw] md:px-9">
                 {/* nœud d'étape allumé */}
                 <span
                   aria-hidden
                   data-on={i <= activeIdx ? 'true' : 'false'}
-                  className="ligne-node absolute right-6 top-6 h-3 w-3 rounded-full border border-green/40 bg-ink"
+                  className="ligne-node absolute right-2 top-1 h-3 w-3 border border-gunmetal/50 bg-canvas"
                 />
-                <span className="font-serif-display text-5xl text-green/40">{s.n}</span>
-                <h3 className="font-serif-display mt-3 text-[26px] leading-[1.05] text-cream md:text-[30px]">{s.t}</h3>
-                <p className="mt-3 text-[14.5px] leading-relaxed text-cream-soft">{s.d}</p>
+                <span className="font-serif-display text-[64px] leading-none text-gunmetal/50">{s.n}</span>
+                <h3 className="font-serif-display mt-4 text-offwhite" style={{ fontSize: 'clamp(26px, 3vw, 36px)' }}>{s.t}</h3>
+                <p className="mt-4 text-[16px] leading-relaxed text-offwhite/70">{s.d}</p>
                 {i === STEPS.length - 1 && (
-                  <span className="mt-5 inline-flex items-center gap-2 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-cyan">
-                    <span className="h-px w-8 bg-gradient-to-r from-green to-cyan" />la ligne continue
+                  <span className="eyebrow mt-7 inline-flex items-center gap-3">
+                    <span className="h-px w-8 bg-gunmetal/60" />la ligne continue
                   </span>
                 )}
               </article>
@@ -111,10 +111,10 @@ export const Parcours: React.FC = () => {
 
         {/* indicateur de progression du scrub (desktop) — scaleX, pas de re-render */}
         {!pinDisabled && (
-          <div className="mx-auto mt-10 w-full max-w-6xl px-5 md:px-8">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(12,196,129,0.14)]">
+          <div className="mx-auto mt-12 w-full max-w-[1200px] px-5 md:px-8">
+            <div className="h-px w-full overflow-hidden bg-gunmetal/20">
               <motion.div
-                className="h-full origin-left rounded-full bg-gradient-to-r from-green to-cyan"
+                className="h-full origin-left bg-gunmetal"
                 style={{ scaleX: barScaleX }}
               />
             </div>

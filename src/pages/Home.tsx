@@ -3,7 +3,7 @@ import {
   motion, AnimatePresence, useScroll, useTransform,
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
-import Grainient from '../components/Grainient';
+import { Prism, PrismShard } from '../components/Prism';
 import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
 import { Metamorphose } from '../components/Metamorphose';
@@ -12,10 +12,13 @@ import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
 
 // =====================================================================
-// AXEM IA — peau morningside (vert/noir) sur la structure play-a.
-// Hero vert signature, sections narratives (duo, problème, métamorphose,
-// parcours, résultats, formation, méthode, ROI, FAQ, CTA), footer-reveal.
-// DA near-black/#0cc481 · moteur spring 320/60/1 · Grainient confiné · boutons édito.
+// AXEM IA — SYSTÈME « VIVID+CO » (darkroom editorial spread).
+// Canvas slate #495764 UNIQUE sur toute la page. AUCUNE carte, AUCUN fond
+// de panneau, AUCUNE ombre, AUCUN radius (sauf nav 5px). La typo EST le
+// sujet : Inter 400, display 105–136px à même le fond. Off-white #fffdf9.
+// Accent UNIQUE gunmetal #6f879c. Prismes de verre 3D avec aberration
+// chromatique DERRIÈRE les gros titres. Boutons outline rectangulaires.
+// Le DUO en pièce maîtresse. Hero « de A à Z » conservé.
 // =====================================================================
 
 const ease = EASE;
@@ -25,14 +28,9 @@ const CASES_URL = 'https://rigorous-ketch-1a4.notion.site/Cas-clients-anonymis-s
 const CLEMENT_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/c803ba324e9ab3d7feca2b40566356fb2405cb21/components/Gemini_Generated_Image_s55lmls55lmls55l.jpg';
 const ALEXIS_IMG = 'https://raw.githubusercontent.com/AlexisZtn/Axem-IA/30e13194199c1c6c681954979c90242b710eebe1/components/Photo%20Alexis.png';
 
-// PEAU MORNINGSIDE — Grainient confiné au hero : vert signature → dark-green → near-black.
-const AZUR = { color1: '#0cc481', color2: '#0f2a24', color3: '#050807' } as const;
-const NAVY = '#080808';
-
 // ---------------------------------------------------------------------
-// NAV — pilule flottante scroll-glass.
+// NAV flottante TRANSPARENTE — wordmark + liens + bouton CONTACT outline.
 // ---------------------------------------------------------------------
-// NAV AXEM (morningside) — Parcours · Cas clients · Formation · Le duo · CTA.
 const NAV_LINKS: [string, string][] = [
   ['Parcours', '#parcours'], ['Cas clients', '#resultats'],
   ['Formation', '#formation'], ['Le duo', '#duo'],
@@ -48,133 +46,90 @@ const Nav: React.FC = () => {
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6">
       <nav
         data-scrolled={scrolled ? 'true' : 'false'}
-        className="nav-pill flex w-full max-w-3xl items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2">
-        <a href="#top" className="link-limitless font-serif-display text-2xl leading-none tracking-tight text-cream hover:text-cream [touch-action:manipulation]">
-          AXEM<span className="aurora-text">.</span>
+        className="nav-pill flex w-full max-w-5xl items-center justify-between gap-3 py-2.5 pl-4 pr-2">
+        <a href="#top" className="link-limitless text-[19px] font-medium leading-none tracking-tight text-offwhite hover:text-offwhite [touch-action:manipulation]">
+          AXEM<span className="prism-glyph">.</span>
         </a>
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map(([l, h]) => (
             <a key={l} href={h}
-              className="group link-limitless relative text-[13px] font-medium text-cream-soft hover:text-cream [touch-action:manipulation]">
+              className="link-limitless relative text-[13px] font-medium uppercase tracking-[0.08em] text-offwhite/70 hover:text-offwhite [touch-action:manipulation]">
               {l}
-              <span className="absolute -bottom-1 left-0 h-px w-0 rounded-full bg-gradient-to-r from-green to-cyan transition-[width] duration-300 [transition-timing-function:var(--ease-limitless)] group-hover:w-full" />
             </a>
           ))}
         </div>
-        <SecondaryButton href={CALENDLY} external size="sm" className="!py-2.5">Réserver un appel</SecondaryButton>
+        <SecondaryButton href={CALENDLY} external size="sm">Contact</SecondaryButton>
       </nav>
     </header>
   );
 };
 
 // ---------------------------------------------------------------------
-// SECTION HEADER — eyebrow réutilisé.
+// EYEBROW — label caps gunmetal + filet.
 // ---------------------------------------------------------------------
 const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-cyan">
-    <span className="h-1.5 w-1.5 rounded-full bg-green" />{children}
+  <div className="eyebrow mb-7 flex items-center gap-3">
+    <span className="h-px w-9 bg-gunmetal/60" />{children}
   </div>
 );
 
 // ---------------------------------------------------------------------
-// 0. HERO — H1 « Votre partenaire IA, de A à Z. »
-// Léger parallax au scroll. Compteur discret « ROI médian → 159 % ».
+// 0. HERO — « Votre partenaire IA, de A à Z. »
+// Inter 400 ~136px, line-height 1.0, prisme de verre derrière. « de A à Z »
+// en emphase. Canvas slate, AUCUN gradient, AUCUNE carte.
 // ---------------------------------------------------------------------
-// Le « A » du « de A à Z. » — accent vert signature STATIQUE (glyphe dessiné,
-// pas d'animation de tracé). Glow vert doux pour l'ancrer comme accent de marque.
-const AccentA: React.FC = () => (
-  <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" aria-hidden fill="none">
-    <defs>
-      <linearGradient id="heroA" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
-      </linearGradient>
-    </defs>
-    <path
-      d="M16 108 L60 14 L104 108 M34 76 L86 76"
-      stroke="url(#heroA)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// =====================================================================
-// 0. HERO — caps Space Grotesk + dégradé signature « DE A À Z. » (blanc → vert).
-// Sous-titre « On forme vos équipes… Et on reste. » Double bouton.
-// Fond Grainient vert CONFINÉ au hero (pas fixed). Le « A » = accent vert statique.
-// =====================================================================
 const Hero: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['0%', '16%']);
   const y = reduce ? '0%' : yRaw;
   return (
-    <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
-      {/* Fond Grainient vert plein cadre — CONFINÉ au hero (z-0, pas fixed) */}
-      <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.13} grainAmount={0.085} contrast={1.32}
-          saturation={1.0} zoom={1.05} warpStrength={1.15}
-        />
+    <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 md:px-8">
+      {/* PRISME DE VERRE derrière le titre — plein cadre, edge-faded vignette. */}
+      <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+        <Prism className="h-[125%] w-[125%] max-w-[1100px]" scale={1} aberration={3.6} speed={28} rotate={-12} />
       </motion.div>
+      {/* léger voile slate pour ancrer le texte (pas de gradient coloré). */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.64) 58%, rgba(8,8,8,0.93) 100%)' }} />
-      <div aria-hidden className="grid-overlay pointer-events-none absolute inset-0 z-[1]" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[28%]"
-        style={{ background: `linear-gradient(180deg, transparent, ${NAVY})` }} />
+        style={{ background: 'radial-gradient(85% 75% at 50% 46%, rgba(73,87,100,0.32) 0%, rgba(73,87,100,0.55) 60%, rgba(73,87,100,0.82) 100%)' }} />
 
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center">
-        {/* CASCADE HERO (mount) — eyebrow .1 · H1 .3 · sous-titre .5 · boutons .7 */}
-        <motion.div
-          {...revealMount(0.1, !!reduce)}
-          className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5">
-          <span className="relative flex h-2 w-2">
-            {!reduce && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-70" />}
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
-          </span>
-          <span className="eyebrow text-[11px] text-cream">
-            Agence d'IA <span className="text-cyan">×</span> Formation
+      <div className="relative z-10 mx-auto flex max-w-[1200px] flex-col items-center text-center">
+        <motion.div {...revealMount(0.1, !!reduce)}>
+          <span className="eyebrow flex items-center gap-3">
+            <span className="h-px w-9 bg-gunmetal/60" />Agence d'IA × Formation
           </span>
         </motion.div>
 
-        {/* H1 — caps Space Grotesk + dégradé signature morningside (blanc → vert).
-            Le « A » du « de A à Z. » = accent vert signature statique. */}
+        {/* H1 — Inter 400, ~136px, line-height 1.0. « de A à Z » en emphase 700. */}
         <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
-          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
+          className="font-serif-display mt-10 text-offwhite"
+          style={{ fontSize: 'clamp(52px, 14vw, 136px)', transformPerspective: 1200 }}>
           <span aria-hidden>
-            <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
+            <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.07} />
             <br />
-            <span className="aurora-solid inline-flex items-baseline gap-[0.12em]">
-              <RiseWords text="de" delay={0.55} stagger={0.09} />
-              {/* le A — accent vert signature statique */}
-              <AccentA />
-              <RiseWords text="à Z." delay={0.7} stagger={0.09} />
+            <span className="emph">
+              <RiseWords text="de A à Z." delay={0.62} stagger={0.08} />
             </span>
           </span>
         </h1>
 
-        <motion.p
-          {...revealMount(0.5, !!reduce)}
-          className="mt-8 max-w-2xl text-balance text-lg leading-relaxed text-cream-soft md:text-xl">
+        <motion.p {...revealMount(0.5, !!reduce)}
+          className="mt-10 max-w-2xl text-balance text-[18px] leading-relaxed text-offwhite/75 md:text-[20px]">
           On forme vos équipes, on conseille votre stratégie, on déploie vos automatisations.
-          <span className="text-cream"> Et on reste.</span>
+          <span className="text-offwhite"> Et on reste.</span>
         </motion.p>
 
-        <motion.div
-          {...revealMount(0.7, !!reduce)}
-          className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <motion.div {...revealMount(0.7, !!reduce)}
+          className="mt-12 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <PrimaryButton href={CALENDLY} external size="lg">Réserver un appel</PrimaryButton>
           <SecondaryButton href="#resultats" size="lg">Voir les cas clients</SecondaryButton>
         </motion.div>
 
-        {/* compteur discret ROI médian */}
-        <motion.div {...revealMount(0.9, !!reduce)} className="mt-12 flex items-center gap-3 text-[13px] text-cream-dim">
-          <span className="font-satoshi font-bold uppercase tracking-[0.18em]">ROI médian</span>
-          <span className="h-px w-8 bg-gradient-to-r from-green to-cyan" />
-          <span className="font-serif-display text-2xl text-cream"><CountUp to={159} suffix=" %" /></span>
+        <motion.div {...revealMount(0.9, !!reduce)} className="mt-14 flex items-center gap-4 text-offwhite/60">
+          <span className="eyebrow">ROI médian</span>
+          <span className="h-px w-9 bg-gunmetal/60" />
+          <span className="font-serif-display text-[34px] leading-none text-offwhite"><CountUp to={159} suffix=" %" /></span>
         </motion.div>
       </div>
     </section>
@@ -182,7 +137,7 @@ const Hero: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 1. PREUVE (logos) — « Ils nous ont confié leur IA. » Marquee scroll-piloté.
+// 1. PREUVE (logos) — bande de type. « Ils nous ont confié leur IA. »
 // ---------------------------------------------------------------------
 const LOGOS: [string, string][] = [
   ['Carrefour', '/logos/carrefour.svg'],
@@ -196,20 +151,17 @@ const LOGOS: [string, string][] = [
 const TrustBar: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  // marquee PILOTÉ par le scroll : translateX lié à la progression de la section
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const xRaw = useTransform(scrollYProgress, [0, 1], ['2%', '-32%']);
   const x = reduce ? '0%' : xRaw;
   const row = [...LOGOS, ...LOGOS];
   return (
-    <section ref={ref} aria-label="Ils nous ont confié leur IA" className="section-clip relative border-y border-green/10 py-14">
+    <section ref={ref} aria-label="Ils nous ont confié leur IA" className="section-clip hair-t hair-b relative py-16">
       <Reveal>
-        <p className="eyebrow mb-8 text-center text-[11px] tracking-[0.3em] text-cream-dim">
-          Ils nous ont confié leur IA
-        </p>
+        <p className="eyebrow mb-10 text-center">Ils nous ont confié leur IA</p>
       </Reveal>
       <div className="ticker-mask group relative overflow-hidden">
-        <motion.div className="flex w-max items-center gap-14 md:gap-20" style={{ x }}>
+        <motion.div className="flex w-max items-center gap-16 md:gap-24" style={{ x }}>
           {row.map(([name, src], i) => (
             <span key={name + i} className="logo-chip shrink-0" title={name}>
               <img src={src} alt={name} loading="lazy"
@@ -222,40 +174,42 @@ const TrustBar: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------
-// 2. LE DUO — « Stratégie + Tech. 55 000 personnes nous suivent. »
-// Les 2 portraits CONVERGENT vers le centre au scroll, la ligne passe entre
-// eux. 2,6 M impressions/mois en count-up.
-// ---------------------------------------------------------------------
+// =====================================================================
+// 2. LE DUO — PIÈCE MAÎTRESSE. Grandes compositions typo + portraits N&B +
+// chiffres en display. « On enseigne ce qu'on déploie. »
+// =====================================================================
 const FOUNDERS = [
-  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC',
+  { img: CLEMENT_IMG, name: 'Clément Predo', school: 'ESSEC', followers: '~40k',
     role: 'Stratégie & Business IA',
     desc: "Le stratège. Je traduis l'IA en résultats concrets et pilote les missions audit, conseil et formation.",
     li: 'https://www.linkedin.com/in/cl%C3%A9ment-predo-426133196/' },
-  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris',
+  { img: ALEXIS_IMG, name: 'Alexis Zeitoun', school: 'Polytechnique · Télécom Paris', followers: '~15-20k',
     role: 'Architecture IA, Tech & Déploiement',
     desc: "L'architecte. Je conçois et déploie les systèmes : agents, automatisations, intégrations en production.",
     li: 'https://www.linkedin.com/in/alexis-zeitoun/' },
 ];
-const DuoCard: React.FC<{ f: typeof FOUNDERS[number]; conv: any }> = ({ f, conv }) => (
-  <motion.div style={{ x: conv }}>
-    <div className="group glass relative overflow-hidden rounded-3xl">
+const DuoFigure: React.FC<{ f: typeof FOUNDERS[number]; conv: any; align: 'left' | 'right' }> = ({ f, conv, align }) => (
+  <motion.div style={{ x: conv }} className="relative">
+    <div className="group relative">
+      {/* portrait N&B plein cadre, edge-faded, AUCUNE carte ni radius. */}
       <div className="relative overflow-hidden">
         <img src={f.img} alt={f.name} loading="lazy"
-          className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
-        <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 45%, rgba(8,8,8,0.85) 100%)' }} />
+          className="aspect-[4/5] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.03]"
+          style={{
+            WebkitMaskImage: 'linear-gradient(180deg, #000 60%, transparent 100%)',
+            maskImage: 'linear-gradient(180deg, #000 60%, transparent 100%)',
+          }} />
         <a href={f.li} target="_blank" rel="noopener noreferrer"
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-green/90 text-[#06101F] shadow-lg transition-transform [transition-timing-function:var(--ease-out)] hover:scale-110"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center border border-offwhite/60 text-offwhite transition-colors [transition-timing-function:var(--ease-out)] hover:border-gunmetal"
           aria-label={`LinkedIn ${f.name}`}>
-          <span className="text-[15px] font-bold">in</span>
+          <span className="text-[13px] font-bold">in</span>
         </a>
       </div>
-      <div className="p-7 md:p-8">
-        <p className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{f.school}</p>
-        <h3 className="font-serif-display mt-1 text-[30px] leading-none text-cream">{f.name}</h3>
-        <p className="mt-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-cream-soft">{f.role}</p>
-        <p className="mt-4 text-[15px] leading-relaxed text-cream-soft">{f.desc}</p>
+      <div className={`mt-6 ${align === 'right' ? 'md:text-right' : ''}`}>
+        <p className="eyebrow mb-3">{f.school} · {f.followers}</p>
+        <h3 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(34px, 4.5vw, 56px)' }}>{f.name}</h3>
+        <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.08em] text-gunmetal">{f.role}</p>
+        <p className={`mt-4 max-w-md text-[16px] leading-relaxed text-offwhite/70 ${align === 'right' ? 'md:ml-auto' : ''}`}>{f.desc}</p>
       </div>
     </div>
   </motion.div>
@@ -264,44 +218,49 @@ const Duo: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
-  // convergence vers le centre : les cartes partent écartées, se rapprochent
-  const leftRaw = useTransform(scrollYProgress, [0, 1], ['-7%', '0%']);
-  const rightRaw = useTransform(scrollYProgress, [0, 1], ['7%', '0%']);
+  const leftRaw = useTransform(scrollYProgress, [0, 1], ['-5%', '0%']);
+  const rightRaw = useTransform(scrollYProgress, [0, 1], ['5%', '0%']);
   const convL = reduce ? '0%' : leftRaw;
   const convR = reduce ? '0%' : rightRaw;
   return (
-    <section id="duo" className="section-clip relative bg-ink-2/40 px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="max-w-2xl">
-          <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              Stratégie + Tech.<br /><span className="aurora-text italic">Un seul interlocuteur.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              On enseigne ce qu'on déploie. 55 000 personnes nous suivent — la stratégie et la
-              technique dans la même équipe, pas de théorie hors-sol.
-            </p>
-          </Reveal>
-        </div>
+    <section id="duo" className="section-clip relative px-5 py-[var(--gap)] md:px-8" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal><Eyebrow>Le duo</Eyebrow></Reveal>
+        <Reveal delay={0.06} perspective>
+          <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(48px, 11vw, 128px)' }}>
+            Stratégie + Tech.<br /><span className="emph">Un seul interlocuteur.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <p className="mt-9 max-w-2xl text-[18px] leading-relaxed text-offwhite/70">
+            On enseigne ce qu'on déploie. 55 000 personnes nous suivent — la stratégie et la
+            technique dans la même équipe, pas de théorie hors-sol.
+          </p>
+        </Reveal>
 
-        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-2">
+        <div ref={ref} className="mt-[88px] grid gap-12 md:grid-cols-2 md:gap-x-16">
           {FOUNDERS.map((f, i) => (
             <motion.div key={f.name} {...reveal(i * 0.12, !!reduce)}>
-              <DuoCard f={f} conv={i === 0 ? convL : convR} />
+              <DuoFigure f={f} conv={i === 0 ? convL : convR} align={i === 0 ? 'left' : 'right'} />
             </motion.div>
           ))}
         </div>
 
-        {/* impressions / mois en count-up */}
+        {/* chiffres en display — 55k cumulés · 2,6M impressions/mois */}
         <Reveal delay={0.1}>
-          <div className="mt-12 flex flex-col items-center gap-1 text-center">
-            <span className="font-serif-display text-cream" style={{ fontSize: 'clamp(48px, 9vw, 92px)' }}>
-              <CountUp to={2.6} decimals={1} suffix=" M" />
-            </span>
-            <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.18em] text-cream-dim">impressions LinkedIn / mois · 55 000 abonnés</span>
+          <div className="mt-[88px] grid gap-y-12 border-t border-gunmetal/25 pt-12 sm:grid-cols-2">
+            <div>
+              <span className="font-serif-display block leading-[0.85] text-offwhite" style={{ fontSize: 'clamp(64px, 12vw, 136px)' }}>
+                <CountUp to={2.6} decimals={1} suffix=" M" />
+              </span>
+              <span className="eyebrow mt-3 block">impressions LinkedIn / mois</span>
+            </div>
+            <div className="sm:text-right">
+              <span className="font-serif-display block leading-[0.85] text-offwhite" style={{ fontSize: 'clamp(64px, 12vw, 136px)' }}>
+                <CountUp to={55} suffix=" k" />
+              </span>
+              <span className="eyebrow mt-3 block">abonnés cumulés · on enseigne ce qu'on déploie</span>
+            </div>
           </div>
         </Reveal>
       </div>
@@ -310,37 +269,33 @@ const Duo: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 3. LE PROBLÈME (before) — scène désaturée/lourde, watermark « aujourd'hui »
-// rouge sourd, parallax doux. Tension narrative avant la métamorphose.
+// 3. LE PROBLÈME — composition typo plein écran, watermark « aujourd'hui ».
 // ---------------------------------------------------------------------
 const Probleme: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const yRaw = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
+  const yRaw = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
   const y = reduce ? '0%' : yRaw;
   return (
     <section id="probleme" ref={ref}
-      className="section-clip relative isolate flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      {/* fond désaturé, lourd — gris-bleu sourd, pas de Grainient lumineux ici */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: 'radial-gradient(80% 80% at 50% 50%, #0b0e16 0%, #07090f 70%, #050709 100%)' }} />
+      className="section-clip relative isolate flex min-h-[80svh] items-center overflow-hidden px-5 md:px-8">
       <motion.div aria-hidden style={{ y }}
-        className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
-        <span className="serif-watermark font-serif-display text-[#ff3b53]/[0.06]" style={{ fontSize: 'clamp(110px, 30vw, 480px)' }}>
+        className="pointer-events-none absolute inset-0 z-[0] flex items-center justify-center">
+        <span className="serif-watermark text-offwhite/[0.05]" style={{ fontSize: 'clamp(110px, 30vw, 460px)' }}>
           aujourd'hui
         </span>
       </motion.div>
-      <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <Reveal><div className="flex justify-center"><div className="eyebrow mb-5 flex items-center gap-2.5 text-[11px] text-[#ff5c70]"><span className="h-1.5 w-1.5 rounded-full bg-[#ff3b53]" />Le problème</div></div></Reveal>
+      <div className="relative z-10 mx-auto w-full max-w-[1200px]">
+        <Reveal><Eyebrow>Le problème</Eyebrow></Reveal>
         <Reveal delay={0.08} perspective>
-          <p className="font-serif-display leading-[1.05] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 6vw, 76px)' }}>
+          <p className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(40px, 9vw, 112px)' }}>
             La saisie manuelle. Les heures perdues.
-            <br /><span className="italic text-[#ff8a98]">L'IA qu'on teste sans jamais déployer.</span>
+            <br /><span className="text-offwhite/55">L'IA qu'on teste sans jamais déployer.</span>
           </p>
         </Reveal>
         <Reveal delay={0.16}>
-          <p className="mx-auto mt-7 max-w-xl text-[16px] leading-relaxed text-cream-soft">
+          <p className="mt-9 max-w-xl text-[18px] leading-relaxed text-offwhite/70">
             Des outils empilés, des POC abandonnés, des équipes qui doutent. La promesse de
             l'IA reste une promesse. C'est là que la ligne se tend.
           </p>
@@ -351,7 +306,7 @@ const Probleme: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 6. LES RÉSULTATS — cartes parallaxe, chiffres count-up, détail hover-reveal.
+// 6. LES RÉSULTATS — chiffres-manifestes en display, cas en bandes de type.
 // ---------------------------------------------------------------------
 const KPIS: { val: React.ReactNode; label: string }[] = [
   { val: <><CountUp to={80} />%</>, label: 'de temps de saisie économisé' },
@@ -382,63 +337,54 @@ const CASES = [
 const Resultats: React.FC = () => {
   const reduce = useReducedMotion();
   return (
-    <section id="resultats" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
-          <div>
-            <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
-            <Reveal delay={0.06} perspective>
-              <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
-                Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
-              </h2>
-            </Reveal>
-          </div>
-          <Reveal delay={0.12}>
-            <p className="text-[16px] leading-relaxed text-cream-soft md:pb-3">
-              Des chiffres réels, issus de missions menées de bout en bout. Anonymisés à la demande des clients.
-            </p>
-          </Reveal>
-        </div>
+    <section id="resultats" className="section-clip relative px-5 md:px-8" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
+        <Reveal delay={0.06} perspective>
+          <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(48px, 11vw, 128px)' }}>
+            Des résultats.<br /><span className="emph">Pas des slides.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <p className="mt-9 max-w-2xl text-[18px] leading-relaxed text-offwhite/70">
+            Des chiffres réels, issus de missions menées de bout en bout. Anonymisés à la demande des clients.
+          </p>
+        </Reveal>
 
-        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
+        {/* chiffres-manifestes en display */}
+        <div className="mt-[88px] grid grid-cols-2 gap-x-8 gap-y-16 md:grid-cols-3 md:gap-y-20">
           {KPIS.map((k, i) => (
-            <motion.div key={i}
-              {...reveal((i % 3) * 0.08, !!reduce)}
-              className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
+            <motion.div key={i} {...reveal((i % 3) * 0.08, !!reduce)}>
+              <div className="font-serif-display leading-[0.82] text-offwhite" style={{ fontSize: 'clamp(56px, 10vw, 128px)' }}>
                 {k.val}
               </div>
-              <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
+              <div className="mt-4 max-w-[220px] text-[14px] leading-snug text-offwhite/65">{k.label}</div>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-24 grid gap-5 md:grid-cols-2">
+        {/* cas en bandes de type — filets gunmetal, zéro carte. */}
+        <div className="mt-[88px] divide-y divide-gunmetal/20 border-t border-gunmetal/20">
           {CASES.map((c, i) => (
-            <motion.article key={c.sector} tabIndex={0}
-              {...reveal((i % 2) * 0.1, !!reduce)}
-              whileHover={reduce ? undefined : { y: -6 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="case-card group glass relative flex flex-col gap-4 overflow-hidden rounded-3xl p-7 outline-none focus-visible:-translate-y-1 md:p-9">
-              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.14em] text-cyan">{c.sector}</span>
-              <div className="space-y-3 text-[14.5px] leading-relaxed">
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Problème · </span>{c.problem}</p>
-                <p className="text-cream-soft"><span className="font-semibold text-cream">Solution · </span>{c.solution}</p>
+            <motion.article key={c.sector}
+              {...reveal((i % 2) * 0.08, !!reduce)}
+              className="case-card group grid gap-6 py-12 md:grid-cols-[0.8fr_1.6fr_auto] md:items-baseline md:gap-12">
+              <span className="text-[13px] font-medium uppercase tracking-[0.1em] text-gunmetal">{c.sector}</span>
+              <div className="space-y-3 text-[16px] leading-relaxed">
+                <p className="text-offwhite/75"><span className="font-bold text-offwhite">Problème · </span>{c.problem}</p>
+                <p className="text-offwhite/75"><span className="font-bold text-offwhite">Solution · </span>{c.solution}</p>
+                <p className="text-[13px] text-offwhite/50">{c.resultLabel}</p>
               </div>
-              <div className="mt-auto flex items-end justify-between border-t border-green/12 pt-5">
-                <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.12em] text-cream-dim">Résultat</span>
-                <span className="font-serif-display text-cream transition-[transform,color] duration-400 [transition-timing-function:var(--ease-out)] group-hover:text-green group-focus-within:text-green md:translate-y-1 md:opacity-70 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100"
-                  style={{ fontSize: 'clamp(40px, 6vw, 64px)' }}>
-                  {c.result}
-                </span>
-              </div>
-              <p className="text-[12.5px] leading-snug text-cream-dim">{c.resultLabel}</p>
+              <span className="font-serif-display leading-[0.85] text-offwhite transition-colors duration-300 group-hover:text-gunmetal"
+                style={{ fontSize: 'clamp(48px, 7vw, 88px)' }}>
+                {c.result}
+              </span>
             </motion.article>
           ))}
         </div>
 
         <Reveal delay={0.1}>
-          <div className="mt-12 flex justify-center">
+          <div className="mt-16">
             <SecondaryButton href={CASES_URL} external arrow>Voir tous les cas clients</SecondaryButton>
           </div>
         </Reveal>
@@ -448,9 +394,8 @@ const Resultats: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 7. LA FORMATION — « On forme vos équipes à faire sans nous. »
-// 10 modules · 3 niveaux · 200–1250 € · 70 % pratique. Galerie drag horizontal
-// + barre « 70 % » qui se remplit. Sans Qualiopi/OF.
+// 7. LA FORMATION — bande de type + galerie drag horizontal (10 modules).
+// Sans Qualiopi/OF.
 // ---------------------------------------------------------------------
 const CATALOGUE = [
   ['F01', 'IA Essentielle', 'Découverte', '300 €'],
@@ -464,16 +409,10 @@ const CATALOGUE = [
   ['F09', 'IA & Données', 'Avancé', '1 000 €'],
   ['F10', 'Architecture IA sur-mesure', 'Avancé', '1 250 €'],
 ] as const;
-const LEVEL_TINT: Record<string, string> = {
-  'Découverte': 'text-mint border-mint/30',
-  'Intermédiaire': 'text-cyan border-cyan/30',
-  'Avancé': 'text-green border-green/30',
-};
 const Formation: React.FC = () => {
   const reduce = useReducedMotion();
   const barRef = useRef<HTMLDivElement>(null);
   const inView = useInView(barRef, { once: true, margin: '-15%' });
-  // drag horizontal (pointer) — translate via state, pas de lib
   const trackRef = useRef<HTMLDivElement>(null);
   const drag = React.useRef({ down: false, startX: 0, scroll: 0 });
   const onDown = (e: React.PointerEvent) => {
@@ -490,64 +429,62 @@ const Formation: React.FC = () => {
     trackRef.current?.releasePointerCapture(e.pointerId);
   };
   return (
-    <section id="formation" className="section-clip relative px-0 py-[clamp(120px,18vh,240px)]">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="max-w-3xl">
-          <Reveal><Eyebrow>La formation</Eyebrow></Reveal>
-          <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6vw, 76px)' }}>
-              On forme vos équipes<br /><span className="aurora-text italic">à faire sans nous.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              10 modules · 3 niveaux · 200 à 1 250 € par personne. On ne forme pas pour cocher
-              une case : on forme pour que vos équipes utilisent l'IA dès le lendemain.
-            </p>
-          </Reveal>
+    <section id="formation" className="section-clip relative px-0" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+        <Reveal><Eyebrow>La formation</Eyebrow></Reveal>
+        <Reveal delay={0.06} perspective>
+          <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(44px, 10vw, 120px)' }}>
+            On forme vos équipes<br /><span className="emph">à faire sans nous.</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <p className="mt-9 max-w-2xl text-[18px] leading-relaxed text-offwhite/70">
+            10 modules · 3 niveaux · 200 à 1 250 € par personne. On ne forme pas pour cocher
+            une case : on forme pour que vos équipes utilisent l'IA dès le lendemain.
+          </p>
+        </Reveal>
 
-          {/* barre 70 % pratique qui se remplit */}
-          <div ref={barRef} className="mt-8 max-w-md">
-            <div className="mb-2 flex items-baseline justify-between">
-              <span className="text-[12px] font-satoshi font-bold uppercase tracking-[0.14em] text-cream-dim">Part de pratique</span>
-              <span className="font-serif-display text-3xl text-cream">{inView ? <CountUp to={70} suffix=" %" /> : '0 %'}</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.05]">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-green to-cyan"
-                initial={{ width: '0%' }}
-                animate={inView ? { width: '70%' } : { width: '0%' }}
-                transition={reduce ? { duration: 0 } : { duration: 1.4, ease: EASE }}
-              />
-            </div>
+        {/* barre 70 % pratique qui se remplit — filet gunmetal. */}
+        <div ref={barRef} className="mt-12 max-w-md">
+          <div className="mb-3 flex items-baseline justify-between">
+            <span className="eyebrow">Part de pratique</span>
+            <span className="font-serif-display text-[40px] leading-none text-offwhite">{inView ? <CountUp to={70} suffix=" %" /> : '0 %'}</span>
+          </div>
+          <div className="h-px w-full overflow-hidden bg-gunmetal/20">
+            <motion.div
+              className="h-full bg-gunmetal"
+              initial={{ width: '0%' }}
+              animate={inView ? { width: '70%' } : { width: '0%' }}
+              transition={reduce ? { duration: 0 } : { duration: 1.4, ease: EASE }}
+            />
           </div>
         </div>
       </div>
 
-      {/* GALERIE drag horizontal — 10 modules */}
+      {/* GALERIE drag horizontal — 10 modules, bandes de type, zéro carte. */}
       <div
         ref={trackRef}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerLeave={onUp}
-        className="drag-x mt-14 flex gap-5 overflow-x-auto px-5 pb-4 md:px-8">
+        className="drag-x mt-16 flex gap-px overflow-x-auto px-5 md:px-8">
         {CATALOGUE.map(([code, title, level, price], i) => (
           <motion.article
             key={code}
             {...reveal(Math.min(i, 4) * 0.06, !!reduce)}
-            className="glass flex w-[78vw] max-w-[320px] shrink-0 select-none flex-col rounded-3xl p-7 md:w-[300px]">
-            <span className={`self-start rounded-full border px-2.5 py-1 text-[10px] font-satoshi font-bold uppercase tracking-[0.12em] ${LEVEL_TINT[level]}`}>{level}</span>
-            <span className="font-serif-display mt-5 text-lg text-green/50">{code}</span>
-            <h3 className="font-serif-display mt-1 text-[26px] leading-[1.05] text-cream">{title}</h3>
-            <div className="mt-auto flex items-end justify-between pt-8">
-              <span className="font-serif-display text-4xl text-cream">{price}</span>
-              <span className="text-[11px] font-satoshi font-bold uppercase tracking-[0.1em] text-cream-dim">/ pers.</span>
+            className="flex w-[72vw] max-w-[300px] shrink-0 select-none flex-col border-l border-gunmetal/25 px-7 py-2 md:w-[280px]">
+            <span className="eyebrow">{level}</span>
+            <span className="font-serif-display mt-6 text-[15px] text-gunmetal">{code}</span>
+            <h3 className="font-serif-display mt-1 text-offwhite" style={{ fontSize: 'clamp(26px, 3vw, 34px)' }}>{title}</h3>
+            <div className="mt-auto flex items-end justify-between pt-10">
+              <span className="font-serif-display text-[40px] text-offwhite">{price}</span>
+              <span className="eyebrow">/ pers.</span>
             </div>
           </motion.article>
         ))}
       </div>
-      <p className="mx-auto mt-6 max-w-6xl px-5 text-[13px] text-cream-dim md:px-8">
+      <p className="mx-auto mt-8 max-w-[1200px] px-5 text-[14px] text-offwhite/55 md:px-8">
         Glissez pour parcourir les 10 modules. Financement sur budget formation entreprise.
       </p>
     </section>
@@ -555,8 +492,7 @@ const Formation: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 8. LA MÉTHODE — Diagnostic → Orientation → Déploiement → Optimisation.
-// Diagramme tracé par une ligne au scroll, nœuds qui s'illuminent.
+// 8. LA MÉTHODE — diagramme tracé par une ligne au scroll (filet gunmetal).
 // ---------------------------------------------------------------------
 const STEPS = [
   { k: 'Diagnostic', meta: '30 min', d: 'On comprend votre contexte, vos irritants, vos objectifs. Gratuit, sans engagement.' },
@@ -569,9 +505,6 @@ const Methode: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 65%'] });
   const pathLength = reduce ? 1 : scrollYProgress;
-  // PERF — l'étape active n'est suivie que par un COMPTEUR (nb d'étapes allumées),
-  // mis à jour seulement au FRANCHISSEMENT de seuil — plus de `setState` avec un
-  // nouveau tableau à chaque frame de scroll (qui re-rendait toute la section).
   const [activeCount, setActiveCount] = React.useState(reduce ? STEPS.length : 0);
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     if (reduce) return;
@@ -581,41 +514,33 @@ const Methode: React.FC = () => {
   });
 
   return (
-    <section id="methode" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/4 -z-[1] h-[50vh] w-[50vh] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
-      <div className="mx-auto max-w-4xl text-center">
-        <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
+    <section id="methode" className="section-clip relative px-5 md:px-8" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+      <div className="mx-auto max-w-[1200px]">
+        <Reveal><Eyebrow>La méthode</Eyebrow></Reveal>
         <Reveal delay={0.06} perspective>
-          <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(36px, 6.5vw, 80px)' }}>
-            Quatre temps.<br /><span className="aurora-text italic">Une seule ligne.</span>
+          <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(44px, 10vw, 120px)' }}>
+            Quatre temps.<br /><span className="emph">Une seule ligne.</span>
           </h2>
         </Reveal>
       </div>
 
-      <div ref={ref} className="relative mx-auto mt-16 max-w-2xl pl-12 md:pl-16">
+      <div ref={ref} className="relative mx-auto mt-[88px] max-w-3xl pl-12 md:pl-16">
         <svg aria-hidden className="pointer-events-none absolute left-[18px] top-2 h-full w-2 md:left-[26px]"
           viewBox="0 0 2 100" preserveAspectRatio="none" fill="none">
-          <path d="M1 0 V100" stroke="rgba(12,196,129,0.14)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-          <motion.path d="M1 0 V100" stroke="url(#methGrad)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
-          <defs>
-            <linearGradient id="methGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
-            </linearGradient>
-          </defs>
+          <path d="M1 0 V100" stroke="rgba(111,135,156,0.18)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <motion.path d="M1 0 V100" stroke="#6f879c" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength }} />
         </svg>
-        <ol className="space-y-12 md:space-y-16">
+        <ol className="space-y-16">
           {STEPS.map((s, i) => (
             <li key={s.k} className="relative">
               <span aria-hidden data-on={i < activeCount ? 'true' : 'false'}
-                className="ligne-node absolute -left-[38px] top-2 h-4 w-4 rounded-full border border-green/40 bg-ink md:-left-[50px]" />
+                className="ligne-node absolute -left-[38px] top-3 h-3.5 w-3.5 border border-gunmetal/50 bg-canvas md:-left-[50px]" />
               <Reveal delay={0.05 * i}>
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <h3 className="font-serif-display text-[30px] leading-none text-cream md:text-[40px]">{s.k}</h3>
-                  <span className="rounded-full border border-green/30 px-3 py-1 text-[12px] font-satoshi font-bold uppercase tracking-[0.12em] text-green">{s.meta}</span>
+                <div className="flex flex-wrap items-baseline gap-4">
+                  <h3 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(34px, 5vw, 56px)' }}>{s.k}</h3>
+                  <span className="eyebrow border border-gunmetal/40 px-3 py-1">{s.meta}</span>
                 </div>
-                <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream-soft">{s.d}</p>
+                <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-offwhite/70">{s.d}</p>
               </Reveal>
             </li>
           ))}
@@ -626,37 +551,25 @@ const Methode: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 9. LE ROI EN UN CHIFFRE — « 159 % » plein écran. Une boucle d'accent se
-// trace autour du chiffre au scroll. Respiration max.
+// 9. LE ROI EN UN CHIFFRE — « 159 % » plein écran, prisme derrière.
 // ---------------------------------------------------------------------
 const Roi: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 80%', 'center center'] });
-  const loop = reduce ? 1 : scrollYProgress;
   return (
-    <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden bg-ink px-5 md:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[120px]"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(12,196,129,0.18), transparent 65%)' }} />
+    <section id="roi" className="section-clip relative isolate flex min-h-[90svh] items-center justify-center overflow-hidden px-5 md:px-8">
+      {/* prisme losange derrière le chiffre — edge-faded. */}
+      <PrismShard className="pointer-events-none absolute left-1/2 top-1/2 h-[80vh] w-[80vh] max-w-[800px] -translate-x-1/2 -translate-y-1/2"
+        scale={1} aberration={3} speed={22} rotate={16} />
+      <div aria-hidden className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(60% 60% at 50% 50%, rgba(73,87,100,0.25) 0%, rgba(73,87,100,0.7) 70%)' }} />
       <div ref={ref} className="relative z-10 flex flex-col items-center text-center">
-        {/* la boucle SVG autour du chiffre — se trace au scroll */}
-        <svg aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2" viewBox="0 0 400 400" fill="none">
-          <motion.ellipse cx="200" cy="200" rx="185" ry="120"
-            stroke="url(#roiGrad)" strokeWidth="2" strokeLinecap="round" className="accent-stroke"
-            style={{ pathLength: loop, rotate: -8 }} />
-          <defs>
-            <linearGradient id="roiGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#0cc481" />
-              <stop offset="1" stopColor="#3fe0a8" />
-            </linearGradient>
-          </defs>
-        </svg>
         <Reveal><Eyebrow>Le ROI en un chiffre</Eyebrow></Reveal>
-        <div className="font-serif-display leading-[0.8] text-cream" style={{ fontSize: 'clamp(120px, 28vw, 360px)' }}>
+        <div className="font-serif-display leading-[0.8] text-offwhite" style={{ fontSize: 'clamp(120px, 30vw, 380px)' }}>
           <CountUp to={159} suffix=" %" />
         </div>
         <Reveal delay={0.1}>
-          <p className="mt-4 text-[16px] text-cream-soft">Documenté, pas promis.</p>
+          <p className="mt-6 text-[18px] text-offwhite/70">Documenté, pas promis.</p>
         </Reveal>
       </div>
     </section>
@@ -664,7 +577,7 @@ const Roi: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 10. FAQ — accordéons hover-reveal.
+// 10. FAQ — accordéons, filets gunmetal.
 // ---------------------------------------------------------------------
 const FAQ_ITEMS = [
   { q: 'Par où commencer ?', a: 'Par un appel de 30 minutes, gratuit. On comprend votre contexte et on vous dit honnêtement si l\'IA est pertinente — et par quoi commencer. Pas de vente forcée.' },
@@ -676,17 +589,16 @@ const FaqRow: React.FC<{ q: string; a: string }> = ({ q, a }) => {
   const reduce = useReducedMotion();
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="border-b border-green/12">
+    <div className="border-b border-gunmetal/20">
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="group flex w-full items-center justify-between gap-4 py-6 text-left outline-none [touch-action:manipulation]">
-        <span className="relative font-serif-display text-[22px] leading-tight text-cream md:text-[28px]">
+        className="group flex w-full items-center justify-between gap-4 py-8 text-left outline-none [touch-action:manipulation]">
+        <span className="font-serif-display text-offwhite transition-colors duration-300 group-hover:text-gunmetal" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)' }}>
           {q}
-          <span aria-hidden className="absolute -bottom-1 left-0 h-px w-0 bg-green/60 transition-[width] duration-300 [transition-timing-function:var(--ease-out)] group-hover:w-full group-focus-visible:w-full" />
         </span>
         <motion.span aria-hidden animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.3, ease }}
-          className="shrink-0 text-2xl leading-none text-green">+</motion.span>
+          className="shrink-0 text-2xl leading-none text-gunmetal">+</motion.span>
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -696,7 +608,7 @@ const FaqRow: React.FC<{ q: string; a: string }> = ({ q, a }) => {
             exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
             transition={{ type: reduce ? 'tween' : 'spring', stiffness: 220, damping: 30, opacity: { duration: 0.25 } }}
             className="overflow-hidden">
-            <p className="max-w-2xl pb-6 text-[15px] leading-relaxed text-cream-soft">{a}</p>
+            <p className="max-w-2xl pb-8 text-[17px] leading-relaxed text-offwhite/70">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -704,15 +616,15 @@ const FaqRow: React.FC<{ q: string; a: string }> = ({ q, a }) => {
   );
 };
 const Faq: React.FC = () => (
-  <section id="faq" className="section-clip relative px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-    <div className="mx-auto max-w-3xl">
+  <section id="faq" className="section-clip relative px-5 md:px-8" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+    <div className="mx-auto max-w-[1200px]">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
       <Reveal delay={0.06} perspective>
-        <h2 className="font-serif-display mb-10 leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(34px, 5.5vw, 64px)' }}>
-          Tout ce qu'on <span className="aurora-text italic">nous demande.</span>
+        <h2 className="font-serif-display mb-12 text-offwhite" style={{ fontSize: 'clamp(40px, 8vw, 104px)' }}>
+          Tout ce qu'on <span className="emph">nous demande.</span>
         </h2>
       </Reveal>
-      <div>
+      <div className="border-t border-gunmetal/20">
         {FAQ_ITEMS.map((f) => <FaqRow key={f.q} q={f.q} a={f.a} />)}
       </div>
     </div>
@@ -721,77 +633,56 @@ const Faq: React.FC = () => (
 
 // ---------------------------------------------------------------------
 // 11. CTA FINAL — « Le parcours commence par une conversation. »
-// Le « Z » fait écho au « A » du hero (accent vert statique). Calendly inline.
+// Prisme derrière. Calendly inline. Écho A → Z.
 // ---------------------------------------------------------------------
-const AccentZ: React.FC = () => (
-  <svg viewBox="0 0 120 120" className="accent-glyph inline-block h-[0.82em] w-[0.82em] align-baseline" aria-hidden fill="none">
-    <defs>
-      <linearGradient id="ctaZ" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#0cc481" />
-        <stop offset="1" stopColor="#3fe0a8" />
-      </linearGradient>
-    </defs>
-    <path
-      d="M22 18 L98 18 L22 102 L98 102"
-      stroke="url(#ctaZ)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"
-    />
-  </svg>
-);
 const CtaFinal: React.FC = () => {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: '-20%' });
   return (
     <section id="contact" ref={ref}
-      className="section-clip relative isolate overflow-hidden bg-ink px-5 py-[clamp(120px,18vh,240px)] md:px-8">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.14} grainAmount={0.08} contrast={1.3}
-          saturation={1.0} zoom={1.0} warpStrength={1.1}
-        />
-      </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: 'radial-gradient(90% 90% at 50% 40%, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.7) 65%, rgba(8,8,8,0.92) 100%)' }} />
+      className="section-clip relative isolate overflow-hidden px-5 md:px-8" style={{ paddingTop: 'var(--gap)', paddingBottom: 'var(--gap)' }}>
+      <Prism className="pointer-events-none absolute -left-[10%] top-1/2 h-[90vh] w-[70vh] max-w-[700px] -translate-y-1/2"
+        scale={1} aberration={3.2} speed={30} rotate={-18} />
+      <div aria-hidden className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(90% 90% at 30% 40%, rgba(73,87,100,0.2) 0%, rgba(73,87,100,0.7) 70%)' }} />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1fr_1.05fr]">
-        <div className="text-center lg:text-left">
-          <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
+      <div className="relative z-10 mx-auto grid max-w-[1200px] items-center gap-14 lg:grid-cols-[1fr_1.05fr]">
+        <div>
+          <Reveal><Eyebrow>30 minutes, gratuit</Eyebrow></Reveal>
           <Reveal delay={0.06} perspective>
-            <h2 className="font-serif-display leading-[1.0] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 6.5vw, 80px)' }}>
-              Le parcours commence<br />par une <span className="aurora-text italic">conversation.</span>
+            <h2 className="font-serif-display text-offwhite" style={{ fontSize: 'clamp(44px, 9vw, 120px)' }}>
+              Le parcours<br />commence par une <span className="emph">conversation.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="mx-auto mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft lg:mx-0">
+            <p className="mt-9 max-w-md text-[18px] leading-relaxed text-offwhite/70">
               On comprend votre contexte, on vous dit honnêtement où l'IA crée de la valeur chez vous.
               Sans engagement.
             </p>
           </Reveal>
-          {/* écho A → Z : accent vert signature, du A du hero au Z ici */}
+          {/* écho A → Z */}
           <Reveal delay={0.16}>
-            <div className="mt-8 flex items-center justify-center gap-3 lg:justify-start">
-              <span className="font-serif-display text-3xl italic text-cream-soft">De A…</span>
-              <span className="font-serif-display text-3xl italic text-cream">à</span>
-              <AccentZ />
+            <div className="mt-9 flex items-center gap-3 font-serif-display text-offwhite/70" style={{ fontSize: 'clamp(24px, 3vw, 34px)' }}>
+              <span>De A…</span>
+              <span className="text-offwhite emph">à Z<span className="prism-glyph">.</span></span>
             </div>
           </Reveal>
           <Reveal delay={0.2}>
-            <div className="mt-8 flex justify-center lg:justify-start">
+            <div className="mt-10">
               <MagneticPrimary href={CALENDLY} external>Réserver mon créneau</MagneticPrimary>
             </div>
           </Reveal>
         </div>
 
         <Reveal delay={0.1}>
-          <div className="glass-strong overflow-hidden rounded-3xl p-1.5 md:p-2">
+          <div className="overflow-hidden border border-gunmetal/25">
             {inView && (
               <iframe
                 title="Réserver un créneau de 30 minutes"
                 src={CALENDLY_EMBED}
                 loading="lazy"
-                className="h-[640px] w-full rounded-[20px] border-0 sm:h-[700px]"
+                className="h-[640px] w-full border-0 sm:h-[700px]"
               />
             )}
           </div>
@@ -802,49 +693,39 @@ const CtaFinal: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// 12. FOOTER — dispositif « footer-reveal » (rideau).
+// 12. FOOTER — dispositif footer-reveal (rideau), canvas slate.
 // ---------------------------------------------------------------------
 const Footer: React.FC = () => {
   return (
-    <footer className="footer-fixed isolate border-t border-green/12 px-5 py-16 md:px-8">
-      {/* SUPPRESSION DU FOND PERSISTANT — le footer est position:fixed (footer-reveal).
-          L'ancien <Grainient> WebGL animé vivait ici, DERRIÈRE tout le contenu, et
-          tournait en permanence pendant tout le scroll (fond persistant qui « bave »
-          sous toutes les sections). Remplacé par un fond near-black PROPRE, uni,
-          avec un halo dark-green STATIQUE confiné au footer (aucun grain/gradient
-          animé qui traîne). */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: '#080808' }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: 'radial-gradient(120% 120% at 50% 100%, rgba(12,196,129,0.10) 0%, rgba(15,28,28,0.45) 45%, #080808 100%)' }} />
+    <footer className="footer-fixed isolate border-t border-gunmetal/25 px-5 py-16 md:px-8">
       <div className="relative z-10 w-full">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="mx-auto grid max-w-[1200px] gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <a href="#top" className="font-serif-display text-4xl leading-none tracking-tight text-cream md:text-5xl">
-              AXEM<span className="aurora-text">.</span>
+            <a href="#top" className="font-serif-display text-[40px] leading-none tracking-tight text-offwhite md:text-[52px]">
+              AXEM<span className="prism-glyph">.</span>
             </a>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-soft">
+            <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-offwhite/70">
               Votre partenaire IA, de A à Z. Audit, conseil, déploiement, formation, production &amp; suivi.
             </p>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Navigation</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
+            <div className="eyebrow mb-5">Navigation</div>
+            <ul className="space-y-3 text-[15px] text-offwhite/70">
               {NAV_LINKS.map(([l, h]) => (
-                <li key={l}><a href={h} className="link-limitless hover:text-cream">{l}</a></li>
+                <li key={l}><a href={h} className="footer-link inline-block hover:text-offwhite">{l}</a></li>
               ))}
             </ul>
           </div>
           <div>
-            <div className="mb-4 text-[11px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">Contact</div>
-            <ul className="space-y-2 text-sm text-cream-soft">
-              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Réserver un appel</a></li>
-              <li><a href="mailto:contact@axem-ia.fr" className="link-limitless hover:text-cream">contact@axem-ia.fr</a></li>
-              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="link-limitless hover:text-cream">Cas clients</a></li>
+            <div className="eyebrow mb-5">Contact</div>
+            <ul className="space-y-3 text-[15px] text-offwhite/70">
+              <li><a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="footer-link inline-block hover:text-offwhite">Réserver un appel</a></li>
+              <li><a href="mailto:contact@axem-ia.fr" className="footer-link inline-block hover:text-offwhite">contact@axem-ia.fr</a></li>
+              <li><a href={CASES_URL} target="_blank" rel="noopener noreferrer" className="footer-link inline-block hover:text-offwhite">Cas clients</a></li>
             </ul>
           </div>
         </div>
-        <div className="mx-auto mt-12 max-w-5xl border-t border-green/8 pt-6 text-center text-xs text-cream-dim">
+        <div className="mx-auto mt-14 max-w-[1200px] border-t border-gunmetal/15 pt-6 text-center text-[13px] text-offwhite/50">
           © 2026 AXEM IA — Paris, France.
         </div>
       </div>
@@ -853,24 +734,20 @@ const Footer: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------
-// PAGE — l'ordre des sections suit le récit du parcours AXEM.
+// PAGE
 // ---------------------------------------------------------------------
 const Home: React.FC = () => {
   useLenis();
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
-      <div className="has-footer-reveal min-h-screen text-cream">
+      <div className="has-footer-reveal min-h-screen text-offwhite">
         <Nav />
         <main id="contenu" className="reveal-main">
-          {/* 0 Hero · 1 Preuve · 2 Duo · 3 Problème · 4 Métamorphose(WOW) ·
-              5 Parcours 7 étapes · 6 Résultats · 7 Formation · 8 Méthode ·
-              9 ROI · 10 FAQ · 11 CTA(Z) · 12 Footer */}
           <Hero />
           <TrustBar />
           <Duo />
           <Probleme />
-          {/* sections pinnées lourdes : montées seulement à l'approche du viewport */}
           <LazySection minHeight="300vh"><Metamorphose /></LazySection>
           <LazySection minHeight="420vh"><Parcours /></LazySection>
           <Resultats />
