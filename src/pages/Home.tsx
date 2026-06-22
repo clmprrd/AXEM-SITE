@@ -529,38 +529,58 @@ const Module03: React.FC = () => {
 // =====================================================================
 // MODULE 04 — CALCULATEUR « VIE RÉELLE » + COMPTEUR LIVE
 // =====================================================================
-// Compteur live ancré sur le temps : base + taux × secondes écoulées.
-// Une seule boucle rAF, largeur fixe (tabular-nums) → anti-CLS.
-const LIVE_BASE = 128_400;      // heures déjà économisées (point d'ancrage)
-const LIVE_RATE = 0.42;         // heures / seconde (incrément réaliste)
-const LIVE_EPOCH = Date.UTC(2026, 0, 1) / 1000; // ancrage temporel fixe
+// Compteur live ancré sur le temps : base + taux × secondes écoulées depuis
+// MINUIT (epoch glissant) → total réaliste (≈ base + max ~140 k/jour), jamais
+// des millions. Une seule boucle rAF, largeur fixe (tabular-nums) → anti-CLS.
+const LIVE_BASE = 412_000;      // heures déjà économisées (ancrage plausible)
+const LIVE_RATE = 1.6;          // heures / seconde (incrément visible mais sobre)
+const liveEpoch = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() / 1000; };
+
+const fmtLive = (n: number) => Math.floor(n).toLocaleString('fr-FR');
 
 const LiveCounter: React.FC = () => {
   const reduce = !!useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    const compute = () => LIVE_BASE + LIVE_RATE * (Date.now() / 1000 - LIVE_EPOCH);
-    const fmt = (n: number) =>
-      Math.floor(n).toLocaleString('fr-FR').replace(/ | /g, ' ');
-    if (reduce) {
-      if (ref.current) ref.current.textContent = fmt(compute());
-      return;
-    }
-    let raf = 0;
-    const loop = () => {
-      if (ref.current) ref.current.textContent = fmt(compute());
+    const el = ref.current;
+    if (!el) return;
+    const epoch = liveEpoch();
+    const compute = () => LIVE_BASE + LIVE_RATE * (Date.now() / 1000 - epoch);
+    el.textContent = fmtLive(compute()); // seed immediat (couvre reduced-motion)
+    if (reduce) return;
+    let raf = requestAnimationFrame(function loop() {
+      el.textContent = fmtLive(compute());
       raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    });
     return () => cancelAnimationFrame(raf);
   }, [reduce]);
-  // largeur réservée par un placeholder invisible (anti-CLS)
+  // Span rendu VIDE cote React (aucun enfant texte JSX a reconcilier par-dessus
+  // l'ecriture imperative). Largeur reservee par le placeholder (anti-CLS).
   return (
     <span className="live-counter relative inline-block text-right">
       <span aria-hidden className="invisible">000 000</span>
-      <span ref={ref} className="absolute inset-0 text-[var(--txt)]">{LIVE_BASE.toLocaleString('fr-FR')}</span>
+      <span ref={ref} className="absolute inset-0 text-[var(--txt)]" />
     </span>
   );
+};
+
+// count-up rAF one-shot à chaque changement de cible (pas par frame de scroll).
+// Anime depuis la valeur AFFICHÉE courante (suivie dans un ref synchronisé à
+// chaque frame) → pas de lag d'un cran quand on déplace vite les curseurs.
+const useAnimatedNumber = (value: number, decimals = 0) => {
+  const reduce = !!useReducedMotion();
+  const [shown, setShown] = useState(value);
+  const current = useRef(value);
+  useEffect(() => {
+    if (reduce) { current.current = value; setShown(value); return; }
+    const controls = animate(current.current, value, {
+      duration: 0.6, ease: EASE,
+      onUpdate: (v) => { current.current = v; setShown(+v.toFixed(decimals)); },
+      onComplete: () => { current.current = value; setShown(value); },
+    });
+    return () => controls.stop();
+  }, [value, decimals, reduce]);
+  return shown;
 };
 
 const Module04: React.FC = () => {
@@ -574,21 +594,6 @@ const Module04: React.FC = () => {
   const weeks = +(hoursPerMonth / 35).toFixed(1);                 // semaines de travail (35 h)
   const etp = +((hoursPerMonth * 12) / (35 * 47)).toFixed(1);     // ETP libéré (47 sem actives/an)
 
-  // count-up rAF one-shot à chaque changement de valeur cible (pas par frame de scroll).
-  const useAnimatedNumber = (value: number, decimals = 0) => {
-    const [shown, setShown] = useState(value);
-    const prev = useRef(value);
-    useEffect(() => {
-      if (reduce) { setShown(value); prev.current = value; return; }
-      const controls = animate(prev.current, value, {
-        duration: 0.6, ease: EASE,
-        onUpdate: (v) => setShown(+v.toFixed(decimals)),
-        onComplete: () => { prev.current = value; },
-      });
-      return () => controls.stop();
-    }, [value, decimals]);
-    return shown;
-  };
   const aHours = useAnimatedNumber(hoursPerMonth);
   const aWeeks = useAnimatedNumber(weeks, 1);
   const aEtp = useAnimatedNumber(etp, 1);
@@ -706,15 +711,17 @@ const Home: React.FC = () => {
       <div className="demo min-h-screen">
         <div className="demo-bg" aria-hidden />
         <div className="demo-grid" aria-hidden />
-        <Nav />
-        <main>
-          <Hero />
-          <Module01 />
-          <Module02 />
-          <Module03 />
-          <Module04 />
-        </main>
-        <Footer />
+        <div className="demo-content">
+          <Nav />
+          <main>
+            <Hero />
+            <Module01 />
+            <Module02 />
+            <Module03 />
+            <Module04 />
+          </main>
+          <Footer />
+        </div>
       </div>
     </MotionConfig>
   );

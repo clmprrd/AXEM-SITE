@@ -694,6 +694,11 @@ body {
   color: var(--txt);
   font-family: 'Poppins', sans-serif;
 }
+.demo {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
 .demo ::selection { background: rgba(56, 189, 248, 0.25); color: #fff; }
 .demo .d-display {
   font-family: 'Space Grotesk', sans-serif;
@@ -723,11 +728,15 @@ body {
   box-shadow: 0 10px 34px -18px rgba(0, 0, 0, 0.7);
 }
 
-/* fond global de page : bleu nuit + halo cyan statique très discret en haut */
+/* fond global de page : bleu nuit + halo cyan statique très discret en haut.
+   z-index:0 dans le contexte d'empilement isolé de `.demo` (PAS z-index:-1 qui,
+   sur un fixed, peut composer en NOIR par-dessus le contenu après scroll). Le
+   contenu (`.demo-content`) vit au-dessus en z-index:1. */
 .demo-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
+  pointer-events: none;
   background:
     radial-gradient(120% 80% at 50% -10%, rgba(56, 189, 248, 0.08), transparent 55%),
     radial-gradient(90% 70% at 85% 8%, rgba(91, 140, 255, 0.06), transparent 50%),
@@ -736,13 +745,18 @@ body {
 .demo-grid {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
+  pointer-events: none;
   background-image:
     linear-gradient(rgba(124, 160, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(124, 160, 255, 0.04) 1px, transparent 1px);
   background-size: 56px 56px;
   -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%);
   mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%);
+}
+.demo-content {
+  position: relative;
+  z-index: 1;
 }
 
 /* NAV ancres démo — pilule glass */
