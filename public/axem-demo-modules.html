@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AXEM — Modules (démo)</title>
+<meta name="description" content="Démo interactive AXEM — 4 modules d'UX/UI en HTML auto-contenu." />
+
+<!-- =====================================================================
+     AXEM — DÉMO « 4 MODULES UX/UI » · EXPORT HTML AUTO-CONTENU
+     ---------------------------------------------------------------------
+     Portage vanilla (zéro build, zéro dépendance) de la page React
+     `design/demo-modules`. Tout est inliné dans CE fichier : il s'ouvre
+     en double-clic, sans serveur. Polices via Google Fonts (lien CDN).
+
+     DA bleu nuit NEUTRE (#070B16 / #0B1020), accent UNIQUE cyan/bleu
+     (#38BDF8 / #5B8CFF).
+
+     MODULE 01 — Grille logos IA : spotlight (torche radiale lerp) +
+                 magnétique (lissé) + hover-reveal. Desktop only.
+     MODULE 02 — Node-graph workflow : tracé SVG (stroke-dashoffset) +
+                 point qui circule (animateMotion) + nœuds qui s'allument.
+     MODULE 03 — Before/After slider draggable (souris + tactile + clavier).
+     MODULE 04 — Calculateur « vie réelle » + compteur live d'impact.
+
+     PERF / QUALITÉ : transform/opacity/SVG only · spotlight via custom
+     props lissées (lerp) · mousemove throttlé en rAF · count-up rAF
+     one-shot · live counter une seule boucle ancrée sur le temps ·
+     prefers-reduced-motion → états finaux statiques · spotlight/magnétique
+     coupés au tactile (@media hover:hover) · responsive 375/768/1440.
+     ===================================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* =====================================================================
+   1. TOKENS & RESET
+   ===================================================================== */
+:root {
+  --bg-0: #070b16;
+  --bg-1: #0b1020;
+  --bg-2: #0e1530;
+  --line: rgba(124, 160, 255, 0.12);
+  --line-strong: rgba(124, 160, 255, 0.22);
+  --txt: #eef2ff;
+  --txt-soft: #aab4d4;
+  --txt-dim: #6b76a0;
+  --cyan: #38bdf8;
+  --blue: #5b8cff;
+  --accent-grad: linear-gradient(100deg, #38bdf8 0%, #5b8cff 100%);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+html, body { overflow-x: hidden; }
+
+body {
+  background-color: var(--bg-0);
+  color: var(--txt);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+::selection { background: rgba(56, 189, 248, 0.25); color: #fff; }
+::-moz-selection { background: rgba(56, 189, 248, 0.25); color: #fff; }
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+/* lien d'évitement accessible */
+.skip-link {
+  position: absolute;
+  left: 12px; top: 12px;
+  z-index: 100;
+  background: var(--cyan);
+  color: #061325;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 10px;
+  transform: translateY(-180%);
+  transition: transform 0.2s var(--ease-out);
+}
+.skip-link:focus { transform: translateY(0); outline: 2px solid #fff; outline-offset: 2px; }
+
+/* =====================================================================
+   2. TYPO HELPERS
+   ===================================================================== */
+.d-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+.d-eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+}
+.d-grad-text {
+  background-image: var(--accent-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--cyan);
+}
+.txt-soft { color: var(--txt-soft); }
+.txt-dim { color: var(--txt-dim); }
+.cyan { color: var(--cyan); }
+
+/* =====================================================================
+   3. FONDS GLOBAUX (halo + grille masquée)
+   ===================================================================== */
+.demo-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(56, 189, 248, 0.08), transparent 55%),
+    radial-gradient(90% 70% at 85% 8%, rgba(91, 140, 255, 0.06), transparent 50%),
+    var(--bg-0);
+}
+.demo-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(124, 160, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 160, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%);
+}
+.demo-content { position: relative; z-index: 1; }
+
+/* =====================================================================
+   4. LAYOUT UTILITAIRES
+   ===================================================================== */
+.section { position: relative; overflow-x: clip; padding: clamp(96px, 14vh, 180px) 20px; }
+@media (min-width: 768px) { .section { padding-left: 32px; padding-right: 32px; } }
+.wrap-2xl { max-width: 42rem; margin: 0 auto; }
+.wrap-3xl { max-width: 48rem; margin: 0 auto; }
+.wrap-4xl { max-width: 56rem; margin: 0 auto; }
+.wrap-5xl { max-width: 64rem; margin: 0 auto; }
+.text-center { text-align: center; }
+
+/* reveal scroll-in (remplace framer-motion <Reveal>) : opacity+translate, transform-only */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  will-change: transform, opacity;
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* =====================================================================
+   5. NAV (pilule d'ancres)
+   ===================================================================== */
+.nav-header {
+  position: fixed;
+  inset-inline: 0;
+  top: 16px;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+@media (min-width: 768px) { .nav-header { top: 24px; } }
+.demo-nav {
+  display: flex;
+  width: 100%;
+  max-width: 42rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 999px;
+  padding: 8px 12px 8px 20px;
+  background: rgba(7, 11, 22, 0.6);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: 0 8px 30px -16px rgba(0, 0, 0, 0.8);
+}
+.nav-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 20px; line-height: 1; color: var(--txt); }
+.nav-brand .tag { margin-left: 8px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--txt-dim); vertical-align: middle; }
+.nav-anchors { display: flex; align-items: center; gap: 4px; }
+@media (min-width: 640px) { .nav-anchors { gap: 8px; } }
+.demo-anchor {
+  position: relative;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--txt-dim);
+  transition: color 0.25s var(--ease-out);
+  touch-action: manipulation;
+}
+@media (min-width: 640px) { .demo-anchor { padding: 6px 12px; } }
+.demo-anchor .dot { margin-left: 8px; color: var(--line-strong); }
+.demo-anchor[data-active='true'] { color: var(--txt); }
+.demo-anchor[data-active='true']::after {
+  content: '';
+  position: absolute;
+  left: 6px; right: 6px; bottom: -6px;
+  height: 2px; border-radius: 2px;
+  background: var(--accent-grad);
+}
+
+/* =====================================================================
+   6. EN-TÊTE DE SECTION
+   ===================================================================== */
+.sec-head .eyebrow-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--cyan);
+}
+.sec-head .eyebrow-dot { height: 6px; width: 6px; border-radius: 50%; background: var(--cyan); display: inline-block; }
+.sec-head h2 { margin-top: 20px; color: var(--txt); font-size: clamp(30px, 5vw, 56px); }
+.sec-head p { margin: 16px auto 0; max-width: 36rem; font-size: 15px; line-height: 1.65; color: var(--txt-soft); }
+
+/* =====================================================================
+   7. HERO
+   ===================================================================== */
+.hero {
+  position: relative;
+  display: flex;
+  min-height: 78svh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160px 20px 96px;
+  text-align: center;
+}
+@media (min-width: 768px) { .hero { padding-left: 32px; padding-right: 32px; } }
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(13, 19, 41, 0.5);
+  padding: 6px 16px;
+  color: var(--cyan);
+}
+.ping { position: relative; display: inline-flex; height: 8px; width: 8px; }
+.ping .ring { position: absolute; inset: 0; border-radius: 50%; background: var(--cyan); opacity: 0.6; animation: ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite; }
+.ping .core { position: relative; display: inline-flex; height: 8px; width: 8px; border-radius: 50%; background: var(--cyan); }
+@keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+.hero h1 { margin-top: 32px; max-width: 56rem; color: var(--txt); font-size: clamp(38px, 8vw, 92px); text-wrap: balance; }
+.hero-sub { margin-top: 28px; max-width: 36rem; font-size: 16px; line-height: 1.65; color: var(--txt-soft); text-wrap: balance; }
+@media (min-width: 768px) { .hero-sub { font-size: 18px; } }
+.hero-chips { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(13, 19, 41, 0.4);
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--txt-soft);
+  transition: border-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  touch-action: manipulation;
+}
+.hero-chip:hover { border-color: var(--line-strong); color: var(--txt); }
+.hero-chip .num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--cyan); }
+
+/* =====================================================================
+   8. MODULE 01 — GRILLE LOGOS IA (spotlight + magnétique + reveal)
+   ===================================================================== */
+.tool-grid {
+  position: relative;
+  border-radius: 26px;
+  border: 1px solid var(--line);
+  background: rgba(11, 16, 32, 0.5);
+  overflow: hidden;
+  padding: 16px;
+  margin-top: 56px;
+}
+@media (min-width: 640px) { .tool-grid { padding: 24px; } }
+.tool-grid-torch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out);
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(56, 189, 248, 0.16),
+    rgba(91, 140, 255, 0.06) 40%,
+    transparent 65%
+  );
+}
+@media (hover: hover) and (pointer: fine) {
+  .tool-grid[data-lit='true'] .tool-grid-torch { opacity: 1; }
+}
+.tool-grid-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 640px) { .tool-grid-inner { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+.tool-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  text-align: center;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(9, 14, 28, 0.7);
+  transition: border-color 0.3s var(--ease-out), background-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out), transform 0.2s var(--ease-out);
+  will-change: transform;
+  outline: none;
+  touch-action: manipulation;
+}
+/* reveal entrée (chips) */
+.tool-chip-wrap { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out); }
+.tool-chip-wrap.is-in { opacity: 1; transform: none; }
+/* mode pointeur fin : chips assombris, révélés par la torche au hover */
+@media (hover: hover) and (pointer: fine) {
+  .tool-grid[data-lit='true'] .tool-chip { opacity: 0.55; }
+  .tool-chip { transition: opacity 0.35s var(--ease-out), border-color 0.3s var(--ease-out), background-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), transform 0.2s var(--ease-out); }
+  .tool-chip:hover {
+    opacity: 1 !important;
+    border-color: var(--line-strong);
+    background: rgba(14, 21, 46, 0.9);
+    box-shadow: 0 18px 40px -22px rgba(56, 189, 248, 0.5);
+  }
+}
+.tool-mono {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--cyan);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+.tool-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13.5px; color: var(--txt); }
+/* carte « ce qu'on fait avec » */
+.tool-reveal {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 6px);
+  width: max-content;
+  max-width: 230px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--txt-soft);
+  background: rgba(14, 21, 46, 0.96);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  z-index: 5;
+}
+.tool-chip:hover .tool-reveal,
+.tool-chip:focus-visible .tool-reveal,
+.tool-chip[data-open='true'] .tool-reveal {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.tool-reveal::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 100%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(14, 21, 46, 0.96);
+}
+.tool-hint { margin-top: 20px; text-align: center; font-size: 13px; color: var(--txt-dim); }
+
+/* =====================================================================
+   9. MODULE 02 — NODE-GRAPH WORKFLOW
+   ===================================================================== */
+.flow-desktop { position: relative; max-width: 56rem; margin: 56px auto 0; display: none; }
+@media (min-width: 768px) { .flow-desktop { display: block; } }
+.flow-svg { width: 100%; height: auto; display: block; }
+.flow-edge-bg { stroke: rgba(124, 160, 255, 0.16); stroke-width: 2; fill: none; }
+.flow-edge {
+  stroke: url(#demoFlowGrad);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  /* tracé via dashoffset : longueur ~ via path measurement JS */
+}
+.flow-dot { fill: #bfe6ff; filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.9)); }
+.flow-node-box {
+  fill: rgba(13, 19, 41, 0.92);
+  stroke: var(--line);
+  stroke-width: 1.5;
+  transition: stroke 0.4s var(--ease-out);
+}
+.flow-node[data-on='true'] .flow-node-box { stroke: rgba(56, 189, 248, 0.7); }
+.flow-node[data-on='true'] .flow-node-halo { opacity: 1; }
+.flow-node-halo { opacity: 0; transition: opacity 0.5s var(--ease-out); }
+.flow-node { cursor: default; outline: none; }
+.flow-node-label { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; fill: var(--txt); }
+.flow-node-idx { font-family: 'Space Grotesk', sans-serif; font-size: 9px; letter-spacing: 0.18em; fill: #6b76a0; text-transform: uppercase; }
+/* tooltip nœud (HTML overlay positionné en %) */
+.flow-tip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.3;
+  max-width: 200px;
+  text-align: center;
+  color: var(--txt-soft);
+  background: rgba(14, 21, 46, 0.97);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease-out);
+  z-index: 5;
+}
+.flow-tip[data-show='true'] { opacity: 1; }
+/* mobile : version empilée verticale */
+.flow-mobile { max-width: 24rem; margin: 48px auto 0; display: block; }
+@media (min-width: 768px) { .flow-mobile { display: none; } }
+.flow-stack { position: relative; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.flow-stack li { position: relative; }
+.flow-stack-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(13, 19, 41, 0.6);
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.flow-stack-step.is-in { opacity: 1; transform: none; }
+.flow-stack-dot {
+  flex-shrink: 0;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent-grad);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+}
+.flow-stack-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--txt); }
+.flow-stack-tip { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--txt-soft); }
+.flow-stack-line { position: absolute; left: 31px; top: 100%; height: 12px; width: 2px; background: linear-gradient(180deg, rgba(56, 189, 248, 0.5), rgba(91, 140, 255, 0.2)); }
+
+/* =====================================================================
+   10. MODULE 03 — BEFORE/AFTER SLIDER
+   ===================================================================== */
+.ba-shell { max-width: 48rem; margin: 56px auto 0; }
+.ba-wrap {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: pan-y;
+  aspect-ratio: 4 / 3;
+}
+@media (min-width: 640px) { .ba-wrap { aspect-ratio: 16 / 9; } }
+.ba-panel { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 20px; }
+@media (min-width: 640px) { .ba-panel { padding: 28px; } }
+.ba-before { background: linear-gradient(160deg, #0a0f1e, #0c1326); }
+.ba-after { background: linear-gradient(160deg, #0c1430, #0e1838); clip-path: inset(0 0 0 var(--pos, 50%)); }
+.ba-handle {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--pos, 50%);
+  width: 2px;
+  transform: translateX(-1px);
+  background: var(--accent-grad);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+  z-index: 3;
+}
+.ba-knob {
+  position: absolute;
+  top: 50%; left: var(--pos, 50%);
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(14, 21, 46, 0.95);
+  border: 1.5px solid var(--cyan);
+  box-shadow: 0 8px 26px -10px rgba(56, 189, 248, 0.8);
+  cursor: ew-resize;
+  color: var(--cyan);
+  z-index: 4;
+}
+.ba-knob:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.ba-tag {
+  position: absolute;
+  top: 14px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ba-tag-before { left: 14px; color: var(--txt-dim); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); }
+.ba-tag-after { right: 14px; color: var(--cyan); background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); z-index: 5; }
+.ba-mono {
+  margin-top: 40px;
+  font-family: 'Space Grotesk', 'Courier New', monospace;
+  font-size: clamp(11px, 1.5vw, 13px);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.ba-mono.before { color: var(--txt-dim); }
+.ba-mono.after { color: var(--txt); }
+.ba-hint { margin-top: 20px; text-align: center; font-size: 13px; color: var(--txt-dim); }
+
+/* =====================================================================
+   11. MODULE 04 — CALCULATEUR + COMPTEUR LIVE
+   ===================================================================== */
+.calc-grid { max-width: 64rem; margin: 56px auto 0; display: grid; gap: 24px; }
+@media (min-width: 1024px) { .calc-grid { grid-template-columns: 0.9fr 1.1fr; } }
+.d-card {
+  background: rgba(13, 19, 41, 0.66);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 34px -18px rgba(0, 0, 0, 0.7);
+  border-radius: 24px;
+}
+.calc-controls { display: flex; flex-direction: column; gap: 32px; padding: 28px; }
+@media (min-width: 768px) { .calc-controls { padding: 32px; } }
+.calc-row .row-head { margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between; }
+.calc-row label { color: var(--txt-soft); }
+.calc-val { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 24px; color: var(--txt); font-variant-numeric: tabular-nums; }
+.calc-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(124, 160, 255, 0.16);
+  outline: none;
+}
+.calc-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent-grad);
+  border: 2px solid #0b1020;
+  box-shadow: 0 4px 14px -4px rgba(56, 189, 248, 0.8);
+  cursor: pointer;
+}
+.calc-range::-moz-range-thumb {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 2px solid #0b1020;
+  box-shadow: 0 4px 14px -4px rgba(56, 189, 248, 0.8);
+  cursor: pointer;
+}
+.calc-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.range-scale { margin-top: 6px; display: flex; justify-content: space-between; font-size: 11px; color: var(--txt-dim); }
+.calc-note { font-size: 12.5px; line-height: 1.6; color: var(--txt-dim); }
+.calc-out { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+
+.calc-results { display: flex; flex-direction: column; justify-content: center; padding: 28px; }
+@media (min-width: 768px) { .calc-results { padding: 36px; } }
+.calc-results .big-label { color: var(--cyan); }
+.calc-big { font-family: 'Space Grotesk', sans-serif; font-weight: 600; margin-top: 4px; line-height: 1; color: var(--txt); font-size: clamp(56px, 12vw, 104px); }
+.calc-big .unit { margin-left: 8px; vertical-align: baseline; font-size: 0.35em; color: var(--txt-soft); }
+.calc-sub-grid { margin-top: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.calc-sub-card { border-radius: 16px; border: 1px solid var(--line); background: rgba(9, 14, 28, 0.5); padding: 20px; }
+.calc-sub-num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--txt); font-size: clamp(28px, 5vw, 40px); }
+.calc-sub-label { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--txt-soft); }
+
+/* compteur live d'impact */
+.live-box {
+  max-width: 64rem;
+  margin: 32px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: rgba(13, 19, 41, 0.45);
+  padding: 28px 24px;
+  text-align: center;
+}
+@media (min-width: 640px) { .live-box { flex-direction: row; gap: 20px; } }
+.live-big { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--txt); font-size: clamp(26px, 5vw, 44px); }
+.live-big .unit { margin-left: 8px; font-size: 0.5em; color: var(--txt-soft); }
+.live-counter { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; position: relative; display: inline-block; text-align: right; }
+.live-counter .placeholder { visibility: hidden; }
+.live-counter .value { position: absolute; inset: 0; color: var(--txt); }
+.live-caption { font-size: 14px; color: var(--txt-soft); }
+
+/* =====================================================================
+   12. FOOTER
+   ===================================================================== */
+.footer { border-top: 1px solid var(--line); padding: 56px 20px; text-align: center; }
+@media (min-width: 768px) { .footer { padding-left: 32px; padding-right: 32px; } }
+.footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 30px; color: var(--txt); }
+.footer p { margin: 16px auto 0; max-width: 28rem; font-size: 14px; line-height: 1.6; color: var(--txt-soft); }
+.footer .copy { margin-top: 24px; font-size: 12px; color: var(--txt-dim); }
+
+/* =====================================================================
+   13. REDUCED MOTION — états finaux statiques, on coupe tout flux
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal, .tool-chip-wrap, .flow-stack-step { opacity: 1 !important; transform: none !important; }
+  .ping .ring { display: none; }
+  /* l'arête du graphe reste tracée à 100% (dashoffset 0 posé par JS) */
+}
+</style>
+</head>
+
+<body>
+<a href="#mod-01" class="skip-link">Aller aux modules</a>
+
+<!-- fonds globaux -->
+<div class="demo-bg" aria-hidden="true"></div>
+<div class="demo-grid" aria-hidden="true"></div>
+
+<div class="demo-content">
+
+  <!-- ============================ NAV ============================ -->
+  <header class="nav-header">
+    <nav class="demo-nav" aria-label="Navigation des modules">
+      <a href="#top" class="nav-brand">AXEM<span class="d-grad-text">.</span><span class="tag">démo</span></a>
+      <div class="nav-anchors" id="navAnchors">
+        <a href="#mod-01" class="demo-anchor" data-anchor="mod-01" aria-label="Module 01">01<span class="dot">·</span></a>
+        <a href="#mod-02" class="demo-anchor" data-anchor="mod-02" aria-label="Module 02">02<span class="dot">·</span></a>
+        <a href="#mod-03" class="demo-anchor" data-anchor="mod-03" aria-label="Module 03">03<span class="dot">·</span></a>
+        <a href="#mod-04" class="demo-anchor" data-anchor="mod-04" aria-label="Module 04">04</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ============================ HERO ============================ -->
+    <section id="top" class="hero">
+      <div class="reveal hero-badge d-eyebrow">
+        <span class="ping"><span class="ring"></span><span class="core"></span></span>
+        Démo interactive · 4 modules
+      </div>
+      <h1 class="reveal d-display">L'interface, <span class="d-grad-text">jugée en vrai.</span></h1>
+      <p class="reveal hero-sub">
+        Quatre modules d'UX/UI interactifs, isolés pour évaluation. Survolez, glissez,
+        ajustez — chaque interaction est pensée pour être fluide, pas pour épater à vide.
+      </p>
+      <div class="reveal hero-chips">
+        <a href="#mod-01" class="hero-chip"><span class="num">01</span> Les outils</a>
+        <a href="#mod-02" class="hero-chip"><span class="num">02</span> La méthode</a>
+        <a href="#mod-03" class="hero-chip"><span class="num">03</span> La métamorphose</a>
+        <a href="#mod-04" class="hero-chip"><span class="num">04</span> L'impact</a>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 01 — GRILLE LOGOS ===================== -->
+    <section id="mod-01" class="section">
+      <div class="sec-head text-center wrap-2xl">
+        <div class="reveal eyebrow-row d-eyebrow"><span class="eyebrow-dot"></span>Module 01 · Les outils qu'on maîtrise</div>
+        <h2 class="reveal d-display">Une stack, <span class="d-grad-text">éclairée au curseur.</span></h2>
+        <p class="reveal">Passez la torche sur la grille : chaque outil s'illumine et révèle ce qu'on en fait. Sur mobile, touchez un outil pour afficher son usage.</p>
+      </div>
+      <div class="wrap-4xl">
+        <div class="tool-grid" id="toolGrid" data-lit="false">
+          <div class="tool-grid-torch" aria-hidden="true"></div>
+          <div class="tool-grid-inner" id="toolGridInner"><!-- chips injectées en JS --></div>
+        </div>
+        <p class="tool-hint">Spotlight + magnétisme actifs au pointeur · grille statique &amp; tap-reveal au tactile.</p>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 02 — NODE-GRAPH ===================== -->
+    <section id="mod-02" class="section">
+      <div class="sec-head text-center wrap-2xl">
+        <div class="reveal eyebrow-row d-eyebrow"><span class="eyebrow-dot"></span>Module 02 · Notre méthode</div>
+        <h2 class="reveal d-display">Un workflow <span class="d-grad-text">qui s'anime.</span></h2>
+        <p class="reveal">La ligne se trace, les nœuds s'allument en séquence et un point de donnée circule en continu. Survolez un nœud pour savoir ce qu'il fait.</p>
+      </div>
+
+      <!-- DESKTOP / TABLETTE — graphe horizontal SVG -->
+      <div class="flow-desktop" id="flowDesktop">
+        <svg viewBox="0 0 900 180" class="flow-svg" role="img" aria-label="Workflow : Audit, n8n, Claude, Make, Livrable">
+          <defs>
+            <linearGradient id="demoFlowGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#38bdf8" />
+              <stop offset="1" stop-color="#5b8cff" />
+            </linearGradient>
+          </defs>
+          <!-- edges : bg + tracé animé (dashoffset). flowPath posé en JS -->
+          <path class="flow-edge-bg" id="flowEdgeBg" d="" />
+          <path class="flow-edge" id="flowEdge" d="" />
+          <!-- point de données qui circule -->
+          <circle class="flow-dot" id="flowDot" r="4.5">
+            <animateMotion id="flowDotMotion" dur="4.5s" repeatCount="indefinite" path="" />
+          </circle>
+          <!-- nœuds injectés en JS -->
+          <g id="flowNodes"></g>
+        </svg>
+        <!-- tooltips HTML positionnés en % -->
+        <div id="flowTips"></div>
+      </div>
+
+      <!-- MOBILE — version empilée verticale -->
+      <div class="flow-mobile">
+        <ol class="flow-stack" id="flowStack"><!-- étapes injectées en JS --></ol>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 03 — BEFORE/AFTER ===================== -->
+    <section id="mod-03" class="section">
+      <div class="sec-head text-center wrap-2xl">
+        <div class="reveal eyebrow-row d-eyebrow"><span class="eyebrow-dot"></span>Module 03 · La métamorphose</div>
+        <h2 class="reveal d-display">Du brouillon <span class="d-grad-text">au livrable.</span></h2>
+        <p class="reveal">Glissez le séparateur (souris, doigt ou flèches du clavier) pour révéler ce que l'IA fait d'un email jeté en vrac : un message pro, prêt à envoyer.</p>
+      </div>
+      <div class="ba-shell">
+        <div class="ba-wrap" id="baWrap" style="--pos:50%">
+          <!-- BEFORE — input brut -->
+          <div class="ba-panel ba-before">
+            <span class="ba-tag ba-tag-before">Avant · brut</span>
+<pre class="ba-mono before">objet: rdv
+
+slt, donc voilà faudrait qu'on
+se voie pour parler du projet
+truc dont on avait parlé la
+dernière fois jsais plus quand
+exactement... t'es dispo quand ?
+genre cette semaine ou la
+prochaine ? bon a+</pre>
+          </div>
+          <!-- AFTER — résultat IA (clip-path piloté par --pos) -->
+          <div class="ba-panel ba-after">
+            <span class="ba-tag ba-tag-after">Après · IA</span>
+<pre class="ba-mono after">Objet : Point projet — créneau cette semaine ?
+
+Bonjour Camille,
+
+Je reviens vers vous concernant le projet
+évoqué récemment. Seriez-vous disponible
+pour un échange de 30 minutes ?
+
+Je vous propose jeudi 14 h ou vendredi 10 h —
+dites-moi ce qui vous arrange.
+
+Bien à vous,
+Léa</pre>
+          </div>
+          <!-- séparateur + knob accessible -->
+          <div class="ba-handle" aria-hidden="true"></div>
+          <div class="ba-knob" id="baKnob" role="slider" tabindex="0"
+               aria-label="Curseur avant / après" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M7 4 L3 9 L7 14 M11 4 L15 9 L11 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <p class="ba-hint">Glissez → ou utilisez ← / → au clavier. Même mock, deux états — aucune image lourde.</p>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 04 — CALCULATEUR ===================== -->
+    <section id="mod-04" class="section">
+      <div class="sec-head text-center wrap-2xl">
+        <div class="reveal eyebrow-row d-eyebrow"><span class="eyebrow-dot"></span>Module 04 · Combien vous récupérez</div>
+        <h2 class="reveal d-display">Le temps rendu, <span class="d-grad-text">en clair.</span></h2>
+        <p class="reveal">Ajustez votre équipe et les heures répétitives par personne. On traduit le gain en heures, en semaines de travail et en équivalent temps plein libéré.</p>
+      </div>
+
+      <div class="calc-grid">
+        <!-- curseurs -->
+        <div class="reveal d-card calc-controls">
+          <div class="calc-row">
+            <div class="row-head">
+              <label for="team" class="d-eyebrow">Taille d'équipe</label>
+              <span class="calc-val calc-out" id="teamOut">8</span>
+            </div>
+            <input id="team" class="calc-range" type="range" min="1" max="50" value="8" aria-valuetext="8 personnes" />
+            <div class="range-scale"><span>1</span><span>50</span></div>
+          </div>
+          <div class="calc-row">
+            <div class="row-head">
+              <label for="hours" class="d-eyebrow">Heures répétitives / sem / pers.</label>
+              <span class="calc-val calc-out" id="hoursOut">6 h</span>
+            </div>
+            <input id="hours" class="calc-range" type="range" min="1" max="20" value="6" aria-valuetext="6 heures" />
+            <div class="range-scale"><span>1 h</span><span>20 h</span></div>
+          </div>
+          <p class="calc-note">Hypothèse : ~40 % des tâches répétitives sont automatisables. Estimation indicative, affinée lors de l'audit.</p>
+        </div>
+
+        <!-- sorties -->
+        <div class="reveal d-card calc-results">
+          <div>
+            <div class="d-eyebrow big-label">Heures récupérables / mois</div>
+            <div class="calc-big d-display">
+              <span class="calc-out" id="outHours">83</span><span class="unit">h</span>
+            </div>
+          </div>
+          <div class="calc-sub-grid">
+            <div class="calc-sub-card">
+              <div class="calc-sub-num d-display"><span class="calc-out" id="outWeeks">2,4</span></div>
+              <div class="calc-sub-label">semaines de travail récupérées / mois</div>
+            </div>
+            <div class="calc-sub-card">
+              <div class="calc-sub-num d-display">≈ <span class="calc-out" id="outEtp">0,6</span></div>
+              <div class="calc-sub-label">ETP libéré sur l'année</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPTEUR LIVE d'impact -->
+      <div class="reveal live-box">
+        <span class="ping" style="height:10px;width:10px"><span class="ring"></span><span class="core" style="height:10px;width:10px"></span></span>
+        <span class="live-big d-display">
+          <span class="live-counter">
+            <span class="placeholder" aria-hidden="true">000 000</span>
+            <span class="value" id="liveValue"></span>
+          </span>
+          <span class="unit">heures</span>
+        </span>
+        <span class="live-caption">déjà économisées pour nos clients</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="footer">
+    <a href="#top" class="footer-brand">AXEM<span class="d-grad-text">.</span></a>
+    <p>Page de démo — 4 modules d'UX/UI interactifs pour évaluation. Une fois validés, on les généralise au site.</p>
+    <p class="copy">© 2026 AXEM IA — démo interne.</p>
+  </footer>
+
+</div>
+
+<script>
+/* =====================================================================
+   SCRIPT — toute l'interactivité vanilla. Sections numérotées.
+   prefers-reduced-motion respecté partout (états finaux statiques).
+   ===================================================================== */
+(function () {
+  'use strict';
+  var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* -------------------------------------------------------------------
+     0. REVEAL — fade + slide à l'entrée dans le viewport (IntersectionObserver).
+     Remplace framer-motion <Reveal>. Pas de scroll-listener par frame.
+     ------------------------------------------------------------------- */
+  function observeReveal(selector, cls) {
+    var els = Array.prototype.slice.call(document.querySelectorAll(selector));
+    if (REDUCE) { els.forEach(function (el) { el.classList.add(cls); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add(cls); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  }
+  observeReveal('.reveal', 'is-in');
+
+  /* -------------------------------------------------------------------
+     1. NAV — surligne l'ancre de la section active (IntersectionObserver).
+     ------------------------------------------------------------------- */
+  (function () {
+    var ids = ['mod-01', 'mod-02', 'mod-03', 'mod-04'];
+    var anchors = {};
+    document.querySelectorAll('.demo-anchor').forEach(function (a) {
+      anchors[a.getAttribute('data-anchor')] = a;
+    });
+    function setActive(id) {
+      ids.forEach(function (k) {
+        if (anchors[k]) anchors[k].setAttribute('data-active', k === id ? 'true' : 'false');
+      });
+    }
+    var io = new IntersectionObserver(function (entries) {
+      var vis = entries.filter(function (e) { return e.isIntersecting; })
+        .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; })[0];
+      if (vis) setActive(vis.target.id);
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5] });
+    ids.forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+  })();
+
+  /* -------------------------------------------------------------------
+     2. MODULE 01 — GRILLE LOGOS : chips + spotlight (lerp) + magnétique.
+     ------------------------------------------------------------------- */
+  var TOOLS = [
+    { name: 'Claude',      mono: 'C',  use: 'Agents & rédaction longue' },
+    { name: 'Claude Code', mono: '⌘', use: 'Dev assisté & refactor' },
+    { name: 'n8n',         mono: 'n8', use: 'Automatisations sur-mesure' },
+    { name: 'Make',        mono: 'M',  use: 'Connexions no-code' },
+    { name: 'OpenAI',      mono: 'OA', use: 'Génération & vision' },
+    { name: 'Mistral',     mono: 'Mi', use: 'Modèles souverains EU' },
+    { name: 'Gemini',      mono: 'G',  use: 'Multimodal & contexte long' },
+    { name: 'Perplexity',  mono: 'Px', use: 'Recherche sourcée' }
+  ];
+
+  (function () {
+    var inner = document.getElementById('toolGridInner');
+    var grid = document.getElementById('toolGrid');
+    if (!inner || !grid) return;
+
+    // construit les chips magnétiques
+    TOOLS.forEach(function (t, i) {
+      var wrap = document.createElement('div');
+      wrap.className = 'tool-chip-wrap';
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tool-chip';
+      btn.setAttribute('data-open', 'false');
+      btn.setAttribute('aria-label', t.name + ' — ' + t.use);
+      btn.innerHTML =
+        '<span class="tool-mono" aria-hidden="true">' + t.mono + '</span>' +
+        '<span class="tool-name d-display">' + t.name + '</span>' +
+        '<span class="tool-reveal" role="tooltip">' + t.use + '</span>';
+
+      // magnétique : translation lissée vers le curseur (~0.18 du delta). Desktop only.
+      var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+      function loop() {
+        cx += (tx - cx) * 0.2; cy += (ty - cy) * 0.2;
+        btn.style.transform = 'translate(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px)';
+        if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) { raf = requestAnimationFrame(loop); }
+        else { btn.style.transform = 'translate(' + tx + 'px,' + ty + 'px)'; raf = 0; }
+      }
+      if (HOVER && !REDUCE) {
+        btn.addEventListener('mousemove', function (e) {
+          var r = btn.getBoundingClientRect();
+          tx = (e.clientX - (r.left + r.width / 2)) * 0.18;
+          ty = (e.clientY - (r.top + r.height / 2)) * 0.18;
+          if (!raf) raf = requestAnimationFrame(loop);
+        });
+        btn.addEventListener('mouseleave', function () {
+          tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(loop);
+        });
+      }
+      // tap mobile : toggle reveal
+      btn.addEventListener('click', function () {
+        var open = btn.getAttribute('data-open') === 'true';
+        btn.setAttribute('data-open', open ? 'false' : 'true');
+      });
+
+      wrap.appendChild(btn);
+      inner.appendChild(wrap);
+
+      // reveal d'entrée échelonné
+      if (!REDUCE) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              setTimeout(function () { wrap.classList.add('is-in'); }, (i % 4) * 60);
+              io.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.3 });
+        io.observe(wrap);
+      } else { wrap.classList.add('is-in'); }
+    });
+
+    // spotlight : --mx/--my lissés en lerp, mousemove throttlé en rAF. Desktop only.
+    if (HOVER && !REDUCE) {
+      var target = { x: 0.5, y: 0.5 }, cur = { x: 0.5, y: 0.5 }, gRaf = 0;
+      function tick() {
+        cur.x += (target.x - cur.x) * 0.16;
+        cur.y += (target.y - cur.y) * 0.16;
+        grid.style.setProperty('--mx', (cur.x * 100) + '%');
+        grid.style.setProperty('--my', (cur.y * 100) + '%');
+        if (Math.abs(target.x - cur.x) > 0.001 || Math.abs(target.y - cur.y) > 0.001) {
+          gRaf = requestAnimationFrame(tick);
+        } else { gRaf = 0; }
+      }
+      grid.addEventListener('mousemove', function (e) {
+        var r = grid.getBoundingClientRect();
+        target.x = (e.clientX - r.left) / r.width;
+        target.y = (e.clientY - r.top) / r.height;
+        grid.setAttribute('data-lit', 'true');
+        if (!gRaf) gRaf = requestAnimationFrame(tick);
+      });
+      grid.addEventListener('mouseleave', function () { grid.setAttribute('data-lit', 'false'); });
+    }
+  })();
+
+  /* -------------------------------------------------------------------
+     3. MODULE 02 — NODE-GRAPH : path bézier, tracé (dashoffset), dot,
+        nœuds qui s'allument en séquence, tooltips au hover.
+     ------------------------------------------------------------------- */
+  var FLOW_NODES = [
+    { id: 'audit',  label: 'Audit',    x: 70,  tip: 'On cartographie vos tâches répétitives.' },
+    { id: 'n8n',    label: 'n8n',      x: 250, tip: 'Orchestration & automatisations sur-mesure.' },
+    { id: 'claude', label: 'Claude',   x: 430, tip: 'Raisonnement, rédaction, décisions.' },
+    { id: 'make',   label: 'Make',     x: 610, tip: 'Connexions no-code vers vos outils.' },
+    { id: 'liv',    label: 'Livrable', x: 790, tip: 'Résultat livré, mesuré, maintenu.' }
+  ];
+  var NODE_Y = 90, NODE_W = 110, NODE_H = 48;
+
+  // chemin reliant les centres (un seul path continu pour le dot)
+  var flowPath = (function () {
+    var cx = FLOW_NODES.map(function (n) { return n.x + NODE_W / 2; });
+    var cy = NODE_Y + NODE_H / 2;
+    var d = 'M ' + cx[0] + ' ' + cy;
+    for (var i = 1; i < cx.length; i++) {
+      var mid = (cx[i - 1] + cx[i]) / 2;
+      d += ' C ' + mid + ' ' + cy + ', ' + mid + ' ' + cy + ', ' + cx[i] + ' ' + cy;
+    }
+    return d;
+  })();
+
+  (function () {
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    var edgeBg = document.getElementById('flowEdgeBg');
+    var edge = document.getElementById('flowEdge');
+    var dotMotion = document.getElementById('flowDotMotion');
+    var nodesG = document.getElementById('flowNodes');
+    var tipsWrap = document.getElementById('flowTips');
+    var desk = document.getElementById('flowDesktop');
+    if (!edge || !nodesG) return;
+
+    edgeBg.setAttribute('d', flowPath);
+    edge.setAttribute('d', flowPath);
+    if (dotMotion) dotMotion.setAttribute('path', flowPath);
+
+    // construit les nœuds + tooltips
+    FLOW_NODES.forEach(function (n, i) {
+      var g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('class', 'flow-node');
+      g.setAttribute('data-on', REDUCE ? 'true' : 'false');
+      g.setAttribute('tabindex', '0');
+
+      var halo = document.createElementNS(SVGNS, 'rect');
+      halo.setAttribute('class', 'flow-node-halo');
+      halo.setAttribute('x', n.x - 5); halo.setAttribute('y', NODE_Y - 5);
+      halo.setAttribute('width', NODE_W + 10); halo.setAttribute('height', NODE_H + 10);
+      halo.setAttribute('rx', '16'); halo.setAttribute('fill', 'none');
+      halo.setAttribute('stroke', '#38bdf8'); halo.setAttribute('stroke-width', '1');
+      halo.setAttribute('opacity', '0');
+      halo.style.filter = 'drop-shadow(0 0 8px rgba(56,189,248,0.6))';
+
+      var box = document.createElementNS(SVGNS, 'rect');
+      box.setAttribute('class', 'flow-node-box');
+      box.setAttribute('x', n.x); box.setAttribute('y', NODE_Y);
+      box.setAttribute('width', NODE_W); box.setAttribute('height', NODE_H);
+      box.setAttribute('rx', '14');
+
+      var label = document.createElementNS(SVGNS, 'text');
+      label.setAttribute('class', 'flow-node-label');
+      label.setAttribute('x', n.x + NODE_W / 2); label.setAttribute('y', NODE_Y + NODE_H / 2 + 5);
+      label.setAttribute('text-anchor', 'middle');
+      label.textContent = n.label;
+
+      var idx = document.createElementNS(SVGNS, 'text');
+      idx.setAttribute('class', 'flow-node-idx');
+      idx.setAttribute('x', n.x + NODE_W / 2); idx.setAttribute('y', NODE_Y - 14);
+      idx.setAttribute('text-anchor', 'middle');
+      idx.textContent = String(i + 1).length < 2 ? '0' + (i + 1) : '' + (i + 1);
+
+      g.appendChild(halo); g.appendChild(box); g.appendChild(label); g.appendChild(idx);
+      nodesG.appendChild(g);
+
+      // tooltip HTML positionné en %
+      var tip = document.createElement('div');
+      tip.className = 'flow-tip';
+      tip.setAttribute('data-show', 'false');
+      tip.style.left = (((n.x + NODE_W / 2) / 900) * 100) + '%';
+      tip.style.top = ((NODE_Y / 180) * 100 - 4) + '%';
+      tip.textContent = n.tip;
+      tipsWrap.appendChild(tip);
+
+      function show() { tip.setAttribute('data-show', 'true'); }
+      function hide() { tip.setAttribute('data-show', 'false'); }
+      g.addEventListener('mouseenter', show);
+      g.addEventListener('mouseleave', hide);
+      g.addEventListener('focus', show);
+      g.addEventListener('blur', hide);
+    });
+
+    // tracé de l'arête : stroke-dashoffset (longueur réelle mesurée).
+    var len = edge.getTotalLength ? edge.getTotalLength() : 1000;
+    edge.style.strokeDasharray = len;
+    if (REDUCE) {
+      edge.style.strokeDashoffset = 0; // état final statique
+    } else {
+      edge.style.strokeDashoffset = len;
+      edge.style.transition = 'stroke-dashoffset 1.8s var(--ease-out)';
+
+      // séquence : tracé + allumage des nœuds quand visible (one-shot)
+      var nodeEls = nodesG.querySelectorAll('.flow-node');
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            requestAnimationFrame(function () { edge.style.strokeDashoffset = 0; });
+            FLOW_NODES.forEach(function (_, i) {
+              setTimeout(function () {
+                if (nodeEls[i]) nodeEls[i].setAttribute('data-on', 'true');
+              }, 350 + i * 320);
+            });
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.4 });
+      io.observe(desk);
+    }
+  })();
+
+  // version mobile empilée
+  (function () {
+    var stack = document.getElementById('flowStack');
+    if (!stack) return;
+    FLOW_NODES.forEach(function (n, i) {
+      var li = document.createElement('li');
+      var num = String(i + 1).length < 2 ? '0' + (i + 1) : '' + (i + 1);
+      li.innerHTML =
+        '<div class="flow-stack-step">' +
+          '<span class="flow-stack-dot" aria-hidden="true"></span>' +
+          '<div>' +
+            '<div class="flow-stack-title"><span class="cyan">' + num + '</span> · ' + n.label + '</div>' +
+            '<p class="flow-stack-tip">' + n.tip + '</p>' +
+          '</div>' +
+        '</div>' +
+        (i < FLOW_NODES.length - 1 ? '<span class="flow-stack-line" aria-hidden="true"></span>' : '');
+      stack.appendChild(li);
+
+      var step = li.querySelector('.flow-stack-step');
+      if (REDUCE) { step.classList.add('is-in'); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            setTimeout(function () { step.classList.add('is-in'); }, i * 80);
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      io.observe(step);
+    });
+  })();
+
+  /* -------------------------------------------------------------------
+     4. MODULE 03 — BEFORE/AFTER SLIDER (souris + tactile + clavier).
+        --pos : 0 = tout AFTER révélé, 100 = tout BEFORE.
+     ------------------------------------------------------------------- */
+  (function () {
+    var wrap = document.getElementById('baWrap');
+    var knob = document.getElementById('baKnob');
+    if (!wrap || !knob) return;
+    var pos = 50, dragging = false;
+
+    function apply() {
+      wrap.style.setProperty('--pos', pos + '%');
+      knob.setAttribute('aria-valuenow', Math.round(100 - pos));
+      knob.setAttribute('aria-valuetext', Math.round(100 - pos) + ' % de résultat IA révélé');
+    }
+    function fromClientX(clientX) {
+      var r = wrap.getBoundingClientRect();
+      var p = ((clientX - r.left) / r.width) * 100;
+      pos = Math.max(2, Math.min(98, p));
+      apply();
+    }
+    wrap.addEventListener('pointerdown', function (e) {
+      dragging = true; fromClientX(e.clientX);
+    });
+    window.addEventListener('pointermove', function (e) { if (dragging) fromClientX(e.clientX); });
+    window.addEventListener('pointerup', function () { dragging = false; });
+
+    knob.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { pos = Math.max(2, pos - 4); apply(); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { pos = Math.min(98, pos + 4); apply(); e.preventDefault(); }
+      else if (e.key === 'Home') { pos = 2; apply(); e.preventDefault(); }
+      else if (e.key === 'End') { pos = 98; apply(); e.preventDefault(); }
+    });
+    apply();
+  })();
+
+  /* -------------------------------------------------------------------
+     5. MODULE 04 — CALCULATEUR : count-up rAF one-shot + compteur live.
+     ------------------------------------------------------------------- */
+  (function () {
+    var team = document.getElementById('team');
+    var hours = document.getElementById('hours');
+    var teamOut = document.getElementById('teamOut');
+    var hoursOut = document.getElementById('hoursOut');
+    var outHours = document.getElementById('outHours');
+    var outWeeks = document.getElementById('outWeeks');
+    var outEtp = document.getElementById('outEtp');
+    if (!team || !hours) return;
+
+    var COEF = 0.4;
+    function fmtInt(n) { return Math.round(n).toLocaleString('fr-FR'); }
+    function fmtDec(n) { return n.toFixed(1).replace('.', ','); }
+    var EASE = function (t) { return 1 - Math.pow(1 - t, 3); }; // ease-out cubic
+
+    // anime un nombre depuis sa valeur courante vers une cible (rAF one-shot).
+    function makeAnimator(el, decimals, fmt) {
+      var current = parseFloat((el.textContent || '0').replace(',', '.')) || 0;
+      var raf = 0;
+      return function (value) {
+        if (REDUCE) { current = value; el.textContent = fmt(value); return; }
+        if (raf) cancelAnimationFrame(raf);
+        var from = current, start = null, dur = 600;
+        (function step(ts) {
+          if (start === null) start = ts;
+          var p = Math.min(1, (ts - start) / dur);
+          var v = from + (value - from) * EASE(p);
+          current = v;
+          el.textContent = fmt(decimals ? +v.toFixed(decimals) : v);
+          if (p < 1) { raf = requestAnimationFrame(step); }
+          else { current = value; el.textContent = fmt(value); raf = 0; }
+        })(performance.now());
+      };
+    }
+    var animHours = makeAnimator(outHours, 0, fmtInt);
+    var animWeeks = makeAnimator(outWeeks, 1, fmtDec);
+    var animEtp = makeAnimator(outEtp, 1, fmtDec);
+
+    function recompute() {
+      var t = +team.value, h = +hours.value;
+      teamOut.textContent = t;
+      hoursOut.textContent = h + ' h';
+      team.setAttribute('aria-valuetext', t + ' personnes');
+      hours.setAttribute('aria-valuetext', h + ' heures');
+
+      var hoursPerMonth = Math.round(t * h * 4.33 * COEF);
+      var weeks = +(hoursPerMonth / 35).toFixed(1);
+      var etp = +((hoursPerMonth * 12) / (35 * 47)).toFixed(1);
+
+      animHours(hoursPerMonth);
+      animWeeks(weeks);
+      animEtp(etp);
+    }
+    team.addEventListener('input', recompute);
+    hours.addEventListener('input', recompute);
+    recompute();
+  })();
+
+  /* -------------------------------------------------------------------
+     6. COMPTEUR LIVE — base + taux × secondes depuis minuit. Une boucle rAF,
+        largeur fixe (tabular-nums + placeholder) → anti-CLS.
+     ------------------------------------------------------------------- */
+  (function () {
+    var el = document.getElementById('liveValue');
+    if (!el) return;
+    var LIVE_BASE = 412000;   // heures déjà économisées (ancrage plausible)
+    var LIVE_RATE = 1.6;      // heures / seconde
+    var d = new Date(); d.setHours(0, 0, 0, 0);
+    var epoch = d.getTime() / 1000;
+    function compute() { return LIVE_BASE + LIVE_RATE * (Date.now() / 1000 - epoch); }
+    function fmt(n) { return Math.floor(n).toLocaleString('fr-FR'); }
+    el.textContent = fmt(compute()); // seed immédiat (couvre reduced-motion)
+    if (REDUCE) return;
+    (function loop() {
+      el.textContent = fmt(compute());
+      requestAnimationFrame(loop);
+    })();
+  })();
+
+})();
+</script>
+</body>
+</html>
