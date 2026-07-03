@@ -41,6 +41,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* V4 — sur pointeur fin (souris) uniquement ET hors reduced-motion, on masque
+   le curseur natif au profit du curseur magnétique custom. Tactile /
+   reduced-motion : curseur natif conservé (le composant custom ne se monte pas). */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body,
+  a, button, [role="button"], input, textarea, select, summary,
+  [data-magnetic] { cursor: none; }
+}
+
 /* Focus clavier visible (a11y) — teal */
 :focus-visible {
   outline: 2px solid #00827c;
@@ -132,6 +141,22 @@ body {
   font-size: clamp(36px, 6.5vw, 88px);
   line-height: 1.0;
   letter-spacing: -0.035em;
+}
+
+/* =====================================================================
+   TYPO CINÉTIQUE (V4) — titres qui morphent la graisse au survol.
+   La police Inter est chargée en VARIABLE (axe wght) ; ce helper pose la
+   graisse de repos via `font-variation-settings` (que le composant 21st
+   VariableFontHover pilote lettre-à-lettre au hover). `cursor: default` pour
+   signaler l'interactivité sans changer la sémantique.
+   ===================================================================== */
+.varfont-kinetic {
+  font-variation-settings: 'wght' 500;
+  cursor: default;
+}
+/* Sur pointeur fin (souris), on invite le survol ; le composant gère le reste. */
+@media (hover: hover) {
+  .varfont-kinetic { will-change: font-variation-settings; }
 }
 
 /* WATERMARK — wordmark géant très désaturé (lecture en arrière-plan) */

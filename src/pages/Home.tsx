@@ -11,6 +11,31 @@ import { Metamorphose } from '../components/Metamorphose';
 import { Parcours } from '../components/Parcours';
 import { useLenis } from '../ui/useLenis';
 import { LazySection } from '../ui/LazySection';
+import { VariableFontHoverByRandomLetter } from '../components/ui/VariableFontHover';
+
+// ---------------------------------------------------------------------
+// KineticAccent — mot d'accent typo CINÉTIQUE (composant 21st danielpetho).
+// Les lettres morphent leur graisse (Inter variable, axe wght) dans un ordre
+// aléatoire au survol/à la proximité du curseur. Reduced-motion → texte inerte
+// (on ne monte pas le composant animé). Garde la couleur d'accent `aurora-text`.
+// ---------------------------------------------------------------------
+const KineticAccent: React.FC<{ children: string; className?: string }> = ({
+  children,
+  className = 'aurora-text',
+}) => {
+  const reduce = useReducedMotion();
+  if (reduce) return <span className={className}>{children}</span>;
+  return (
+    <VariableFontHoverByRandomLetter
+      label={children}
+      className={`varfont-kinetic inline-block ${className}`}
+      fromFontVariationSettings="'wght' 500"
+      toFontVariationSettings="'wght' 900"
+      staggerDuration={0.028}
+      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+    />
+  );
+};
 
 // =====================================================================
 // AXEM IA — DA « AUROS · L'OBSERVATOIRE ÉDITORIAL ».
@@ -151,9 +176,14 @@ const Hero: React.FC = () => {
 
         {/* H1 — Inter display extrême + dégradé signature Auros (highlight → teal).
             Le « A » du « de A à Z. » = accent teal signature statique. */}
-        <h1 aria-label="Votre partenaire IA, de A à Z."
-          className="font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
-          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200 }}>
+        {/* H1 KINÉTIQUE — Inter VARIABLE : la graisse du titre morphe à la
+            proximité du curseur (whileHover). Coexiste avec la cascade RiseWords
+            au mount ; l'accent « à Z. » reçoit le morph par lettre (21st). */}
+        <motion.h1 aria-label="Votre partenaire IA, de A à Z."
+          className="varfont-kinetic font-serif-display mt-8 leading-[1.0] tracking-[0.02em] text-cream"
+          style={{ fontSize: 'clamp(40px, 9.5vw, 104px)', transformPerspective: 1200, fontVariationSettings: "'wght' 500" }}
+          initial={reduce ? undefined : { fontVariationSettings: "'wght' 500" }}
+          whileHover={reduce ? undefined : { fontVariationSettings: "'wght' 720", transition: { type: 'spring', stiffness: 200, damping: 26 } }}>
           <span aria-hidden>
             <RiseWords text="Votre partenaire IA," delay={0.3} stagger={0.08} />
             <br />
@@ -164,7 +194,7 @@ const Hero: React.FC = () => {
               <RiseWords text="à Z." delay={0.7} stagger={0.09} />
             </span>
           </span>
-        </h1>
+        </motion.h1>
 
         <motion.p
           {...revealMount(0.5, !!reduce)}
@@ -311,7 +341,7 @@ const Duo: React.FC = () => {
           <Reveal><Eyebrow>Les auteurs</Eyebrow></Reveal>
           {/* STATEMENT TYPO EXTRÊME en ouverture de la « page auteurs » */}
           <RevealType as="h2" className="display-md mt-2 text-cream">
-            On enseigne ce<br />qu'on <span className="aurora-text">déploie.</span>
+            On enseigne ce<br />qu'on <KineticAccent>déploie.</KineticAccent>
           </RevealType>
           <Reveal delay={0.12}>
             <p className="mt-7 max-w-xl text-[16px] leading-relaxed text-cream-soft">
@@ -422,7 +452,7 @@ const Resultats: React.FC = () => {
           <div>
             <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
             <RevealType as="h2" className="display-md text-cream">
-              Des résultats.<br /><span className="aurora-text">Pas des slides.</span>
+              Des résultats.<br /><KineticAccent>Pas des slides.</KineticAccent>
             </RevealType>
           </div>
           <Reveal delay={0.12}>
@@ -527,7 +557,7 @@ const Formation: React.FC = () => {
         <div className="max-w-3xl">
           <Reveal><Eyebrow>La formation</Eyebrow></Reveal>
           <RevealType as="h2" className="display-md text-cream">
-            On forme vos équipes<br /><span className="aurora-text">à faire sans nous.</span>
+            On forme vos équipes<br /><KineticAccent>à faire sans nous.</KineticAccent>
           </RevealType>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
@@ -617,7 +647,7 @@ const Methode: React.FC = () => {
       <div className="mx-auto max-w-4xl text-center">
         <Reveal><div className="flex justify-center"><Eyebrow>La méthode</Eyebrow></div></Reveal>
         <RevealType as="h2" className="display-md text-cream">
-          Quatre temps.<br /><span className="aurora-text">Une seule ligne.</span>
+          Quatre temps.<br /><KineticAccent>Une seule ligne.</KineticAccent>
         </RevealType>
       </div>
 
@@ -742,7 +772,7 @@ const Faq: React.FC = () => (
     <div className="mx-auto max-w-3xl">
       <Reveal><Eyebrow>Questions fréquentes</Eyebrow></Reveal>
       <RevealType as="h2" className="display-md mb-10 text-cream">
-        Tout ce qu'on <span className="aurora-text">nous demande.</span>
+        Tout ce qu'on <KineticAccent>nous demande.</KineticAccent>
       </RevealType>
       <div>
         {FAQ_ITEMS.map((f) => <FaqRow key={f.q} q={f.q} a={f.a} />)}
@@ -791,7 +821,7 @@ const CtaFinal: React.FC = () => {
         <div className="text-center lg:text-left">
           <Reveal><div className="flex justify-center lg:justify-start"><Eyebrow>30 minutes, gratuit</Eyebrow></div></Reveal>
           <RevealType as="h2" className="display-md text-cream">
-            Le parcours commence<br />par une <span className="aurora-text">conversation.</span>
+            Le parcours commence<br />par une <KineticAccent>conversation.</KineticAccent>
           </RevealType>
           <Reveal delay={0.12}>
             <p className="mx-auto mt-6 max-w-md text-[16px] leading-relaxed text-cream-soft lg:mx-0">
