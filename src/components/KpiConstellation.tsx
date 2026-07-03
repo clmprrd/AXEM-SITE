@@ -57,7 +57,9 @@ export const KpiConstellation: React.FC<Props> = ({ kpis }) => {
     // positions (centre de chaque nœud) relatives au wrap, en px CSS.
     let pts: { x: number; y: number }[] = [];
 
-    const measure = () => {
+    // (re)dimensionne le canvas — seulement au mount / resize (réassigner
+    // canvas.width chaque frame provoquerait un clignotement inutile).
+    const setSize = () => {
       const wr = wrap.getBoundingClientRect();
       W = Math.max(1, Math.floor(wr.width));
       H = Math.max(1, Math.floor(wr.height));
@@ -66,6 +68,11 @@ export const KpiConstellation: React.FC<Props> = ({ kpis }) => {
       canvas.style.width = W + 'px';
       canvas.style.height = H + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    // relit les positions des nœuds (centre) relatives au wrap — peu coûteux,
+    // appelé chaque frame pendant le tracé pour suivre les cartes qui se posent.
+    const measure = () => {
+      const wr = wrap.getBoundingClientRect();
       pts = nodeRefs.current.map((el) => {
         if (!el) return { x: 0, y: 0 };
         const r = el.getBoundingClientRect();
@@ -106,11 +113,13 @@ export const KpiConstellation: React.FC<Props> = ({ kpis }) => {
     };
 
     const ro = new ResizeObserver(() => {
+      setSize();
       measure();
       // au resize, on redessine à l'état courant (fini si déjà joué).
       drawLines(reduce || inView ? 1 : 0);
     });
     ro.observe(wrap);
+    setSize();
     measure();
 
     if (reduce) {
@@ -133,6 +142,10 @@ export const KpiConstellation: React.FC<Props> = ({ kpis }) => {
     let litCount = 0;
     const loop = (now: number) => {
       const p = Math.min(1, (now - t0) / dur);
+      // re-mesure chaque frame : les cartes-chiffres arrivent en spring (translate-y)
+      // pendant le tracé — les lignes suivent ainsi exactement les nœuds qui se posent.
+      // coût négligeable (6 rect reads, aucune écriture DOM interleaved).
+      measure();
       drawLines(p);
       // allume les nœuds au fil de la progression (0 → dernier).
       const target = Math.min(kpis.length, Math.floor(p * kpis.length + 0.5));
