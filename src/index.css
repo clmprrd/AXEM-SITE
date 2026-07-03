@@ -661,6 +661,109 @@ body {
   }
 }
 
+/* =====================================================================
+   CURSEUR MAGNÉTIQUE GLOBAL — « Constellation Synthèse ».
+   Point-étoile teal + anneau-traînée. Actif seulement sur pointeur fin
+   (desktop). On masque alors le curseur système. Jamais sur tactile ni
+   reduced-motion (le composant ne se monte pas dans ces cas).
+   ===================================================================== */
+.magnetic-dot {
+  width: 7px;
+  height: 7px;
+  background: #cbfffc;
+  box-shadow: 0 0 8px 1px rgba(63, 216, 207, 0.85), 0 0 2px rgba(203, 255, 252, 0.9);
+  will-change: transform;
+}
+.magnetic-ring {
+  border: 1px solid rgba(63, 216, 207, 0.55);
+  box-shadow: 0 0 18px -6px rgba(63, 216, 207, 0.5);
+  will-change: transform, width, height;
+}
+/* masque le curseur système quand le custom est actif (desktop only) */
+@media (hover: hover) and (pointer: fine) {
+  html.has-magnetic-cursor,
+  html.has-magnetic-cursor a,
+  html.has-magnetic-cursor button,
+  html.has-magnetic-cursor [role='button'],
+  html.has-magnetic-cursor label,
+  html.has-magnetic-cursor .btn {
+    cursor: none;
+  }
+  /* on garde un curseur natif là où le texte s'édite/se sélectionne */
+  html.has-magnetic-cursor input,
+  html.has-magnetic-cursor textarea,
+  html.has-magnetic-cursor select,
+  html.has-magnetic-cursor .drag-x {
+    cursor: auto;
+  }
+  html.has-magnetic-cursor .drag-x { cursor: grab; }
+  html.has-magnetic-cursor .drag-x:active { cursor: grabbing; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .magnetic-cursor-root { display: none !important; }
+}
+
+/* =====================================================================
+   KPI CONSTELLATION — le « moment signature ». Les chiffres résultats se
+   matérialisent en points-étoiles reliés par des lignes quand la section
+   entre à l'écran (IntersectionObserver / whileInView, pas de scroll-jacking).
+   ===================================================================== */
+.kpi-constellation {
+  position: relative;
+}
+.kpi-star {
+  position: relative;
+  transition: transform 0.4s var(--ease-out);
+}
+/* le point-étoile ancré à chaque KPI (relié par le canvas de lignes) */
+.kpi-node {
+  transition: box-shadow 0.6s var(--ease-out), background-color 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+.kpi-node[data-lit='true'] {
+  background-color: #cbfffc;
+  box-shadow: 0 0 0 4px rgba(63, 216, 207, 0.14), 0 0 16px rgba(63, 216, 207, 0.7);
+  transform: scale(1.15);
+}
+@media (prefers-reduced-motion: reduce) {
+  .kpi-star, .kpi-node { transition: none !important; }
+}
+
+/* =====================================================================
+   DUO ÉDITORIAL — portraits duotone teal (page auteurs).
+   Le duotone est obtenu par grayscale + une couche teal en mix-blend.
+   Au survol, la couche s'atténue et l'image reprend vie.
+   ===================================================================== */
+.duotone {
+  position: relative;
+  overflow: hidden;
+}
+.duotone img {
+  filter: grayscale(1) contrast(1.08) brightness(0.92);
+  transition: filter 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.duotone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 130, 124, 0.55) 0%, rgba(1, 29, 28, 0.72) 100%);
+  mix-blend-mode: color;
+  opacity: 0.9;
+  transition: opacity 0.6s var(--ease-out);
+  pointer-events: none;
+}
+.duotone:hover img {
+  filter: grayscale(0.35) contrast(1) brightness(1);
+  transform: scale(1.03);
+}
+.duotone:hover::after {
+  opacity: 0.35;
+}
+@media (prefers-reduced-motion: reduce) {
+  .duotone img, .duotone::after { transition: none !important; }
+  .duotone:hover img { transform: none; }
+}
+
 /* drag horizontal (galerie formation) — cache la scrollbar, snap doux */
 .drag-x {
   -ms-overflow-style: none;

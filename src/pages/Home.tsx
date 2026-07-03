@@ -14,6 +14,8 @@ import ParticleSphere from '../components/ParticleSphere';
 import { DuoReseau } from '../components/DuoReseau';
 import { SphereDivider } from '../components/SphereDivider';
 import { SafeCanvas } from '../ui/SafeCanvas';
+import { KpiConstellation } from '../components/KpiConstellation';
+import { MagneticCursor } from '../ui/MagneticCursor';
 
 // Fallback CSS (tons Auros) si WebGL indisponible — la page reste vivante.
 const GrainientFallback = (
@@ -291,13 +293,13 @@ const Probleme: React.FC = () => {
 // ---------------------------------------------------------------------
 // 6. LES RÉSULTATS — cartes parallaxe, chiffres count-up, détail hover-reveal.
 // ---------------------------------------------------------------------
-const KPIS: { val: React.ReactNode; label: string }[] = [
-  { val: <><CountUp to={80} />%</>, label: 'de temps de saisie économisé' },
-  { val: <CountUp to={95} suffix=" k€" />, label: 'de coûts neutralisés / an' },
-  { val: <>×<CountUp to={4} /></>, label: 'plus rapide sur le traitement' },
-  { val: <CountUp to={317} suffix=" h" />, label: 'libérées par mois' },
-  { val: <>&gt;<CountUp to={98} />%</>, label: 'd\'anomalies détectées' },
-  { val: <CountUp to={159} suffix=" %" />, label: 'de ROI sur 12 mois' },
+const KPIS: { val: React.ReactNode; label: string; sub?: string }[] = [
+  { val: <><CountUp to={80} />%</>, label: 'de temps de saisie économisé', sub: 'BTP' },
+  { val: <CountUp to={95} suffix=" k€" />, label: 'de coûts neutralisés / an', sub: 'BTP' },
+  { val: <>×<CountUp to={4} /></>, label: 'plus rapide sur le traitement', sub: 'Admin. judiciaire' },
+  { val: <CountUp to={317} suffix=" h" />, label: 'libérées par mois', sub: 'Aéro / ferroviaire' },
+  { val: <>&gt;<CountUp to={98} />%</>, label: 'd\'anomalies détectées', sub: 'Aéro / ferroviaire' },
+  { val: <CountUp to={159} suffix=" %" />, label: 'de ROI médian sur 12 mois', sub: 'Toutes missions' },
 ];
 const CASES = [
   { sector: 'BTP · Rénovation',
@@ -324,7 +326,7 @@ const Resultats: React.FC = () => {
       <div className="mx-auto max-w-6xl">
         <div className="grid items-end gap-8 md:grid-cols-[1.2fr_1fr]">
           <div>
-            <Reveal><Eyebrow>Résultats</Eyebrow></Reveal>
+            <Reveal><Eyebrow>Résultats · la constellation</Eyebrow></Reveal>
             <Reveal delay={0.06} perspective>
               <h2 className="font-serif-display leading-[0.98] tracking-[-0.01em] text-cream" style={{ fontSize: 'clamp(38px, 7vw, 84px)' }}>
                 Des résultats.<br /><span className="aurora-text italic">Pas des slides.</span>
@@ -333,23 +335,16 @@ const Resultats: React.FC = () => {
           </div>
           <Reveal delay={0.12}>
             <p className="text-[16px] leading-relaxed text-cream-soft md:pb-3">
-              Des chiffres réels, issus de missions menées de bout en bout. Anonymisés à la demande des clients.
+              Chaque chiffre est une étoile de notre constellation de missions — réels, menés de
+              bout en bout, anonymisés à la demande des clients. Ils se relient sous vos yeux.
             </p>
           </Reveal>
         </div>
 
-        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
-          {KPIS.map((k, i) => (
-            <motion.div key={i}
-              {...reveal((i % 3) * 0.08, !!reduce)}
-              className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
-              <div className="font-serif-display leading-[0.85] text-cream" style={{ fontSize: 'clamp(48px, 8vw, 104px)' }}>
-                {k.val}
-              </div>
-              <div className="mt-3 max-w-[200px] text-[13px] font-medium leading-snug text-cream-soft">{k.label}</div>
-            </motion.div>
-          ))}
-        </div>
+        {/* KPI CONSTELLATION — moment signature : les chiffres se matérialisent en
+            points-étoiles reliés par des lignes à l'entrée à l'écran (whileInView,
+            zéro scroll-jacking). Cf. src/components/KpiConstellation.tsx. */}
+        <KpiConstellation kpis={KPIS} />
 
         <div className="mt-24 grid gap-5 md:grid-cols-2">
           {CASES.map((c, i) => (
@@ -809,6 +804,9 @@ const Home: React.FC = () => {
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
+      {/* Curseur magnétique global — point-étoile + traînée. Desktop only,
+          désactivé tactile & reduced-motion (le composant se démonte). */}
+      <MagneticCursor />
       <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">

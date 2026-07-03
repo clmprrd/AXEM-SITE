@@ -78,9 +78,11 @@ const SAT_LABELS: { idx: number; text: string; align: string }[] = [
 
 const Portrait: React.FC<{ f: typeof FOUNDERS[number]; side: 'left' | 'right' }> = ({ f, side }) => (
   <div className={`group glass relative w-[min(86vw,340px)] overflow-hidden rounded-2xl ${side === 'left' ? 'md:mr-auto' : 'md:ml-auto'}`}>
-    <div className="relative overflow-hidden">
+    {/* portrait DUOTONE teal — traitement « page auteurs éditoriale ». Le duotone
+        s'atténue au survol (l'image reprend ses couleurs). Cf. .duotone dans index.css. */}
+    <div className="duotone relative overflow-hidden">
       <img src={f.img} alt={f.name} loading="lazy"
-        className="aspect-[5/4] w-full object-cover grayscale transition-[filter,transform] duration-500 [transition-timing-function:var(--ease-out)] group-hover:scale-[1.04] group-hover:grayscale-0" />
+        className="aspect-[5/4] w-full object-cover" />
       <div aria-hidden className="pointer-events-none absolute inset-0"
         style={{ background: 'linear-gradient(180deg, transparent 42%, rgba(1,29,28,0.92) 100%)' }} />
       <a href={f.li} target="_blank" rel="noopener noreferrer"
@@ -128,8 +130,14 @@ export const DuoReseau: React.FC = () => {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream-soft">
-              On enseigne ce qu'on déploie. La stratégie et la technique dans la même équipe —
-              et autour de nous, tout un réseau d'expertise, de missions et d'audience qui prend vie.
+              La stratégie et la technique dans la même équipe — et autour de nous, tout un
+              réseau d'expertise, de missions et d'audience qui prend vie.
+            </p>
+          </Reveal>
+          {/* baseline éditoriale signature — la promesse du duo, en gros. */}
+          <Reveal delay={0.16} perspective>
+            <p className="font-serif-display mt-8 text-cream" style={{ fontSize: 'clamp(24px, 3.4vw, 40px)', lineHeight: 1.1 }}>
+              « On enseigne <span className="aurora-text italic">ce qu'on déploie.</span> »
             </p>
           </Reveal>
         </div>
@@ -173,19 +181,22 @@ export const DuoReseau: React.FC = () => {
           </div>
         </div>
 
-        {/* impressions / abonnés en count-up — la portée du réseau */}
+        {/* PORTÉE DU RÉSEAU — gros chiffres éditoriaux (page auteurs). Bandeau
+            cadré par une hairline, chiffres XXL en count-up. */}
         <Reveal delay={0.1}>
-          <div className="mt-16 grid gap-8 sm:grid-cols-3">
-            {[
-              { v: <CountUp to={2.6} decimals={1} suffix=" M" />, l: 'impressions LinkedIn / mois' },
-              { v: <CountUp to={55} suffix=" k" />, l: 'abonnés cumulés' },
-              { v: <><CountUp to={5} />+</>, l: 'sessions dirigeants / semaine' },
-            ].map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="font-serif-display leading-none text-cream" style={{ fontSize: 'clamp(40px, 7vw, 72px)' }}>{s.v}</div>
-                <div className="mt-2 text-[12px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">{s.l}</div>
-              </div>
-            ))}
+          <div className="mt-20 border-t border-[rgba(63,216,207,0.16)] pt-12">
+            <div className="grid gap-10 sm:grid-cols-3">
+              {[
+                { v: <CountUp to={2.6} decimals={1} suffix=" M" />, l: 'impressions LinkedIn / mois' },
+                { v: <CountUp to={55} suffix=" k" />, l: 'abonnés cumulés' },
+                { v: <><CountUp to={5} />+</>, l: 'sessions dirigeants / semaine' },
+              ].map((s, i) => (
+                <div key={i} className="text-center">
+                  <div className="font-serif-display leading-[0.88] text-cream" style={{ fontSize: 'clamp(48px, 8.5vw, 88px)' }}>{s.v}</div>
+                  <div className="mt-3 text-[12px] font-satoshi font-bold uppercase tracking-[0.16em] text-cream-dim">{s.l}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </Reveal>
       </div>
