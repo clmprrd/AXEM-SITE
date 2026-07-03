@@ -645,3 +645,61 @@ body {
 .drag-x::-webkit-scrollbar { display: none; }
 .drag-x:active { cursor: grabbing; }
 .drag-x > * { scroll-snap-align: start; }
+
+/* =====================================================================
+   CURSEUR MAGNÉTIQUE GLOBAL (CursorField)
+   Point net + anneau-traînée. Actif desktop (hover:hover) uniquement ; le
+   composant ne se monte pas en tactile / reduced-motion. On masque le curseur
+   natif seulement quand le custom est actif (classe sur <html>).
+   ===================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  html.cursor-on,
+  html.cursor-on a,
+  html.cursor-on button,
+  html.cursor-on [data-cursor],
+  html.cursor-on [role="button"] {
+    cursor: none;
+  }
+}
+.cursor-field { contain: layout style size; }
+.cursor-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 9999px;
+  background: var(--mint, #cbfffc);
+  box-shadow: 0 0 8px rgba(34, 224, 200, 0.9);
+  will-change: transform;
+}
+.cursor-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(34, 224, 200, 0.6);
+  will-change: transform;
+}
+
+/* =====================================================================
+   KPI CONSTELLATION — le « moment waouh » capturable.
+   Cadre abyssal net (fond opaque pour un GIF propre), étoiles lumineuses.
+   ===================================================================== */
+.constellation-stage {
+  background:
+    radial-gradient(120% 120% at 50% 0%, #013331 0%, #012624 55%, #011817 100%);
+  border: 1px solid rgba(103, 232, 223, 0.14);
+  box-shadow: inset 0 0 80px rgba(1, 24, 23, 0.6);
+}
+.constellation-star {
+  background: var(--mint, #cbfffc);
+  box-shadow:
+    0 0 6px rgba(34, 224, 200, 0.9),
+    0 0 16px rgba(34, 224, 200, 0.5);
+  will-change: transform, opacity;
+}

@@ -4,8 +4,11 @@ import {
   useMotionValueEvent, useReducedMotion, useInView, MotionConfig,
 } from 'framer-motion';
 import Grainient from '../components/Grainient';
+import { HeroFlux } from '../components/HeroFlux';
 import ConstellationField from '../components/ConstellationField';
 import { Constellate } from '../components/Constellate';
+import { KpiConstellation } from '../components/KpiConstellation';
+import { CursorField } from '../ui/CursorField';
 import { DuoConstellation } from '../components/DuoConstellation';
 import { RiseWords, Reveal, CountUp, EASE, SPRING, reveal, revealMount } from '../ui/motion';
 import { PrimaryButton, SecondaryButton, MagneticPrimary } from '../ui/Button';
@@ -115,14 +118,14 @@ const Hero: React.FC = () => {
   const y = reduce ? '0%' : yRaw;
   return (
     <section id="top" ref={ref} className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-36 text-center md:px-8">
-      {/* Fond Grainient vert plein cadre — CONFINÉ au hero (z-0, pas fixed) */}
+      {/* Fond WebGL HeroFlux — distorsion pilotée par la VÉLOCITÉ du curseur.
+          CONFINÉ au hero (z-0, pas fixed). Fallback SafeCanvas interne : si le
+          contexte WebGL échoue, le canvas reste vide et le radial teal ci-dessous
+          transparait (jamais de page blanche). Fond CSS statique de secours. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0"
+        style={{ background: 'radial-gradient(120% 100% at 50% 30%, #013331 0%, #012624 55%, #011817 100%)' }} />
       <motion.div aria-hidden style={{ y }} className="pointer-events-none absolute inset-0 z-0">
-        <Grainient
-          className="h-full w-full"
-          color1={AZUR.color1} color2={AZUR.color2} color3={AZUR.color3}
-          timeSpeed={reduce ? 0 : 0.13} grainAmount={0.085} contrast={1.32}
-          saturation={1.0} zoom={1.05} warpStrength={1.15}
-        />
+        <HeroFlux className="h-full w-full" reduced={!!reduce} />
       </motion.div>
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]"
         style={{ background: 'radial-gradient(95% 85% at 50% 42%, rgba(1,38,36,0.28) 0%, rgba(1,38,36,0.64) 58%, rgba(1,24,23,0.94) 100%)' }} />
@@ -323,8 +326,14 @@ const Resultats: React.FC = () => {
           </Reveal>
         </div>
 
+        {/* MOMENT WAOUH — séquence constellation capturable en GIF (rejouable).
+            Les chiffres-résultats se matérialisent en étoiles puis se relient. */}
+        <div className="mt-16">
+          <KpiConstellation />
+        </div>
+
         {/* KPI = constellations qui se matérialisent depuis les particules du fond */}
-        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
+        <div className="mt-24 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-y-16">
           {KPIS.map((k, i) => (
             <Constellate key={i} dots={6} spread={110} delay={(i % 3) * 0.06}
               className={i % 2 === 1 ? 'md:translate-y-6' : ''}>
@@ -780,9 +789,18 @@ const Footer: React.FC = () => {
 // ---------------------------------------------------------------------
 const Home: React.FC = () => {
   useLenis();
+  const reduce = useReducedMotion();
+  // active le curseur custom (masque le natif) uniquement desktop + motion OK
+  React.useEffect(() => {
+    if (reduce) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    document.documentElement.classList.add('cursor-on');
+    return () => document.documentElement.classList.remove('cursor-on');
+  }, [reduce]);
   return (
     <MotionConfig reducedMotion="user">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
+      <CursorField />
       <div className="has-footer-reveal min-h-screen text-cream">
         <Nav />
         <main id="contenu" className="reveal-main">

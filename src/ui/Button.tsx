@@ -101,6 +101,7 @@ export const MagneticPrimary: React.FC<Common & { strength?: number }> = ({
       onMouseMove={onMove}
       onMouseLeave={reset}
       aria-label={ariaLabel}
+      data-magnetic
       style={reduce ? undefined : { x: tx, y: ty }}
       className={`btn btn-primary ${sizeCls(size)} ${className}`}>
       <Inner arrow={arrow} sweep>{children}</Inner>
