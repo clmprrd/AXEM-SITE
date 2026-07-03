@@ -19,7 +19,9 @@ module.exports = {
         'accent-soft': 'var(--accent-soft)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['General Sans', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        serif: ['Instrument Serif', 'Georgia', 'serif'],
       },
       maxWidth: {
         container: '1200px',
