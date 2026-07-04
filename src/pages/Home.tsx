@@ -4,6 +4,7 @@ import {
   Sun, Moon, ArrowRight, ArrowUpRight, Mail, Sparkles, FileText, ShieldCheck,
   Search, Compass, Workflow, GraduationCap, UserRound, Clapperboard, LifeBuoy, Check,
 } from 'lucide-react';
+import TimelineEra from '../components/TimelineEra';
 
 // =====================================================================
 // AXEM IA — système « de A à Z » (éditorial-technique, design-engineered)
@@ -544,6 +545,7 @@ const Home: React.FC = () => (
     <main>
       <Hero />
       <Trust />
+      <TimelineEra />
       <Services />
       <Results />
       <Method />
