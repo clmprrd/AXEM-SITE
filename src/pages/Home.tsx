@@ -5,6 +5,7 @@ import {
   Search, Compass, Workflow, GraduationCap, UserRound, Clapperboard, LifeBuoy, Check,
 } from 'lucide-react';
 import TimelineEra from '../components/TimelineEra';
+import AxemHero from '../components/AxemHero';
 
 // =====================================================================
 // AXEM IA — système « de A à Z » (éditorial-technique, design-engineered)
@@ -543,7 +544,7 @@ const Home: React.FC = () => (
   <div className="min-h-screen bg-bg">
     <Nav />
     <main>
-      <Hero />
+      <AxemHero />
       <Trust />
       <TimelineEra />
       <Services />

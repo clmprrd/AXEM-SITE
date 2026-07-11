@@ -26,8 +26,8 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #0b0b0a;
-  --bg-subtle: #100f0d;
+  --bg: #060605;
+  --bg-subtle: #0b0b0a;
   --surface: #151412;
   --surface-2: #1b1a17;
   --text: #f4f1ea;

@@ -9,7 +9,7 @@
 
     <!-- Anti-flash de thème : applique data-theme AVANT le rendu -->
     <style>
-      html[data-theme='dark'] { background: #0b0b0a; }
+      html[data-theme='dark'] { background: #050605; }
       html[data-theme='light'] { background: #fbfaf8; }
     </style>
     <script>
@@ -17,7 +17,7 @@
         try {
           var t = localStorage.getItem('axem-theme');
           if (t !== 'light' && t !== 'dark') {
-            t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            t = 'dark';
           }
           document.documentElement.setAttribute('data-theme', t);
           document.documentElement.style.colorScheme = t;
