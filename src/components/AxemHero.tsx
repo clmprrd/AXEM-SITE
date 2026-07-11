@@ -47,14 +47,18 @@ const Letter: React.FC<{ ch: string; px: MotionValue<number>; py: MotionValue<nu
   const scale = useSpring(useTransform(f, [0, 1], [1, 1.14]), { stiffness: 220, damping: 20 });
   return (
     <motion.span
-      ref={ref}
-      className="inline-block"
-      style={{ x: tx, y: ty, scale, color: accent ? 'var(--accent)' : undefined, willChange: 'transform' }}
-      initial={{ y: 120, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 1, delay: 0.15 + i * 0.07, ease }}
+      className="inline-block overflow-hidden"
+      initial={{ opacity: 0, y: '55%' }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.95, delay: 0.15 + i * 0.07, ease }}
     >
-      {ch}
+      <motion.span
+        ref={ref}
+        className="inline-block"
+        style={{ x: tx, y: ty, scale, color: accent ? 'var(--accent)' : undefined, willChange: 'transform' }}
+      >
+        {ch}
+      </motion.span>
     </motion.span>
   );
 };
@@ -73,7 +77,7 @@ const AxemName: React.FC = () => {
       className="relative flex select-none items-start justify-center leading-[0.82]"
       aria-label="AXEM"
     >
-      <h1 className="flex font-semibold tracking-[-0.04em] text-ink" style={{ fontSize: 'clamp(5rem, 26vw, 22rem)', fontWeight: 700 }}>
+      <h1 className="flex font-semibold tracking-[-0.05em] text-ink" style={{ fontSize: 'clamp(4rem, 20vw, 15rem)', fontWeight: 700 }}>
         {letters.map((ch, i) => (
           <Letter key={i} ch={ch} px={px} py={py} i={i} />
         ))}
