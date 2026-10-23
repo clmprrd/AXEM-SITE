@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/cowork", "destination": "/formation-cowork.html" },
+    { "source": "/cowork/", "destination": "/formation-cowork.html" }
+  ]
+}
